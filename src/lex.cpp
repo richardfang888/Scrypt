@@ -1,4 +1,4 @@
-# include "lex.hpp"
+# include "lib/lex.hpp"
 # include <ionmanip>
 # include <algorithm>
 
@@ -97,5 +97,9 @@ void printTokens(vector<Token> &tokens) {
 
 
 int main(int argc, const char** argv) {
+    string input;
+    getline(cin, input);
+    vector<Token> tokens = readTokens(input);
+    printTokens(tokens);
     return 0;
 }
