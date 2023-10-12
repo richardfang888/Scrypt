@@ -23,6 +23,9 @@ vector<Token> readTokens(string &input) {
         // handle newline
         switch (c) {
             // handle delimiters
+            case 'E':  // unsure about END token
+                createToken(currToken, tokens, END, "END", 3);
+                return tokens;
             case '\n':
                 currToken.lineNumber++;
                 currToken.columnNumber = 1;
