@@ -1,21 +1,23 @@
 # include "lib/lex.hpp"
 # include <iomanip>
+# include <iostream>
 # include <algorithm>
 
-vector<Token> readTokens(string &sinput) {
+using namespace std;
+
+// Helper function to create and push tokens
+void createToken(Token &currToken, vector<Token> &tokens, TokenType type, const string &text, int length) {
+    currToken.type = type;
+    currToken.text = text;
+    currToken.length = length;
+    tokens.push_back(currToken);
+    currToken.columnNumber += length;
+}
+vector<Token> readTokens(string &input) {
     vector<Token> tokens;
     Token currToken;
     currToken.lineNumber = 1;
     currToken.columnNumber = 1;
-
-    // Helper function to create and push tokens
-    void createToken(Token &currToken,TokenType type, const string& text, int length) {
-        currToken.type = type;
-        currToken.text = text;
-        currToken.length = length;
-        tokens.push_back(currToken);
-        currToken.columnNumber += length;
-    }
 
     for (char c : input) {
         // handle newline
@@ -29,24 +31,24 @@ vector<Token> readTokens(string &sinput) {
                 currToken.columnNumber++;
                 break;
             case '(':
-                createToken(currToken, LEFT_PAREN, "(", 1);
+                createToken(currToken, tokens, LEFT_PAREN, "(", 1);
                 break;
             case ')':
-                createToken(currToken, RIGHT_PAREN, ")", 1);
+                createToken(currToken, tokens, RIGHT_PAREN, ")", 1);
                 break;
 
             // handle operators
             case '+':
-                createToken(currToken, PLUS, "+", 1);
+                createToken(currToken, tokens, PLUS, "+", 1);
                 break;
             case '-':
-                createToken(currToken, MINUS, "-", 1);
+                createToken(currToken, tokens, MINUS, "-", 1);
                 break;
             case '*':
-                createToken(currToken, TIMES, "*", 1);
+                createToken(currToken, tokens, TIMES, "*", 1);
                 break;
             case '/':
-                createToken(currToken, DIVIDES, "/", 1);
+                createToken(currToken, tokens, DIVIDES, "/", 1);
                 break;
             
             // handle numbers
@@ -61,14 +63,16 @@ vector<Token> readTokens(string &sinput) {
             case '8':
             case '9':
             case '.':
-                if currToken.type == FLOAT:
+                if (currToken.type == FLOAT) {
                     currToken.text += c;
                     currToken.length++;
-                    currToekn.lineNumber = tokens.back().lineNumber; 
+                    currToken.lineNumber = tokens.back().lineNumber; 
                     tokens.pop_back();
-                    createToken(currToken, FLOAT, currToken.text, currToken.length);
-                else:
-                    createToken(currToken, FLOAT, c, 1);
+                    createToken(currToken, tokens, FLOAT, currToken.text, currToken.length);
+                }
+                else {
+                    createToken(currToken, tokens, FLOAT, string(1, c), 1);
+                }
                 break;
         }
     }
