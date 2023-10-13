@@ -136,9 +136,9 @@ void printTokens(vector<Token> &tokens) {
 
 
 int main(int argc, const char** argv) {
-    // string input;
-    // getline(cin, input);
-    string input = "(+(-2 4.444 )\n32(* 5 13.45)(\n";
+    string input;
+    getline(cin, input);
+    // string input = "(+(-2 4.444 )\n32(* 5 13.45)(\n";
     vector<Token> tokens = readTokens(input);
     printTokens(tokens);
     return 0;
