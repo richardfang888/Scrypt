@@ -20,17 +20,22 @@ vector<Token> readTokens(string &input) {
     currToken.columnNumber = 1;
 
     for (char c : input) {
+        // try to make this contained in case '.'
+        if (currToken.type == DOT && !(c >= '0' && c <= '9')) {
+            tokens.back().type = OTHER;
+            tokens.back().columnNumber += tokens.back().length;
+            return tokens;
+        }
         // handle newline
         switch (c) {
             // handle delimiters
-            case 'E':  // unsure about END token
-                createToken(currToken, tokens, END, "END", 3);
-                return tokens;
             case '\n':
+                currToken.type = NEWLINE;
                 currToken.lineNumber++;
                 currToken.columnNumber = 1;
                 break;
             case ' ':
+                currToken.type = WHITESPACE;
                 currToken.columnNumber++;
                 break;
             case '(':
@@ -65,11 +70,10 @@ vector<Token> readTokens(string &input) {
             case '7':
             case '8':
             case '9':
-            case '.':
-                if (currToken.type == FLOAT) {
+                if (currToken.type == FLOAT || currToken.type == DOT) {
                     currToken.text += c;
                     currToken.length++;
-                    currToken.lineNumber = tokens.back().lineNumber; 
+                    currToken.columnNumber = tokens.back().columnNumber; 
                     tokens.pop_back();
                     createToken(currToken, tokens, FLOAT, currToken.text, currToken.length);
                 }
@@ -77,6 +81,24 @@ vector<Token> readTokens(string &input) {
                     createToken(currToken, tokens, FLOAT, string(1, c), 1);
                 }
                 break;
+            case '.':
+                if (currToken.type != FLOAT) {
+                    createToken(currToken, tokens, OTHER, string(1, c), 1);
+                    return tokens;
+                }
+                else {
+                    currToken.text += c;
+                    currToken.length++;
+                    currToken.columnNumber = tokens.back().columnNumber; 
+                    tokens.pop_back();
+                    createToken(currToken, tokens, DOT, currToken.text, currToken.length);
+                }
+                break;
+            
+            // handle unknown tokens (syntax error)
+            default:
+                createToken(currToken, tokens, OTHER, string(1, c), 1);
+                return tokens;
         }
     }
 
@@ -84,6 +106,16 @@ vector<Token> readTokens(string &input) {
 }
 
 void printTokens(vector<Token> &tokens) {
+    if (tokens.back().type == TokenType::OTHER) {
+        cout << "Syntax error on line " << tokens.back().lineNumber << " column " 
+             << tokens.back().columnNumber << endl;
+        return;
+    }
+
+    if (tokens.back().type != TokenType::END) {
+        tokens.push_back(Token{TokenType::END, "END", 0, tokens.back().lineNumber + 1, 1});
+    }
+    
     int maxLineNumWidth = 0;
     int maxColNumWidth = 0;
 
@@ -97,15 +129,16 @@ void printTokens(vector<Token> &tokens) {
 
     for (const Token& token : tokens) {
         cout << right << setw(maxLineNumWidth) << token.lineNumber << " "
-                << right << setw(maxColNumWidth) << token.columnNumber << " "
-                << token.text << endl;
+             << right << setw(maxColNumWidth) << token.columnNumber << " "
+             << token.text << endl;
     }
 }
 
 
 int main(int argc, const char** argv) {
-    string input;
-    getline(cin, input);
+    // string input;
+    // getline(cin, input);
+    string input = "(+(-2 4.444 )\n32(* 5 13.45)(\n";
     vector<Token> tokens = readTokens(input);
     printTokens(tokens);
     return 0;

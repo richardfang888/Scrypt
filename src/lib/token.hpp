@@ -16,11 +16,17 @@ enum TokenType {
 
     // numbers
     FLOAT,
+    DOT,
 
     // delimiters
+    NEWLINE,
+    WHITESPACE,
     LEFT_PAREN,
     RIGHT_PAREN,
-    END
+    END,
+
+    // other unexpected tokens (syntax error)
+    OTHER
 };
 
 struct Token {
