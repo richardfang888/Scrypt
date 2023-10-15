@@ -100,9 +100,9 @@ vector<Token> readTokens(string &input) {
                 break;
             
             // handle unknown tokens (syntax error)
-            default:
-                createToken(currToken, tokens, OTHER, string(1, c), 1);
-                return tokens;
+            // default:
+            //     createToken(currToken, tokens, OTHER, string(1, c), 1);
+            //     return tokens;
         }
     }
 
