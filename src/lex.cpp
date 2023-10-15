@@ -26,9 +26,8 @@ vector<Token> readTokens(string &input) {
             tokens.back().columnNumber += tokens.back().length;
             return tokens;
         }
-        // handle newline
+        // handle delimiters
         switch (c) {
-            // handle delimiters
             case '\n':
                 currToken.type = NEWLINE;
                 currToken.lineNumber++;
@@ -44,6 +43,10 @@ vector<Token> readTokens(string &input) {
             case ')':
                 createToken(currToken, tokens, RIGHT_PAREN, ")", 1);
                 break;
+            // unsure how to handle END token
+            case 'E':
+                createToken(currToken, tokens, END, "END", 1);
+                return tokens;
 
             // handle operators
             case '+':
