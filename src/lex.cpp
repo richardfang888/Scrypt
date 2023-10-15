@@ -109,6 +109,10 @@ vector<Token> readTokens(string &input) {
         }
     }
 
+    if (tokens.back().type != TokenType::END) {
+        tokens.push_back(Token{TokenType::END, "END", 0, currToken.lineNumber, currToken.columnNumber});
+    }
+
     return tokens;
 }
 
@@ -117,10 +121,6 @@ void printTokens(vector<Token> &tokens) {
         cout << "Syntax error on line " << tokens.back().lineNumber << " column " 
              << tokens.back().columnNumber << "." << endl;
         exit(1);
-    }
-
-    if (tokens.back().type != TokenType::END) {
-        tokens.push_back(Token{TokenType::END, "END", 0, tokens.back().lineNumber, 1});
     }
 
     for (const Token& token : tokens) {
