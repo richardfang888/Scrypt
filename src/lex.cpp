@@ -13,6 +13,7 @@ void createToken(Token &currToken, vector<Token> &tokens, TokenType type, const 
     tokens.push_back(currToken);
     currToken.columnNumber += length;
 }
+
 vector<Token> readTokens(string &input) {
     vector<Token> tokens;
     Token currToken;
@@ -20,7 +21,6 @@ vector<Token> readTokens(string &input) {
     currToken.columnNumber = 1;
 
     for (char c : input) {
-        // try to make this contained in case '.'
         if (currToken.type == DOT && !(c >= '0' && c <= '9')) {
             tokens.back().type = OTHER;
             tokens.back().columnNumber += tokens.back().length;
@@ -147,7 +147,6 @@ int main(int argc, const char** argv) {
     while (!cin.eof()) {
         text += cin.get();
     }
-    cout << text << endl;
 
     tokens = readTokens(text);
     printTokens(tokens);
