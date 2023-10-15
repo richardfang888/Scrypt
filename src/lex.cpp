@@ -13,7 +13,7 @@ void createToken(Token &currToken, vector<Token> &tokens, TokenType type, const 
     tokens.push_back(currToken);
     currToken.columnNumber += length;
 }
-vector<Token> readTokens(string &input, int lineNumber) {
+vector<Token> readTokens(string &input) {
     vector<Token> tokens;
     Token currToken;
     currToken.lineNumber = 1;
@@ -137,13 +137,15 @@ void printTokens(vector<Token> &tokens) {
 
 int main(int argc, const char** argv) {
     string input;
-    int line = 0;
+    string text;
+    vector<Token> tokens;
+
     while (!cin.eof()) {
-        line++;
-        if (getline(cin, input)) {
-            vector<Token> tokens = readTokens(input, line);
-            printTokens(tokens);
-        }
+        text += cin.get();
     }
+
+    tokens = readTokens(text);
+    printTokens(tokens);
+
     return 0;
 }
