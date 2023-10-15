@@ -87,7 +87,7 @@ vector<Token> readTokens(string &input) {
                 }
                 break;
             case '.':
-                if (currToken.type != FLOAT) {
+                if (currToken.type != FLOAT || currToken.text.find(".") != string::npos) {
                     createToken(currToken, tokens, OTHER, string(1, c), 1);
                     return tokens;
                 }
@@ -137,8 +137,6 @@ int main(int argc, const char** argv) {
     while (!cin.eof()) {
         text += cin.get();
     }
-    
-    text.erase(text.size() - 1);
 
     tokens = readTokens(text);
     printTokens(tokens);
