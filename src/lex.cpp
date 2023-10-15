@@ -134,8 +134,8 @@ int main(int argc, const char** argv) {
     string text;
     vector<Token> tokens;
 
-    while (!cin.eof()) {
-        text += cin.get();
+    while (getline(cin, input)) {
+        text += input + '\n';
     }
 
     tokens = readTokens(text);
