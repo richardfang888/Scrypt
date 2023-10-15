@@ -137,6 +137,8 @@ int main(int argc, const char** argv) {
     while (!cin.eof()) {
         text += cin.get();
     }
+    
+    text.erase(text.size() - 1);
 
     tokens = readTokens(text);
     printTokens(tokens);
