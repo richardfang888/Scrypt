@@ -45,10 +45,6 @@ vector<Token> readTokens(string &input) {
             case ')':
                 createToken(currToken, tokens, RIGHT_PAREN, ")", 1);
                 break;
-            // unsure how to handle END token
-            case '\0':
-                createToken(currToken, tokens, END, "END", 1);
-                return tokens;
 
             // handle operators
             case '+':
@@ -110,7 +106,7 @@ vector<Token> readTokens(string &input) {
     }
 
     if (tokens.back().type != TokenType::END) {
-        tokens.push_back(Token{TokenType::END, "END", 0, currToken.lineNumber, currToken.columnNumber});
+        createToken(currToken, tokens, END, "END", 0);
     }
 
     return tokens;
