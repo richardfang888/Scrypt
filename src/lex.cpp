@@ -26,6 +26,7 @@ vector<Token> readTokens(string &input) {
             tokens.back().columnNumber += tokens.back().length;
             return tokens;
         }
+
         // handle delimiters
         switch (c) {
             case '\n':
@@ -100,9 +101,11 @@ vector<Token> readTokens(string &input) {
                 break;
             
             // handle unknown tokens (syntax error)
-            // default:
-            //     createToken(currToken, tokens, OTHER, string(1, c), 1);
-            //     return tokens;
+            default:
+                if (!isspace(c)) {
+                    createToken(currToken, tokens, OTHER, string(1, c), 1);
+                    return tokens;
+                }
         }
     }
 
@@ -119,22 +122,9 @@ void printTokens(vector<Token> &tokens) {
     if (tokens.back().type != TokenType::END) {
         tokens.push_back(Token{TokenType::END, "END", 0, tokens.back().lineNumber, 1});
     }
-    
-    int maxLineNumWidth = 0;
-    int maxColNumWidth = 0;
 
     for (const Token& token : tokens) {
-        int lineNumWidth = to_string(token.lineNumber).length();
-        int colNumWidth = to_string(token.columnNumber).length();
-
-        maxLineNumWidth = max(maxLineNumWidth, lineNumWidth);
-        maxColNumWidth = max(maxColNumWidth, colNumWidth);
-    }
-
-    for (const Token& token : tokens) {
-        cout << right << setw(maxLineNumWidth) << token.lineNumber << " "
-             << right << setw(maxColNumWidth) << token.columnNumber << " "
-             << token.text << endl;
+        cout << setw(4) << token.lineNumber << setw(5) << token.columnNumber << "  " << token.text << endl;
     }
 }
 
