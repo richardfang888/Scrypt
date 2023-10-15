@@ -134,6 +134,9 @@ int main(int argc, const char** argv) {
         getline(cin, input);
         text += input + '\n';
     }
+    if (!text.empty()) {
+        text = text.substr(0, text.size() - 1);
+    }
 
     tokens = readTokens(text);
     printTokens(tokens);
