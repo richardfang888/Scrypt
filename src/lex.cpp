@@ -45,7 +45,7 @@ vector<Token> readTokens(string &input) {
                 createToken(currToken, tokens, RIGHT_PAREN, ")", 1);
                 break;
             // unsure how to handle END token
-            case 'E':
+            case '\0':
                 createToken(currToken, tokens, END, "END", 1);
                 return tokens;
 
@@ -109,11 +109,11 @@ vector<Token> readTokens(string &input) {
     return tokens;
 }
 
-bool printTokens(vector<Token> &tokens) {
+void printTokens(vector<Token> &tokens) {
     if (tokens.back().type == TokenType::OTHER) {
         cout << "Syntax error on line " << tokens.back().lineNumber << " column " 
              << tokens.back().columnNumber << "." << endl;
-        return false;
+        exit(1);
     }
 
     if (tokens.back().type != TokenType::END) {
@@ -136,8 +136,6 @@ bool printTokens(vector<Token> &tokens) {
              << right << setw(maxColNumWidth) << token.columnNumber << " "
              << token.text << endl;
     }
-    
-    return true;
 }
 
 
@@ -151,9 +149,7 @@ int main(int argc, const char** argv) {
     }
 
     tokens = readTokens(text);
-    if (printTokens(tokens)) {
-        return 0;
-    }
+    printTokens(tokens);
 
-    return 1;
+    return 0;
 }
