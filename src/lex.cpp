@@ -34,6 +34,7 @@ vector<Token> readTokens(string &input) {
                 currToken.columnNumber = 1;
                 break;
             case ' ':
+            case '\t':
                 currToken.type = WHITESPACE;
                 currToken.columnNumber++;
                 break;
@@ -146,6 +147,7 @@ int main(int argc, const char** argv) {
     while (!cin.eof()) {
         text += cin.get();
     }
+    cout << text << endl;
 
     tokens = readTokens(text);
     printTokens(tokens);
