@@ -4,6 +4,6 @@ void createToken(Token &currToken, vector<Token> &tokens, TokenType type, const 
 
 vector<Token> readTokens(string &input);
 
-void printTokens(vector<Token> &tokens);
+bool printTokens(vector<Token> &tokens);
 
 

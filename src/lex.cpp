@@ -109,15 +109,15 @@ vector<Token> readTokens(string &input) {
     return tokens;
 }
 
-void printTokens(vector<Token> &tokens) {
+bool printTokens(vector<Token> &tokens) {
     if (tokens.back().type == TokenType::OTHER) {
         cout << "Syntax error on line " << tokens.back().lineNumber << " column " 
-             << tokens.back().columnNumber << endl;
-        return;
+             << tokens.back().columnNumber << "." << endl;
+        return false;
     }
 
     if (tokens.back().type != TokenType::END) {
-        tokens.push_back(Token{TokenType::END, "END", 0, tokens.back().lineNumber + 1, 1});
+        tokens.push_back(Token{TokenType::END, "END", 0, tokens.back().lineNumber, 1});
     }
     
     int maxLineNumWidth = 0;
@@ -136,6 +136,8 @@ void printTokens(vector<Token> &tokens) {
              << right << setw(maxColNumWidth) << token.columnNumber << " "
              << token.text << endl;
     }
+    
+    return true;
 }
 
 
@@ -149,7 +151,9 @@ int main(int argc, const char** argv) {
     }
 
     tokens = readTokens(text);
-    printTokens(tokens);
+    if (printTokens(tokens)) {
+        return 0;
+    }
 
     return 1;
 }
