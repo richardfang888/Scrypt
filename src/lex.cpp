@@ -13,7 +13,7 @@ void createToken(Token &currToken, vector<Token> &tokens, TokenType type, const 
     tokens.push_back(currToken);
     currToken.columnNumber += length;
 }
-vector<Token> readTokens(string &input) {
+vector<Token> readTokens(string &input, int lineNumber) {
     vector<Token> tokens;
     Token currToken;
     currToken.lineNumber = 1;
@@ -137,9 +137,13 @@ void printTokens(vector<Token> &tokens) {
 
 int main(int argc, const char** argv) {
     string input;
-    getline(cin, input);
-    // string input = "(+(-2 4.444 )\n32(* 5 13.45)(\n";
-    vector<Token> tokens = readTokens(input);
-    printTokens(tokens);
+    int line = 0;
+    while (!cin.eof()) {
+        line++;
+        if (getline(cin, input)) {
+            vector<Token> tokens = readTokens(input, line);
+            printTokens(tokens);
+        }
+    }
     return 0;
 }
