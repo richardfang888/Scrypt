@@ -127,12 +127,17 @@ void printTokens(vector<Token> &tokens) {
 
 int main(int argc, const char** argv) {
     string input;
-    string text;
+    stringstream ss;
     vector<Token> tokens;
 
     while (!cin.eof()) {
         getline(cin, input);
-        text += input + '\n';
+        ss << input << '\n';
+    }
+    
+    string text = ss.str();
+    if (!text.empty()) {
+        text.pop_back();
     }
 
     tokens = readTokens(text);
