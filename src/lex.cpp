@@ -106,7 +106,7 @@ vector<Token> readTokens(string &input) {
     }
 
     if (tokens.back().type != TokenType::END) {
-        createToken(currToken, tokens, END, "END", 0);
+        createToken(currToken, tokens, END, "END", 1);
     }
 
     return tokens;
@@ -130,7 +130,8 @@ int main(int argc, const char** argv) {
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input)) {
+    while (!cin.eof()) {
+        getline(cin, input);
         text += input + '\n';
     }
 
