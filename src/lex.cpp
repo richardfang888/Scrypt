@@ -151,5 +151,5 @@ int main(int argc, const char** argv) {
     tokens = readTokens(text);
     printTokens(tokens);
 
-    return 0;
+    return 1;
 }
