@@ -135,8 +135,9 @@ int main(int argc, const char** argv) {
             text += input + "\n";
         }
     }
-
-    
+    // if (text.back() == '\n') {
+    //     text.pop_back();
+    // }
 
     tokens = readTokens(text);
     printTokens(tokens);
