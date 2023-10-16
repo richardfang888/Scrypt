@@ -107,7 +107,7 @@ vector<Token> readTokens(string &input) {
 
     if (tokens.back().type == DOT) {
         createToken(currToken, tokens, OTHER, ".", 1);
-        cout << "trailing";
+        cout << tokens.back().type << endl;
     }
 
     if (tokens.back().type != TokenType::END) {
