@@ -23,7 +23,7 @@ vector<Token> readTokens(string &input) {
 
     for (char c : input) {
         if (currToken.type == DOT && !(c >= '0' && c <= '9')) {
-            currToken.columnNumber += currToken.length; 
+            // currToken.columnNumber += currToken.length; 
             createToken(currToken, tokens, OTHER, string(1, c), 1);
             cout << "trailing dot" << endl;
             return tokens;
