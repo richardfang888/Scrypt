@@ -17,6 +17,7 @@ void createToken(Token &currToken, vector<Token> &tokens, TokenType type, const 
 vector<Token> readTokens(string &input) {
     vector<Token> tokens;
     Token currToken;
+    currToken.type = OTHER;
     currToken.lineNumber = 1;
     currToken.columnNumber = 1;
 

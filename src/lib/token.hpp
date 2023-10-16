@@ -1,6 +1,3 @@
-// token.hpp
-// header file for token struct
-
 #pragma once
 # include <string>
 # include <vector>
