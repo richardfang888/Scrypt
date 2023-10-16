@@ -135,9 +135,10 @@ int main(int argc, const char** argv) {
     string text;
     vector<Token> tokens;
 
-    while (!cin.eof()) {
-        if (getline(cin, input)) {
-            text += input;
+    while (getline(cin, input)) {
+        text += input;
+        if (!cin.eof()) {
+            text += '\n';
         }
     }
 
