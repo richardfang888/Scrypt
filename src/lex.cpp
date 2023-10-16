@@ -22,7 +22,9 @@ vector<Token> readTokens(string &input) {
     currToken.columnNumber = 1;
 
     for (char c : input) {
-        if (currToken.type == DOT && !(c >= '0' && c <= '9')) {\
+        if (currToken.type == DOT && !(c >= '0' && c <= '9')) {
+            cout << c << endl;
+            cout << currToken.columnNumber << endl;
             currToken.columnNumber = tokens.back().columnNumber + tokens.back().length; 
             createToken(currToken, tokens, OTHER, string(1, c), 1);
             return tokens;
@@ -106,12 +108,7 @@ vector<Token> readTokens(string &input) {
         }
     }
 
-    if (tokens.back().type == TokenType::DOT) {
-        currToken.columnNumber = tokens.back().columnNumber; 
-        tokens.pop_back();
-        createToken(currToken, tokens, OTHER, ".", 1);
-    }
-    else if (tokens.back().type != TokenType::END) {
+    if (tokens.back().type != TokenType::END) {
         createToken(currToken, tokens, END, "END", 1);
     }
 
