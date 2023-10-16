@@ -105,12 +105,12 @@ vector<Token> readTokens(string &input) {
         }
     }
 
+    // post-processing
     if (tokens.back().type == DOT) {
         createToken(currToken, tokens, OTHER, "error", 1);
         cout << tokens.back().text << endl;
     }
-
-    if (tokens.back().type != TokenType::END) {
+    else if  (tokens.back().type != TokenType::END) {
         createToken(currToken, tokens, END, "END", 1);
     }
 
