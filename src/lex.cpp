@@ -23,7 +23,7 @@ vector<Token> readTokens(string &input) {
 
     for (char c : input) {
         if (currToken.type == DOT && !(c >= '0' && c <= '9')) {\
-            currToken.columnNumber += tokens.back().length; 
+            currToken.columnNumber = tokens.back().columnNumber + tokens.back().length; 
             createToken(currToken, tokens, OTHER, string(1, c), 1);
             return tokens;
         }
