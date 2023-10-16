@@ -131,11 +131,12 @@ int main(int argc, const char** argv) {
     vector<Token> tokens;
 
     while (!cin.eof()) {
-        getline(cin, input);
-        text += input + '\n';
+        if (getline(cin, input)) {
+            text += input + "\n";
+        }
     }
+
     
-    text.pop_back();
 
     tokens = readTokens(text);
     printTokens(tokens);
