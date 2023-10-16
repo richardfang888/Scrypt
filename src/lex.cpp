@@ -22,10 +22,8 @@ vector<Token> readTokens(string &input) {
     currToken.columnNumber = 1;
 
     for (char c : input) {
-        if (currToken.type == DOT && !(c >= '0' && c <= '9')) {
-            // currToken.columnNumber += currToken.length; 
+        if (currToken.type == DOT && !(c >= '0' && c <= '9')) { 
             createToken(currToken, tokens, OTHER, string(1, c), 1);
-            cout << "trailing" << endl;
             return tokens;
         }
 
@@ -105,6 +103,10 @@ vector<Token> readTokens(string &input) {
                     return tokens;
                 }
         }
+    }
+
+    if (tokens.back().type == DOT) {
+        createToken(currToken, tokens, OTHER, ".", 1);
     }
 
     if (tokens.back().type != TokenType::END) {
