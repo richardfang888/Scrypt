@@ -105,7 +105,7 @@ vector<Token> readTokens(string &input) {
         }
     }
 
-    if (tokens.back().type != TokenType::DOT) {
+    if (tokens.back().type == TokenType::DOT) {
         currToken.columnNumber = tokens.back().columnNumber; 
         tokens.pop_back();
         createToken(currToken, tokens, OTHER, ".", 1);
@@ -137,11 +137,8 @@ int main(int argc, const char** argv) {
 
     while (!cin.eof()) {
         if (getline(cin, input)) {
-            text += input + "\n";
+            text += input;
         }
-    }
-    if (text.back() == '\n') {
-        text.pop_back();
     }
 
     tokens = readTokens(text);
