@@ -132,7 +132,9 @@ int main(int argc, const char** argv) {
 
     while (!cin.eof()) {
         getline(cin, input);
-        text += input + '\n';
+        if (!input.empty()) {
+            text += input + '\n';
+        }
     }
 
     tokens = readTokens(text);
