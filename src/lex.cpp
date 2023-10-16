@@ -23,7 +23,7 @@ vector<Token> readTokens(string &input) {
 
     for (char c : input) {
         if (currToken.type == DOT && !(c >= '0' && c <= '9')) { 
-            createToken(currToken, tokens, OTHER, string(1, c), 1);
+            createToken(currToken, tokens, OTHER, "error", 1);
             return tokens;
         }
 
@@ -84,7 +84,7 @@ vector<Token> readTokens(string &input) {
                 break;
             case '.':
                 if (currToken.type != FLOAT || currToken.text.find(".") != string::npos) {
-                    createToken(currToken, tokens, OTHER, string(1, c), 1);
+                    createToken(currToken, tokens, OTHER, "error", 1);
                     return tokens;
                 }
                 else {
@@ -106,8 +106,8 @@ vector<Token> readTokens(string &input) {
     }
 
     if (tokens.back().type == DOT) {
-        createToken(currToken, tokens, OTHER, ".", 1);
-        cout << tokens.back().type << endl;
+        createToken(currToken, tokens, OTHER, "error", 1);
+        cout << tokens.back().text << endl;
     }
 
     if (tokens.back().type != TokenType::END) {
