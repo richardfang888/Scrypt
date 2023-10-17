@@ -138,9 +138,14 @@ Node *AST::getRoot() const
 
 void AST::printInfix() const
 {
-    cout << "(";
+    if (root && root->token.type != FLOAT)
+        cout << "(";
+
     printInfix(root);
-    cout << ")";
+
+    if (root && root->token.type != FLOAT)
+        cout << ")";
+
     cout << endl;
 }
 void AST::printInfix(const Node *node) const
@@ -150,7 +155,11 @@ void AST::printInfix(const Node *node) const
 
     if (node->token.type == FLOAT)
     {
-        cout << node->token.text;
+        double val = stod(node->token.text);
+        if (val == static_cast<int>(val))
+            cout << static_cast<int>(val);
+        else
+            cout << node->token.text;
     }
     else
     {
