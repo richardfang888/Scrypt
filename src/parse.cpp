@@ -58,6 +58,15 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
             node->children.push_back(makeTree(tokens, index, eindex));
         }
 
+        if ((node->token.type == PLUS || node->token.type == MINUS ||
+             node->token.type == TIMES || node->token.type == DIVIDES) &&
+            node->children.size() != 2)
+        {
+            printErrorTwo(node->token);
+            deleteNode(node); // clean up the node to avoid memory leaks
+            return nullptr;
+        }
+
         if (index < eindex && tokens[index].type == RIGHT_PAREN)
         {
             index++;
@@ -65,6 +74,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         else
         {
             printErrorTwo(tokens[index]);
+            deleteNode(node);
             return nullptr;
         }
 
@@ -217,7 +227,7 @@ int main(int argc, const char **argv)
         }
     }
 
-    // text = "(* (? 1 2) 3 (/ 4 5 (- 6 7)))";
+    // text = "(+ 1)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
