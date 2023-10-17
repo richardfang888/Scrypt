@@ -138,7 +138,9 @@ Node *AST::getRoot() const
 
 void AST::printInfix() const
 {
+    cout << "(";
     printInfix(root);
+    cout << ")";
     cout << endl;
 }
 void AST::printInfix(const Node *node) const
