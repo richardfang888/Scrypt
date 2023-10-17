@@ -22,6 +22,7 @@ int main(int argc, const char **argv)
 
     // text = "(+(-2 4.444 ) 32(* 5 13.45))";
     tokens = readTokens(text);
+    checkLexErrors(tokens);
     printTokens(tokens);
 
     return 0;

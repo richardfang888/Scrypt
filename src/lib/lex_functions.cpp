@@ -128,7 +128,7 @@ vector<Token> readTokens(string &input)
     return tokens;
 }
 
-void printTokens(vector<Token> &tokens)
+void checkLexErrors(vector<Token> &tokens)
 {
     if (tokens.back().type == TokenType::OTHER)
     {
@@ -136,7 +136,10 @@ void printTokens(vector<Token> &tokens)
              << tokens.back().columnNumber << "." << endl;
         exit(1);
     }
+}
 
+void printTokens(vector<Token> &tokens)
+{
     for (const Token &token : tokens)
     {
         cout << setw(4) << token.lineNumber << setw(5) << token.columnNumber << "  " << token.text << endl;

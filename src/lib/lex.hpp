@@ -5,3 +5,5 @@ void createToken(Token &currToken, vector<Token> &tokens, TokenType type, const 
 vector<Token> readTokens(string &input);
 
 void printTokens(vector<Token> &tokens);
+
+void checkLexErrors(vector<Token> &tokens);
