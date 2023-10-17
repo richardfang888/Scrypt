@@ -6,7 +6,7 @@ using namespace std;
 AST::AST(const vector<Token> &tokens)
 {
     int index = 0;
-    root = buildTree(tokens, index, tokens.size() - 1);
+    root = makeTree(tokens, index, tokens.size() - 1);
 }
 
 AST::~AST()
@@ -26,7 +26,7 @@ void AST::deleteNode(Node *node)
     }
 }
 
-Node *AST::buildTree(const vector<Token> &tokens, int &index, int eindex)
+Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 {
     if (index > eindex)
     {
@@ -51,7 +51,7 @@ Node *AST::buildTree(const vector<Token> &tokens, int &index, int eindex)
 
         while (index < eindex && tokens[index].type != RIGHT_PAREN)
         {
-            node->children.push_back(buildTree(tokens, index, eindex));
+            node->children.push_back(makeTree(tokens, index, eindex));
         }
 
         if (index < eindex && tokens[index].type == RIGHT_PAREN)
@@ -191,7 +191,7 @@ int main(int argc, const char **argv)
         }
     }
 
-    // text = "(+(-2 4.444 ) 32(* 5 13.45))";
+    // text = "(* (+ 1 2) 3 (/ 4 5 (- 6 7)))";
     tokens = readTokens(text);
 
     AST ast(tokens);

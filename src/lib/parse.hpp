@@ -1,4 +1,4 @@
-#include "lexer.cpp"
+#include "lex.hpp"
 
 struct Node
 {
@@ -20,9 +20,7 @@ private:
     Node *root;
 
     double evaluate(Node *root) const;
-    Node *buildTree(const vector<Token> &tokens, int &index, int eindex);
+    Node *makeTree(const vector<Token> &tokens, int &index, int eindex);
     void deleteNode(Node *node);
     void printInfix(const Node *node) const;
 };
-
-void printInfix(const Node *node);

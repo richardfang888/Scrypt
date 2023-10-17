@@ -1,6 +1,10 @@
-#include "lib/lexer.cpp"
+#include "lib/lex.hpp"
+#include <iomanip>
+#include <iostream>
+#include <algorithm>
 
 using namespace std;
+
 int main(int argc, const char **argv)
 {
     string input;
