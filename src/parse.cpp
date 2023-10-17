@@ -70,12 +70,13 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 
         while (index < eindex && tokens[index].type != RIGHT_PAREN)
         {
-            // if (node->children.size() > 0 && tokens[index].type != LEFT_PAREN)
-            // {
-            //     printErrorTwo(tokens[index]);
-            //     deleteNode(node);
-            //     return nullptr;
-            // }
+            // If there are too few operands before the right parenthesis, throw an error
+            if (tokens[index].type == RIGHT_PAREN && node->children.size() < 2)
+            {
+                printErrorTwo(tokens[index]);
+                deleteNode(node);
+                return nullptr;
+            }
             node->children.push_back(makeTree(tokens, index, eindex));
         }
 
@@ -88,16 +89,13 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
             return nullptr;
         }
 
-        if (index < eindex && tokens[index].type == RIGHT_PAREN)
+        if (index == eindex || tokens[index].type != RIGHT_PAREN)
         {
-            index++;
-        }
-        else
-        {
-            printErrorTwo(tokens[index]);
+            printErrorTwo(tokens[index - 1]); // Print error for the operator that lacks operands
             deleteNode(node);
             return nullptr;
         }
+        index++;
 
         return node;
     }
