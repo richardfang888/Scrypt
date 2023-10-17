@@ -30,8 +30,8 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 {
     if (index > eindex)
     {
-        cerr << "Error: Invalid S expression. Unexpected end of input." << endl;
-        return nullptr;
+        cerr << "Unexpected end of input." << endl;
+        exit(2);
     }
 
     Token token = tokens[index];
@@ -67,11 +67,18 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 
         return node;
     }
+    else if (token.type == END)
+    {
+        cerr << "Unexpected token at line " << token.lineNumber
+             << " column " << token.columnNumber
+             << ": " << token.text << endl;
+        exit(2);
+    }
     else
     {
-        cerr << "Error: Invalid S expression. Unexpected token '" << token.text << "'" << endl;
-        index++;
-        return nullptr;
+        cerr << "Unexpected token '" << token.text << "' at line " << token.lineNumber
+             << " column " << token.columnNumber << endl;
+        exit(2); // Exit with exit code 2
     }
 }
 
@@ -209,7 +216,15 @@ int main(int argc, const char **argv)
 
     AST ast(tokens);
     ast.printInfix();
-    cout << ast.evaluateAST() << endl;
+    double result = ast.evaluateAST();
+
+    if (result == 0.0 && ast.getRoot() == nullptr)
+    {
+        cerr << "Runtime error: division by zero." << endl;
+        return 3;
+    }
+
+    cout << result << endl;
 
     return 0;
 }
