@@ -28,13 +28,13 @@ void AST::deleteNode(Node *node)
 
 Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 {
-    Token token = tokens[index];
-
     if (index > eindex)
     {
-        printErrorTwo(token);
+        printErrorTwo(tokens[index]);
+        return nullptr;
     }
 
+    Token token = tokens[index];
     if (token.type == FLOAT)
     {
         Node *node = new Node();
@@ -60,6 +60,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         else
         {
             printErrorTwo(tokens[index]);
+            return nullptr;
         }
 
         return node;
@@ -67,6 +68,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
     else
     {
         printErrorTwo(token);
+        Token token = tokens[index];
     }
 }
 
