@@ -192,9 +192,11 @@ int main(int argc, const char **argv)
     string input;
     string text;
     vector<Token> tokens;
+    int lines = 0;
 
     while (getline(cin, input))
     {
+        lines++;
         text += input;
         if (!cin.eof())
         {
@@ -203,6 +205,13 @@ int main(int argc, const char **argv)
     }
 
     // text = "(* (+ 1 2) 3 (/ 4 5 (- 6 7)))";
+
+    if (lines > 1)
+    {
+        cerr << "error, multiple expressions." << endl;
+        return 1;
+    }
+
     tokens = readTokens(text);
 
     AST ast(tokens);
