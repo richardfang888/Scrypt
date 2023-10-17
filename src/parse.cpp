@@ -45,57 +45,35 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         Node *node = new Node();
         node->token = token;
         index++;
-        // if (index < eindex && (tokens[index].type == PLUS || tokens[index].type == MINUS ||
-        //                        tokens[index].type == TIMES || tokens[index].type == DIVIDES))
-        // {
-        //     printErrorTwo(tokens[index]);
-        //     delete node;
-        //     return nullptr;
-        // }
         return node;
     }
     else if (token.type == LEFT_PAREN)
     {
         Node *node = new Node();
         index++;
-        node->token = tokens[index++];
-
-        if (node->token.type != PLUS && node->token.type != MINUS &&
-            node->token.type != TIMES && node->token.type != DIVIDES)
+        if (index < eindex && (tokens[index].text != "+" || tokens[index].text != "-" ||
+                               tokens[index].text != "*" || tokens[index].text != "/"))
         {
-            printErrorTwo(node->token);
-            deleteNode(node);
+
+            printErrorTwo(tokens[index]);
             return nullptr;
         }
+        node->token = tokens[index++];
 
         while (index < eindex && tokens[index].type != RIGHT_PAREN)
         {
-            // If there are too few operands before the right parenthesis, throw an error
-            if (tokens[index].type == RIGHT_PAREN && node->children.size() < 2)
-            {
-                printErrorTwo(tokens[index]);
-                deleteNode(node);
-                return nullptr;
-            }
             node->children.push_back(makeTree(tokens, index, eindex));
         }
 
-        if ((node->token.type == PLUS || node->token.type == MINUS ||
-             node->token.type == TIMES || node->token.type == DIVIDES) &&
-            node->children.size() < 2)
+        if (index < eindex && tokens[index].type == RIGHT_PAREN)
         {
-            printErrorTwo(node->token);
-            deleteNode(node);
+            index++;
+        }
+        else
+        {
+            printErrorTwo(tokens[index]);
             return nullptr;
         }
-
-        if (index == eindex || tokens[index].type != RIGHT_PAREN)
-        {
-            printErrorTwo(tokens[index - 1]); // Print error for the operator that lacks operands
-            deleteNode(node);
-            return nullptr;
-        }
-        index++;
 
         return node;
     }
@@ -237,16 +215,16 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
-    // text = "(* (+ 1 2) 3 (/ 4 5 (- 6 7)))";
+    text = "(1 2 6 7)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
