@@ -120,7 +120,7 @@ vector<Token> readTokens(string &input)
     {
         createToken(currToken, tokens, OTHER, "error", 1);
     }
-    else if (tokens.back().type != TokenType::END)
+    else if (tokens.empty() || tokens.back().type != TokenType::END)
     {
         createToken(currToken, tokens, END, "END", 1);
     }
