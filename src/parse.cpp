@@ -124,7 +124,7 @@ double AST::evaluate(Node *node) const
                 }
                 else
                 {
-                    cerr << "Runtime error: division by zero." << endl;
+                    cout << "Runtime error: division by zero." << endl;
                     exit(3);
                 }
             }
@@ -217,7 +217,7 @@ int main(int argc, const char **argv)
         }
     }
 
-    // text = "";
+    // text = "(* (? 1 2) 3 (/ 4 5 (- 6 7)))";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
