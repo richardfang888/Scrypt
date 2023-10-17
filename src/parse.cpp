@@ -7,7 +7,7 @@ AST::AST(const vector<Token> &tokens)
 {
     if (tokens.empty())
     {
-        printErrorTwo(Token{END, "", 1, 1});
+        printErrorTwo(Token{END, "", 0, 1, 1});
         return;
     }
     int index = 0;
