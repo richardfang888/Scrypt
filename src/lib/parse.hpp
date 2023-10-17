@@ -1,22 +1,28 @@
-# include "lexer.cpp"
+#include "lexer.cpp"
 
-struct Node {
+struct Node
+{
     Token token;
-    vector<Node*> children;
+    vector<Node *> children;
 };
 
+class AST
+{
+public:
+    AST(const vector<Token> &tokens);
+    ~AST();
 
-class AST {
-    public:
-        AST(const vector<Token>& tokens);
-        double evaluateAST();
-        Node* getRoot() const;
-        void printInfix();
-        virtual ~AST() {}
-    
-    private:
-        Node *root;
-        double evaluate(Node *root);
-        Node* buildTree(const vector<Token>& tokens, int index, int eindex);
+    double evaluateAST();
+    Node *getRoot() const;
+    void printInfix() const;
 
+private:
+    Node *root;
+
+    double evaluate(Node *root) const;
+    Node *buildTree(const vector<Token> &tokens, int &index, int eindex);
+    void deleteNode(Node *node);
+    void printInfix(const Node *node) const;
 };
+
+void printInfix(const Node *node);
