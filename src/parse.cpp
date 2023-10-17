@@ -45,6 +45,13 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         Node *node = new Node();
         node->token = token;
         index++;
+        // if (index < eindex && (tokens[index].type == PLUS || tokens[index].type == MINUS ||
+        //                        tokens[index].type == TIMES || tokens[index].type == DIVIDES))
+        // {
+        //     printErrorTwo(tokens[index]);
+        //     delete node;
+        //     return nullptr;
+        // }
         return node;
     }
     else if (token.type == LEFT_PAREN)
@@ -63,12 +70,12 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 
         while (index < eindex && tokens[index].type != RIGHT_PAREN)
         {
-            if (node->children.size() > 0 && tokens[index].type != LEFT_PAREN)
-            {
-                printErrorTwo(tokens[index]);
-                deleteNode(node);
-                return nullptr;
-            }
+            // if (node->children.size() > 0 && tokens[index].type != LEFT_PAREN)
+            // {
+            //     printErrorTwo(tokens[index]);
+            //     deleteNode(node);
+            //     return nullptr;
+            // }
             node->children.push_back(makeTree(tokens, index, eindex));
         }
 
@@ -232,16 +239,16 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
-    // text = "(1 2 6 7)";
+    text = "(* (+ 1 2) 3 (/ 4 5 (- 6 7)))";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
