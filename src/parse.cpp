@@ -28,13 +28,12 @@ void AST::deleteNode(Node *node)
 
 Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 {
+    Token token = tokens[index];
+
     if (index > eindex)
     {
-        cerr << "Unexpected end of input." << endl;
-        exit(2);
+        printErrorTwoAndExit(token);
     }
-
-    Token token = tokens[index];
 
     if (token.type == FLOAT)
     {
@@ -60,25 +59,14 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         }
         else
         {
-            cerr << "Error: Invalid S expression. Missing or misplaced right parenthesis." << endl;
-            deleteNode(node);
-            return nullptr;
+            printErrorTwoAndExit(tokens[index]);
         }
 
         return node;
     }
-    else if (token.type == END)
-    {
-        cerr << "Unexpected token at line " << token.lineNumber
-             << " column " << token.columnNumber
-             << ": " << token.text << endl;
-        exit(2);
-    }
     else
     {
-        cerr << "Unexpected token '" << token.text << "' at line " << token.lineNumber
-             << " column " << token.columnNumber << endl;
-        exit(2); // Exit with exit code 2
+        printErrorTwoAndExit(token);
     }
 }
 
@@ -99,8 +87,8 @@ double AST::evaluate(Node *node) const
     }
     else if (node->children.size() == 0)
     {
-        cerr << "Error: Invalid AST node." << endl;
-        return 0.0;
+        printErrorTwoAndExit(node->token);
+        return 2;
     }
     else
     {
@@ -129,8 +117,8 @@ double AST::evaluate(Node *node) const
                 }
                 else
                 {
-                    cerr << "Error: Division by zero." << endl;
-                    return 0.0;
+                    cerr << "Runtime error: division by zero." << endl;
+                    exit(3);
                 }
             }
         }
@@ -194,6 +182,14 @@ void AST::printInfix(const Node *node) const
     }
 }
 
+void printErrorTwoAndExit(const Token &token)
+{
+    cerr << "Unexpected token at line " << token.lineNumber
+         << " column " << token.columnNumber << ": "
+         << token.text << endl;
+    exit(2);
+}
+
 int main(int argc, const char **argv)
 {
     string input;
@@ -216,15 +212,7 @@ int main(int argc, const char **argv)
 
     AST ast(tokens);
     ast.printInfix();
-    double result = ast.evaluateAST();
-
-    if (result == 0.0 && ast.getRoot() == nullptr)
-    {
-        cerr << "Runtime error: division by zero." << endl;
-        return 3;
-    }
-
-    cout << result << endl;
+    cout << ast.evaluateAST() << endl;
 
     return 0;
 }

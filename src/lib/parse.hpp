@@ -24,3 +24,5 @@ private:
     void deleteNode(Node *node);
     void printInfix(const Node *node) const;
 };
+
+void printErrorAndExit(const Token &token);
