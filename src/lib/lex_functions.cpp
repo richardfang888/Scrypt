@@ -136,6 +136,11 @@ void checkLexErrors(vector<Token> &tokens)
              << tokens.back().columnNumber << "." << endl;
         exit(1);
     }
+    else if (tokens.size() == 1 && tokens[0].type == TokenType::END)
+    {
+        cerr << "Error: No expression provided." << endl;
+        exit(2);
+    }
 }
 
 void printTokens(vector<Token> &tokens)
