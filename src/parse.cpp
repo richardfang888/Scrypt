@@ -32,7 +32,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 
     if (index > eindex)
     {
-        printErrorTwoAndExit(token);
+        printErrorTwo(token);
     }
 
     if (token.type == FLOAT)
@@ -59,14 +59,14 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         }
         else
         {
-            printErrorTwoAndExit(tokens[index]);
+            printErrorTwo(tokens[index]);
         }
 
         return node;
     }
     else
     {
-        printErrorTwoAndExit(token);
+        printErrorTwo(token);
     }
 }
 
@@ -87,7 +87,7 @@ double AST::evaluate(Node *node) const
     }
     else if (node->children.size() == 0)
     {
-        printErrorTwoAndExit(node->token);
+        printErrorTwo(node->token);
         return 2;
     }
     else
@@ -182,7 +182,7 @@ void AST::printInfix(const Node *node) const
     }
 }
 
-void printErrorTwoAndExit(const Token &token)
+void printErrorTwo(const Token &token)
 {
     cerr << "Unexpected token at line " << token.lineNumber
          << " column " << token.columnNumber << ": "
