@@ -20,7 +20,7 @@ int main(int argc, const char **argv)
         }
     }
 
-    // text = "(+(-2 4.444 ) 32(* 5 13.45))";
+    // text = "(/49 50. \n 12 ($ 7..8 .3))";
     tokens = readTokens(text);
     checkLexErrors(tokens);
     printTokens(tokens);

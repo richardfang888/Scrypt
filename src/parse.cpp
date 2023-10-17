@@ -193,18 +193,19 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
-    // text = "(* (+ 1 2) 3 (/ 4 5 (- 6 7)))";
+    text = "(* (+ 1 2) 3 (/ 4 5 (- 6 7)))";
 
     tokens = readTokens(text);
+    checkLexErrors(tokens);
 
     AST ast(tokens);
     ast.printInfix();
