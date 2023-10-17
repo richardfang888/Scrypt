@@ -68,7 +68,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
     else
     {
         printErrorTwo(token);
-        Token token = tokens[index];
+        return nullptr;
     }
 }
 
