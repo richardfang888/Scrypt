@@ -12,7 +12,7 @@ AST::AST(const vector<Token> &tokens)
     }
     int index = 0;
     root = makeTree(tokens, index, tokens.size() - 1);
-    if (index != tokens.size())
+    if (index != static_cast<int>(tokens.size()))
     {
         deleteNode(root);
         printErrorTwo(tokens[index]);
