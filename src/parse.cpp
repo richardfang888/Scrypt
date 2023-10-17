@@ -196,7 +196,7 @@ void AST::printInfix(const Node *node) const
 
 void printErrorTwo(const Token &token)
 {
-    cerr << "Unexpected token at line " << token.lineNumber
+    cout << "Unexpected token at line " << token.lineNumber
          << " column " << token.columnNumber << ": "
          << token.text << endl;
     exit(2);
@@ -217,7 +217,7 @@ int main(int argc, const char **argv)
         }
     }
 
-    // text = "(* (+ 1 2) 3 (/ 4 5 (- 6 7)))";
+    // text = "";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
