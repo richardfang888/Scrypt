@@ -5,8 +5,19 @@ using namespace std;
 
 AST::AST(const vector<Token> &tokens)
 {
+    if (tokens.empty())
+    {
+        printErrorTwo(Token{END, "", 1, 1});
+        return;
+    }
     int index = 0;
     root = makeTree(tokens, index, tokens.size() - 1);
+    if (index != tokens.size())
+    {
+        deleteNode(root);
+        printErrorTwo(tokens[index]);
+        return;
+    }
 }
 
 AST::~AST()
@@ -28,12 +39,6 @@ void AST::deleteNode(Node *node)
 
 Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 {
-    if (index > eindex)
-    {
-        printErrorTwo(tokens[index]);
-        return nullptr;
-    }
-
     Token token = tokens[index];
     if (token.type == FLOAT)
     {
@@ -122,6 +127,11 @@ double AST::evaluate(Node *node) const
                     cerr << "Runtime error: division by zero." << endl;
                     exit(3);
                 }
+            }
+            else
+            {
+                printErrorTwo(opToken);
+                return 2;
             }
         }
         return result;
