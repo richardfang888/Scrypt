@@ -53,17 +53,31 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         index++;
         node->token = tokens[index++];
 
+        if (node->token.type != PLUS && node->token.type != MINUS &&
+            node->token.type != TIMES && node->token.type != DIVIDES)
+        {
+            printErrorTwo(node->token);
+            deleteNode(node);
+            return nullptr;
+        }
+
         while (index < eindex && tokens[index].type != RIGHT_PAREN)
         {
+            if (node->children.size() > 0 && tokens[index].type != LEFT_PAREN)
+            {
+                printErrorTwo(tokens[index]);
+                deleteNode(node);
+                return nullptr;
+            }
             node->children.push_back(makeTree(tokens, index, eindex));
         }
 
         if ((node->token.type == PLUS || node->token.type == MINUS ||
              node->token.type == TIMES || node->token.type == DIVIDES) &&
-            node->children.size() != 2)
+            node->children.size() < 2)
         {
             printErrorTwo(node->token);
-            deleteNode(node); // clean up the node to avoid memory leaks
+            deleteNode(node);
             return nullptr;
         }
 
@@ -227,7 +241,7 @@ int main(int argc, const char **argv)
         }
     }
 
-    // text = "(+ 1)";
+    // text = "(1 2 6 7)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
