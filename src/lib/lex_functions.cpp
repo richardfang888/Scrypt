@@ -116,7 +116,7 @@ vector<Token> readTokens(string &input)
     }
 
     // post-processing
-    if (tokens.back().type == DOT)
+    if (!tokens.empty() && tokens.back().type == DOT)
     {
         createToken(currToken, tokens, OTHER, "error", 1);
     }
