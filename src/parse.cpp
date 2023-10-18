@@ -54,7 +54,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         if (index > eindex || (tokens[index].type != PLUS && tokens[index].type != MINUS &&
                                tokens[index].type != TIMES && tokens[index].type != DIVIDES))
         {
-            printErrorTwo(tokens[index + 1]);
+            printErrorTwo(tokens[index]);
             deleteNode(node);
             return nullptr;
         }
@@ -67,12 +67,11 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 
         if (node->children.empty() || (node->children.size() == 1 && node->children[0]->token.type != FLOAT))
         {
-            printErrorTwo(tokens[index - 1]); // Point to the operator token
+            printErrorTwo(tokens[index - 1]);
             deleteNode(node);
             return nullptr;
         }
-
-        if (index < eindex && tokens[index].type == RIGHT_PAREN)
+        else if (index < eindex && tokens[index].type == RIGHT_PAREN)
         {
             index++;
         }
@@ -172,9 +171,10 @@ void AST::printInfix() const
 void AST::printInfix(const Node *node) const
 {
     if (!node)
+    {
         return;
-
-    if (node->token.type == FLOAT)
+    }
+    else if (node->token.type == FLOAT)
     {
         double val = stod(node->token.text);
         if (val == static_cast<int>(val))
@@ -231,7 +231,9 @@ int main(int argc, const char **argv)
         }
     }
 
-    // text = "(1 2 6 7)";
+    // text = "(+(*1 2 6 7) 5 (/ 4 2))";
+    // text = "(+(*1 2 * 6 7) 5 (/ 4 2))";
+    // text = "(++2 3)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
