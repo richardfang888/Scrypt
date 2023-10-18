@@ -51,11 +51,11 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
     {
         Node *node = new Node();
         index++;
-        if (index < eindex && (tokens[index].text != "+" || tokens[index].text != "-" ||
-                               tokens[index].text != "*" || tokens[index].text != "/"))
+        if (index > eindex || (tokens[index].type != PLUS && tokens[index].type != MINUS &&
+                               tokens[index].type != TIMES && tokens[index].type != DIVIDES))
         {
-
             printErrorTwo(tokens[index]);
+            deleteNode(node);
             return nullptr;
         }
         node->token = tokens[index++];
