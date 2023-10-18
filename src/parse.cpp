@@ -50,6 +50,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
     else if (token.type == LEFT_PAREN)
     {
         Node *node = new Node();
+        Token opToken = tokens[index];
         index++;
         if (index > eindex || (tokens[index].type != PLUS && tokens[index].type != MINUS &&
                                tokens[index].type != TIMES && tokens[index].type != DIVIDES))
@@ -58,7 +59,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
             deleteNode(node);
             return nullptr;
         }
-        node->token = tokens[index++];
+        node->token = opToken;
 
         while (index < eindex && tokens[index].type != RIGHT_PAREN)
         {
@@ -67,7 +68,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 
         if (node->children.empty() || (node->children.size() == 1 && node->children[0]->token.type != FLOAT))
         {
-            printErrorTwo(tokens[index - 1]); // Point to the operator token
+            printErrorTwo(tokens[index - 1]);
             deleteNode(node);
             return nullptr;
         }
