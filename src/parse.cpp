@@ -65,13 +65,6 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
             node->children.push_back(makeTree(tokens, index, eindex));
         }
 
-        if (node->children.empty() || (node->children.size() == 1 && node->children[0]->token.type != FLOAT))
-        {
-            printErrorTwo(tokens[index - 1]);
-            deleteNode(node);
-            return nullptr;
-        }
-
         if (index < eindex && tokens[index].type == RIGHT_PAREN)
         {
             index++;
