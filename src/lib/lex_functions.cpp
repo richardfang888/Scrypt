@@ -79,7 +79,14 @@ vector<Token> readTokens(string &input)
         case '7':
         case '8':
         case '9':
-            if (currToken.type == FLOAT || currToken.type == DOT)
+            if (currToken.type == IDENTIFIER){
+                currToken.text += c;
+                currToken.length++;
+                currToken.columnNumber = tokens.back().columnNumber;
+                tokens.pop_back();
+                createToken(currToken, tokens, IDENTIFIER, currToken.text, currToken.length);
+            }
+            else if (currToken.type == FLOAT || currToken.type == DOT)
             {
                 currToken.text += c;
                 currToken.length++;
@@ -172,7 +179,14 @@ vector<Token> readTokens(string &input)
             }
             else
             {
-                createToken(currToken, tokens, IDENTIFIER, string(1, c), 1);
+                if(currToken.type == WHITESPACE)
+                {
+                    createToken(currToken, tokens, IDENTIFIER, string(1, c), 1);
+                }
+                else{
+                    createToken(currToken, tokens, OTHER, "error", 1);
+                    return tokens;
+                }
             }
             break;
 
