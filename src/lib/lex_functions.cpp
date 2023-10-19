@@ -64,6 +64,9 @@ vector<Token> readTokens(string &input)
         case '/':
             createToken(currToken, tokens, DIVIDES, "/", 1);
             break;
+        case '=':
+            createToken(currToken, tokens, ASSIGN, "=", 1);
+            break;
 
         // handle numbers
         case '0':
@@ -102,6 +105,74 @@ vector<Token> readTokens(string &input)
                 currToken.columnNumber = tokens.back().columnNumber;
                 tokens.pop_back();
                 createToken(currToken, tokens, DOT, currToken.text, currToken.length);
+            }
+            break;
+
+        //handle identifiers 
+        case '_':
+        case 'a':
+        case 'A':
+        case 'b':
+        case 'B':
+        case 'c':
+        case 'C':
+        case 'd':
+        case 'D':
+        case 'e':
+        case 'E':
+        case 'f':
+        case 'F':
+        case 'g':
+        case 'G':
+        case 'h':
+        case 'H':
+        case 'i':
+        case 'I':
+        case 'j':
+        case 'J':
+        case 'k':
+        case 'K':
+        case 'l':
+        case 'L':
+        case 'm':
+        case 'M':
+        case 'n':
+        case 'N':
+        case 'o':
+        case 'O':
+        case 'p':
+        case 'P':
+        case 'q':
+        case 'Q':
+        case 'r':
+        case 'R':
+        case 's':
+        case 'S':
+        case 't':
+        case 'T':
+        case 'u':
+        case 'U':
+        case 'v':
+        case 'V':
+        case 'w':
+        case 'W':
+        case 'x':
+        case 'X':
+        case 'y':
+        case 'Y':
+        case 'z':
+        case 'Z':
+            if (currToken.type == IDENTIFIER)
+            {
+                currToken.text += c;
+                currToken.length++;
+                currToken.columnNumber = tokens.back().columnNumber;
+                tokens.pop_back();
+                createToken(currToken, tokens, IDENTIFIER, currToken.text, currToken.length);
+            }
+            else
+            {
+                createToken(currToken, tokens, IDENTIFIER, string(1, c), 1);
             }
             break;
 

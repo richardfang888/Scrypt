@@ -10,6 +10,10 @@ enum TokenType {
     MINUS,
     TIMES,
     DIVIDES,
+    ASSIGN,
+
+    // identifiers
+    IDENTIFIER,
 
     // numbers
     FLOAT,
