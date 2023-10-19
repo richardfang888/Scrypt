@@ -59,6 +59,12 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
             return nullptr;
         }
         node->token = tokens[index++];
+        if (tokens[index].type == RIGHT_PAREN)
+        {
+            printErrorTwo(tokens[index]);
+            deleteNode(node);
+            return nullptr;
+        }
 
         while (index < eindex && tokens[index].type != RIGHT_PAREN)
         {
@@ -233,7 +239,7 @@ int main(int argc, const char **argv)
 
     // text = "(+(*1 2 6 7) 5 (/ 4 2))";
     // text = "(+(*1 2 * 6 7) 5 (/ 4 2))";
-    // text = "(++2 3)";
+    // text = "(*)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
