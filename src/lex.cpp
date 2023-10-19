@@ -10,9 +10,9 @@ int main(int argc, const char **argv)
     string input;
     string text;
     vector<Token> tokens;
-    for (int i = 0; i < argc; i++) {
-        cout << argv[i] << endl;
-    }
+    // for (int i = 0; i < argc; i++) {
+    //     cout << argv[i] << endl;
+    // }
     while (getline(cin, input))
     {
         text += input;
@@ -23,6 +23,7 @@ int main(int argc, const char **argv)
     }
 
     // text = "(/49 50. \n 12 ($ 7..8 .3))";
+    text = "(+ aded 5 (/ 4 2))";
     tokens = readTokens(text);
     checkLexErrors(tokens);
     printTokens(tokens);
