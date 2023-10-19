@@ -10,7 +10,7 @@ int main(int argc, const char **argv)
     string input;
     string text;
     vector<Token> tokens;
-
+    cout << argv << endl;
     while (getline(cin, input))
     {
         text += input;

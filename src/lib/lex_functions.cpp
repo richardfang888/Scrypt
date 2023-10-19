@@ -79,7 +79,8 @@ vector<Token> readTokens(string &input)
         case '7':
         case '8':
         case '9':
-            if (currToken.type == IDENTIFIER){
+            if (currToken.type == IDENTIFIER)
+            {
                 currToken.text += c;
                 currToken.length++;
                 currToken.columnNumber = tokens.back().columnNumber;
@@ -169,6 +170,7 @@ vector<Token> readTokens(string &input)
         case 'Y':
         case 'z':
         case 'Z':
+            cout << "got here" << endl;
             if (currToken.type == IDENTIFIER)
             {
                 currToken.text += c;
