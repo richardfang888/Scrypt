@@ -20,7 +20,6 @@ int main(int argc, const char **argv)
         }
     }
 
-    // text = "(/49 50. \n 12 ($ 7..8 .3))";
     tokens = readTokens(text);
     checkLexErrors(tokens);
     printTokens(tokens);

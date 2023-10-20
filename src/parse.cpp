@@ -37,9 +37,13 @@ void AST::deleteNode(Node *node)
     }
 }
 
+// Recursively creates an AST from a list of tokens,
+// checks for if there are formatting errors on converted S expression
 Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 {
     Token token = tokens[index];
+
+    // Base case: if the token is a FLOAT, simply return a new node with that token.
     if (token.type == FLOAT)
     {
         Node *node = new Node();
@@ -47,10 +51,13 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         index++;
         return node;
     }
+    // If the token is a LEFT_PAREN, then a new operation is starting.
     else if (token.type == LEFT_PAREN)
     {
         Node *node = new Node();
         index++;
+
+        // Check if the token after LEFT_PAREN is a valid operation. If not, throw an error.
         if (index > eindex || (tokens[index].type != PLUS && tokens[index].type != MINUS &&
                                tokens[index].type != TIMES && tokens[index].type != DIVIDES))
         {
@@ -59,6 +66,8 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
             return nullptr;
         }
         node->token = tokens[index++];
+
+        // Error checking for an empty operation
         if (tokens[index].type == RIGHT_PAREN)
         {
             printErrorTwo(tokens[index]);
@@ -66,11 +75,13 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
             return nullptr;
         }
 
+        // While there are more tokens inside the parentheses, recursively create child nodes.
         while (index < eindex && tokens[index].type != RIGHT_PAREN)
         {
             node->children.push_back(makeTree(tokens, index, eindex));
         }
 
+        // Error handling for incorrect expressions (like "(+ 1 2" without the closing parenthesis)
         if (node->children.empty() || (node->children.size() == 1 && node->children[0]->token.type != FLOAT))
         {
             printErrorTwo(tokens[index - 1]);
@@ -81,6 +92,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         {
             index++;
         }
+        // If the token is neither a FLOAT nor a LEFT_PAREN, it's unexpected.
         else
         {
             printErrorTwo(tokens[index]);
@@ -105,12 +117,16 @@ double AST::evaluateAST()
     return evaluate(root);
 }
 
+// Evaluates the given AST node and returns the result of the original expression.
 double AST::evaluate(Node *node) const
 {
+    // If the node holds a FLOAT token, simply return its value.
     if (node->token.type == FLOAT)
     {
         return stod(node->token.text);
     }
+
+    // If the node does not have any children, throw an error.
     else if (node->children.size() == 0)
     {
         printErrorTwo(node->token);
@@ -118,6 +134,7 @@ double AST::evaluate(Node *node) const
     }
     else
     {
+        // Iterate over the rest of the children to apply the operation.
         double result = evaluate(node->children[0]);
         for (size_t i = 1; i < node->children.size(); i++)
         {
@@ -136,6 +153,7 @@ double AST::evaluate(Node *node) const
             }
             else if (opToken.type == DIVIDES)
             {
+                // Check for division by zero.
                 double denominator = evaluate(node->children[i]);
                 if (denominator != 0)
                 {
@@ -149,6 +167,7 @@ double AST::evaluate(Node *node) const
             }
             else
             {
+                // If the operation is unrecognized, print an error message.
                 printErrorTwo(opToken);
                 return 2;
             }
@@ -174,6 +193,8 @@ void AST::printInfix() const
 
     cout << endl;
 }
+
+// Prints the infix notation of a given AST.
 void AST::printInfix(const Node *node) const
 {
     if (!node)
@@ -214,6 +235,7 @@ void AST::printInfix(const Node *node) const
     }
 }
 
+// Prints an output 2 error message for a given token
 void printErrorTwo(const Token &token)
 {
     cout << "Unexpected token at line " << token.lineNumber
@@ -236,10 +258,6 @@ int main(int argc, const char **argv)
             text += '\n';
         }
     }
-
-    // text = "(+(*1 2 6 7) 5 (/ 4 2))";
-    // text = "(+(*1 2 * 6 7) 5 (/ 4 2))";
-    // text = "(*)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);

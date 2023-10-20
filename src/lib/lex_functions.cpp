@@ -15,6 +15,7 @@ void createToken(Token &currToken, vector<Token> &tokens, TokenType type, const 
     currToken.columnNumber += length;
 }
 
+// Converts an input string into a list of tokens representing its content
 vector<Token> readTokens(string &input)
 {
     vector<Token> tokens;
@@ -128,6 +129,7 @@ vector<Token> readTokens(string &input)
     return tokens;
 }
 
+// Checks for lexical errors in the given list of tokens
 void checkLexErrors(vector<Token> &tokens)
 {
     if (tokens.back().type == TokenType::OTHER)
