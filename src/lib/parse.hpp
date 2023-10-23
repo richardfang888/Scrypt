@@ -21,6 +21,7 @@ private:
 
     double evaluate(Node *root) const;
     Node *makeTree(const vector<Token> &tokens, int &index, int eindex);
+    void checkTree(Node *node, int childNum, int totalChildren, TokenType OPERATOR) const;
     void deleteNode(Node *node);
     void printInfix(const Node *node) const;
 };

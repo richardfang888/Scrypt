@@ -12,6 +12,7 @@ AST::AST(const vector<Token> &tokens)
     }
     int index = 0;
     root = makeTree(tokens, index, tokens.size() - 1);
+    checkTree(root, 0, 0, OTHER);
     if (index != static_cast<int>(tokens.size()) - 1)
     {
         deleteNode(root);
@@ -51,6 +52,15 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         index++;
         return node;
     }
+
+    if (token.type == IDENTIFIER)
+    {
+        Node *node = new Node();
+        node->token = token;
+        index++;
+        return node;
+    }
+
     // If the token is a LEFT_PAREN, then a new operation is starting.
     else if (token.type == LEFT_PAREN)
     {
@@ -59,7 +69,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 
         // Check if the token after LEFT_PAREN is a valid operation. If not, throw an error.
         if (index > eindex || (tokens[index].type != PLUS && tokens[index].type != MINUS &&
-                               tokens[index].type != TIMES && tokens[index].type != DIVIDES))
+                               tokens[index].type != TIMES && tokens[index].type != DIVIDES && tokens[index].type != ASSIGN))
         {
             printErrorTwo(tokens[index]);
             deleteNode(node);
@@ -92,19 +102,32 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         {
             index++;
         }
-        // If the token is neither a FLOAT nor a LEFT_PAREN, it's unexpected.
+        // If the token is neither a FLOAT, IDENTIFIER nor a LEFT_PAREN, it's unexpected.
         else
         {
             printErrorTwo(tokens[index]);
             return nullptr;
         }
-
         return node;
     }
     else
     {
         printErrorTwo(token);
         return nullptr;
+    }
+}
+
+void AST::checkTree(Node *node, int childNum, int totalChildren, TokenType OPERATOR) const
+{
+    if(OPERATOR == ASSIGN){
+        if(childNum != totalChildren-1 && node->token.type != IDENTIFIER){
+            printErrorTwo(node->token);
+        }
+    }
+    int i = 0;
+    while (i < node->children.size()){
+        checkTree(node->children[i], i, node->children.size(), node->token.type);
+        i++;
     }
 }
 
@@ -165,6 +188,10 @@ double AST::evaluate(Node *node) const
                     exit(3);
                 }
             }
+            else if (opToken.type == ASSIGN)
+            {
+                result = evaluate(node->children[i]);
+            }
             else
             {
                 // If the operation is unrecognized, print an error message.
@@ -183,12 +210,11 @@ Node *AST::getRoot() const
 
 void AST::printInfix() const
 {
-    if (root && root->token.type != FLOAT)
+    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER))
         cout << "(";
 
     printInfix(root);
-
-    if (root && root->token.type != FLOAT)
+    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER))
         cout << ")";
 
     cout << endl;
@@ -209,6 +235,10 @@ void AST::printInfix(const Node *node) const
         else
             cout << node->token.text;
     }
+    else if (node->token.type == IDENTIFIER)
+    {
+        cout << node->token.text;
+    }
     else
     {
         bool isFirst = true;
@@ -222,12 +252,12 @@ void AST::printInfix(const Node *node) const
             {
                 isFirst = false;
             }
-            if (child->token.type != FLOAT)
+            if (child->token.type != FLOAT && child->token.type != IDENTIFIER)
             {
                 cout << "(";
             }
             printInfix(child);
-            if (child->token.type != FLOAT)
+            if (child->token.type != FLOAT && child->token.type != IDENTIFIER)
             {
                 cout << ")";
             }
@@ -259,12 +289,14 @@ int main(int argc, const char **argv)
         }
     }
 
+    //text = "(= b 2 (+ 2 3 4))";
+
     tokens = readTokens(text);
     checkLexErrors(tokens);
 
     AST ast(tokens);
     ast.printInfix();
-    cout << ast.evaluateAST() << endl;
+    //cout << ast.evaluateAST() << endl;
 
     return 0;
 }
