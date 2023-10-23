@@ -124,7 +124,7 @@ void AST::checkTree(Node *node, int childNum, int totalChildren, TokenType OPERA
             printErrorTwo(node->token);
         }
     }
-    int i = 0;
+    long unsigned int i = 0;
     while (i < node->children.size()){
         checkTree(node->children[i], i, node->children.size(), node->token.type);
         i++;
