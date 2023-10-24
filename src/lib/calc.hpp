@@ -14,14 +14,19 @@ public:
 
     double evaluateAST();
     Node *getRoot() const;
-    int getPrecedence(string op) const;
+    Node *makeNode(const Token &token);
     void printInfix() const;
 
 private:
     Node *root;
     double evaluate(Node *root) const;
-    Node *makeTree(const vector<Token> &tokens, int &index, int eindex);
-    Node *makeNode(const Token &token);
+    Node* parseInfix(const std::vector<Token>& tokens, int& index);
+    Node* parseAssignment(const std::vector<Token>& tokens, int& index);
+    Node* parseAddition(const std::vector<Token>& tokens, int& index);
+    Node* parseMultiplication(const std::vector<Token>& tokens, int& index);
+    Node* parsePrimary(const std::vector<Token>& tokens, int& index);
+    bool match(const std::vector<Token>& tokens, int index, TokenType expectedType);
+    Node *makeTree(const vector<Token> &tokens, int &index);
     void checkTree(Node *node, int childNum, int totalChildren, TokenType OPERATOR) const;
     void deleteNode(Node *node);
     void printInfix(const Node *node) const;
