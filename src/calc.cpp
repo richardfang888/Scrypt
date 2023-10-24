@@ -1,5 +1,7 @@
 #include "lib/calc.hpp"
 #include <iostream>
+#include <unordered_map>
+#include <stack>
 
 AST::AST(const vector<Token> &tokens)
 {
@@ -36,98 +38,86 @@ void AST::deleteNode(Node *node)
     }
 }
 
+int AST::getPrecedence(string op) const {
+    if (op == "+" || op == "-") {
+        return 1;
+    }
+    else if (op == "*" || op == "/") {
+        return 2;
+    }
+    else if (op == "^") {
+        return 3;
+    }
+    return 0;
+}
+
+Node *AST::makeNode(const Token &token)
+{
+    Node *node = new Node();
+    node->token = token;
+    return node;
+}
+
 // Recursively creates an AST from a list of tokens,
 // checks for if there are formatting errors on converted S expression
 Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
 {
-    Token token = tokens[index];
+    stack<Node *> nodeStack;
+    stack<Token> tokenStack;
 
-    // Base case: if the token is a FLOAT, simply return a new node with that token.
-    if (token.type == FLOAT)
+    for (int i = 0; i < tokens.size(); i++)
     {
-        Node *node = new Node();
-        node->token = token;
-        index++;
-        return node;
+        if (tokens[i].type == LEFT_PAREN)
+        {
+            tokenStack.push(tokens[i]);
+        }
+        else if (tokens[i].type == FLOAT || tokens[i].type == IDENTIFIER)
+        {
+            Node *node = makeNode(tokens[index]);
+            nodeStack.push(node);
+        }
+        else if (getPrecedence(tokens[i].text) > 0)
+        {
+            while (!tokenStack.empty() && tokenStack.top().type != LEFT_PAREN && 
+                   ((tokens[i].text != "^" && getPrecedence(tokens[i].text) <= getPrecedence(tokenStack.top().text)) || 
+                   (tokens[i].text == "^" && getPrecedence(tokens[i].text) < getPrecedence(tokenStack.top().text))))
+            {
+                Node *node = makeNode(tokenStack.top());
+                tokenStack.pop();
+
+                Node *node1 = nodeStack.top();
+                nodeStack.pop();
+
+                Node *node2 = nodeStack.top();
+                nodeStack.pop();
+
+                node->children.push_back(node2);
+                node->children.push_back(node1);
+                nodeStack.push(node);
+            }
+            tokenStack.push(tokens[i]);
+        }
+        else if (tokens[i].type == RIGHT_PAREN) {
+            while (!tokenStack.empty() && tokenStack.top().type != LEFT_PAREN) {
+                Node *node = makeNode(tokenStack.top());
+                tokenStack.pop();
+
+                Node *node1 = nodeStack.top();
+                nodeStack.pop();
+
+                Node *node2 = nodeStack.top();
+                nodeStack.pop();
+
+                node->children.push_back(node2);
+                node->children.push_back(node1);
+                nodeStack.push(node);
+            }
+            tokenStack.pop();
+        }
     }
-
-    if (token.type == IDENTIFIER)
-    {
-        Node *node = new Node();
-        node->token = token;
-        index++;
-        return node;
-    }
-
-    // If the token is a LEFT_PAREN, then a new operation is starting.
-    else if (token.type == LEFT_PAREN)
-    {
-        Node *node = new Node();
-        index++;
-
-        // Check if the token after LEFT_PAREN is a valid operation. If not, throw an error.
-        if (index > eindex || (tokens[index].type != PLUS && tokens[index].type != MINUS &&
-                               tokens[index].type != TIMES && tokens[index].type != DIVIDES && tokens[index].type != ASSIGN))
-        {
-            printErrorTwo(tokens[index]);
-            deleteNode(node);
-            return nullptr;
-        }
-        node->token = tokens[index++];
-
-        // Error checking for an empty operation
-        if (tokens[index].type == RIGHT_PAREN)
-        {
-            printErrorTwo(tokens[index]);
-            deleteNode(node);
-            return nullptr;
-        }
-
-        // While there are more tokens inside the parentheses, recursively create child nodes.
-        while (index < eindex && tokens[index].type != RIGHT_PAREN)
-        {
-            node->children.push_back(makeTree(tokens, index, eindex));
-        }
-
-        // Error handling for incorrect expressions (like "(+ 1 2" without the closing parenthesis)
-        if (node->children.empty() || (node->children.size() == 1 && node->children[0]->token.type != FLOAT))
-        {
-            printErrorTwo(tokens[index - 1]);
-            deleteNode(node);
-            return nullptr;
-        }
-        else if (index < eindex && tokens[index].type == RIGHT_PAREN)
-        {
-            index++;
-        }
-        // If the token is neither a FLOAT, IDENTIFIER nor a LEFT_PAREN, it's unexpected.
-        else
-        {
-            printErrorTwo(tokens[index]);
-            return nullptr;
-        }
-        return node;
-    }
-    else
-    {
-        printErrorTwo(token);
-        return nullptr;
-    }
+    return nodeStack.top();
 }
 
-void AST::checkTree(Node *node, int childNum, int totalChildren, TokenType OPERATOR) const
-{
-    if(OPERATOR == ASSIGN){
-        if(childNum != totalChildren-1 && node->token.type != IDENTIFIER){
-            printErrorTwo(node->token);
-        }
-    }
-    long unsigned int i = 0;
-    while (i < node->children.size()){
-        checkTree(node->children[i], i, node->children.size(), node->token.type);
-        i++;
-    }
-}
 
 double AST::evaluateAST()
 {
@@ -278,23 +268,23 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
-    //text = "(= b 2 (+ 2 3 4))";
+    text = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
 
     AST ast(tokens);
     ast.printInfix();
-    //cout << ast.evaluateAST() << endl;
+    cout << ast.evaluateAST() << endl;
 
     return 0;
 }
