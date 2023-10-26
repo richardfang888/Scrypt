@@ -128,7 +128,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
             // Implement error handling here
             cout << "Missing closing parenthesis" << endl;
             printErrorTwo(token);
-            deleteNode(expression);
+            root = nullptr;
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
@@ -140,7 +140,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         // Implement error handling here
         cout << "Unexpected token" << endl;
         printErrorTwo(token);
-        deleteNode(root);
+        root = nullptr;
         return nullptr;
     }
 }
