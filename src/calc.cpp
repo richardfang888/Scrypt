@@ -11,8 +11,11 @@ AST::AST(const vector<Token> &tokens)
         printErrorTwo(Token{END, "", 0, 1, 1});
         return;
     }
-    int index = 0;
-    root = makeTree(tokens, index);
+    else
+    {
+        int index = 0;
+        root = makeTree(tokens, index);
+    }
     // checkTree(root, 0, 0, OTHER);
 
     // CAUSING ERROR (figure out later)
@@ -123,7 +126,9 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         {
             // Handle missing closing parenthesis error
             // Implement error handling here
+            cout << "Missing closing parenthesis" << endl;
             printErrorTwo(token);
+            deleteNode(expression);
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
@@ -133,7 +138,9 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
     {
         // Handle unexpected token error
         // Implement error handling here
+        cout << "Unexpected token" << endl;
         printErrorTwo(token);
+        deleteNode(root);
         return nullptr;
     }
 }
@@ -150,19 +157,19 @@ bool AST::match(const vector<Token> &tokens, int index, TokenType expectedType)
 
 void AST::checkTree(Node *node, int childNum, int totalChildren, TokenType OPERATOR) const
 {
-    if (OPERATOR == ASSIGN)
-    {
-        if (childNum != totalChildren - 1 && node->token.type != IDENTIFIER)
-        {
-            printErrorTwo(node->token);
-        }
-    }
-    long unsigned int i = 0;
-    while (i < node->children.size())
-    {
-        checkTree(node->children[i], i, node->children.size(), node->token.type);
-        i++;
-    }
+    // if (OPERATOR == ASSIGN)
+    // {
+    //     if (childNum != totalChildren - 1 && node->token.type != IDENTIFIER)
+    //     {
+    //         printErrorTwo(node->token);
+    //     }
+    // }
+    // long unsigned int i = 0;
+    // while (i < node->children.size())
+    // {
+    //     checkTree(node->children[i], i, node->children.size(), node->token.type);
+    //     i++;
+    // }
 }
 
 double AST::evaluateAST(unordered_map<string, double> &variables)
@@ -363,7 +370,7 @@ int main(int argc, const char **argv)
         checkLexErrors(tokens);
 
         AST ast(tokens);
-        if (ast.getRoot())
+        if (ast.getRoot() != nullptr)
         {
             ast.printInfix();
         }
