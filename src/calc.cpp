@@ -124,6 +124,8 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         {
             // Handle missing closing parenthesis error
             // Implement error handling here
+            printErrorTwo(token);
+            return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
         return expression;
@@ -132,6 +134,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
     {
         // Handle unexpected token error
         // Implement error handling here
+        printErrorTwo(token);
         return nullptr;
     }
 }
@@ -280,6 +283,8 @@ void AST::printInfix(const Node *node) const
         bool isFirst = true;
         for (const auto &child : node->children)
         {
+            if (!child)
+                continue;
             if (!isFirst)
             {
                 cout << " " << node->token.text << " ";
@@ -322,7 +327,6 @@ int main(int argc, const char **argv)
         ast.printInfix();
         double result = ast.evaluateAST();
 
-        // If there was a runtime error, the result will be NaN. Don't print NaN.
         if (!isnan(result))
         {
             cout << result << endl;
