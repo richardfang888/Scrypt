@@ -18,6 +18,7 @@ AST::AST(const vector<Token> &tokens)
         root = makeTree(tokens, index, error);
         if (error)
         {
+            delete(root);
             root = nullptr;
         }
     }
