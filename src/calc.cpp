@@ -128,7 +128,10 @@ Node* AST::parsePrimary(const vector<Token>& tokens, int& index) {
 
 // Utility function to check if the current token matches the expected token type
 bool AST::match(const vector<Token>& tokens, int index, TokenType expectedType) {
-    return index < tokens.size() && tokens[index].type == expectedType;
+    if (index >= int(tokens.size())) {
+        return false;
+    }
+    return tokens[index].type == expectedType;
 }
 
 void AST::checkTree(Node *node, int childNum, int totalChildren, TokenType OPERATOR) const
@@ -298,16 +301,16 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    // while (getline(cin, input))
-    // {
-    //     text += input;
-    //     if (!cin.eof())
-    //     {
-    //         text += '\n';
-    //     }
-    // }
+    while (getline(cin, input))
+    {
+        text += input;
+        if (!cin.eof())
+        {
+            text += '\n';
+        }
+    }
 
-    text = "(x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6))";
+    // text = "(x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6))";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
