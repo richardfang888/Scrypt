@@ -124,6 +124,20 @@ bool AST::match(const vector<Token>& tokens, int index, TokenType expectedType) 
     return index < tokens.size() && tokens[index].type == expectedType;
 }
 
+void AST::checkTree(Node *node, int childNum, int totalChildren, TokenType OPERATOR) const
+{
+    if(OPERATOR == ASSIGN){
+        if(childNum != totalChildren-1 && node->token.type != IDENTIFIER){
+            printErrorTwo(node->token);
+        }
+    }
+    long unsigned int i = 0;
+    while (i < node->children.size()){
+        checkTree(node->children[i], i, node->children.size(), node->token.type);
+        i++;
+    }
+}
+
 double AST::evaluateAST()
 {
     if (!root)

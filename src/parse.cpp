@@ -280,16 +280,16 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
-    //text = "(= b 2 (+ 2 3 4))";
+    text = "(= b 2 (+ 2 3 4))";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
