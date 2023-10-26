@@ -169,7 +169,7 @@ double AST::evaluateAST(unordered_map<string, double> &variables)
 {
     if (!root)
     {
-        return 0;
+        return numeric_limits<double>::quiet_NaN();
     }
     return evaluate(root, variables);
 }
@@ -180,7 +180,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
     if (!node)
     {
         cout << "Error: node is null" << endl; // temp solution
-        return 0;
+        return numeric_limits<double>::quiet_NaN();
     }
     // If the node holds a FLOAT token, simply return its value.
     if (node->token.type == FLOAT)
@@ -211,7 +211,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
     else if (node->children.size() == 0)
     {
         printErrorTwo(node->token);
-        return 2;
+        return numeric_limits<double>::quiet_NaN();
     }
     // Node is assignment operator
     else if (node->token.type == ASSIGN)
@@ -223,7 +223,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
             {
                 // invalid assignment error
                 printErrorTwo(node->token);
-                return 2;
+                return numeric_limits<double>::quiet_NaN();
             }
             variables[node->children[i]->token.text] = result;
         }
@@ -266,12 +266,12 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
             {
                 // If the operation is unrecognized, print an error message.
                 printErrorTwo(opToken);
-                return 2;
+                return numeric_limits<double>::quiet_NaN();
             }
         }
         return result;
     }
-    return 0.0;
+    return numeric_limits<double>::quiet_NaN();
 }
 
 Node *AST::getRoot() const
