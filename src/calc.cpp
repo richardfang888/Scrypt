@@ -181,7 +181,7 @@ double AST::evaluateAST(unordered_map<string, double> &variables)
 }
 
 // Evaluates the given AST node and returns the result of the original expression.
-double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
+double AST::evaluate(Node *node, unordered_map<string, double> &variables)
 {
     if (!node)
     {
@@ -215,6 +215,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
     // Node is an operator but has no children
     else if (node->children.size() == 0)
     {
+        error = true;
         printErrorTwo(node->token);
         return numeric_limits<double>::quiet_NaN();
     }
@@ -227,6 +228,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
             if (node->children[i]->token.type != IDENTIFIER)
             {
                 // invalid assignment error
+                error = true;
                 printErrorTwo(node->token);
                 return numeric_limits<double>::quiet_NaN();
             }
@@ -263,7 +265,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
                     result /= denominator;
                 }
                 else
-                {
+                {   
                     cout << "Runtime error: division by zero." << endl;
                     return numeric_limits<double>::quiet_NaN();
                 }
@@ -271,6 +273,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
             else
             {
                 // If the operation is unrecognized, print an error message.
+                error = true;
                 printErrorTwo(opToken);
                 return numeric_limits<double>::quiet_NaN();
             }

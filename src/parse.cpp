@@ -87,7 +87,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index)
         }
 
         // While there are more tokens inside the parentheses, recursively create child nodes.
-        while (index < tokens.size() - 1 && tokens[index].type != RIGHT_PAREN)
+        while (index < int(tokens.size() - 1) && tokens[index].type != RIGHT_PAREN)
         {
             node->children.push_back(makeTree(tokens, index));
         }
@@ -99,7 +99,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index)
             deleteNode(node);
             return nullptr;
         }
-        else if (index < tokens.size() - 1 && tokens[index].type == RIGHT_PAREN)
+        else if (index < int(tokens.size() - 1) && tokens[index].type == RIGHT_PAREN)
         {
             index++;
         }

@@ -21,7 +21,7 @@ public:
 
 private:
     Node *root;
-    double evaluate(Node *root, unordered_map<string, double> &variables) const;
+    double evaluate(Node *root, unordered_map<string, double> &variables);
     Node* parseInfix(const std::vector<Token>& tokens, int& index);
     Node* parseAssignment(const std::vector<Token>& tokens, int& index);
     Node* parseAddition(const std::vector<Token>& tokens, int& index);
