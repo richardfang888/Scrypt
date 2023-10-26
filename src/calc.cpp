@@ -4,7 +4,7 @@
 #include <limits>
 #include <cmath>
 
-AST::AST(const vector<Token> &tokens)
+AST::AST(const vector<Token> &tokens, bool &error)
 {
     if (tokens.empty())
     {
@@ -14,13 +14,7 @@ AST::AST(const vector<Token> &tokens)
     else
     {
         int index = 0;
-        bool error = false;
         root = makeTree(tokens, index, error);
-        if (error)
-        {
-            delete(root);
-            root = nullptr;
-        }
     }
     // checkTree(root, 0, 0, OTHER);
 
@@ -368,8 +362,9 @@ int main(int argc, const char **argv)
         text = "((((x = 3) + (y = 5)) + w) + (z = 145))";
         vector<Token> tokens = readTokens(input);
         checkLexErrors(tokens);
-        AST ast(tokens);
-        if (ast.getRoot() != nullptr)
+        bool error = false;
+        AST ast(tokens, error);
+        if (ast.getRoot() != nullptr && !error)
         {
             ast.printInfix();
         }

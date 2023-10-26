@@ -10,7 +10,7 @@ struct Node
 class AST
 {
 public:
-    AST(const vector<Token> &tokens);
+    AST(const vector<Token> &tokens, bool &error);
     ~AST();
 
     double evaluateAST(unordered_map<string, double> &variables);
