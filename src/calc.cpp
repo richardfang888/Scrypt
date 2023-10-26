@@ -178,6 +178,11 @@ double AST::evaluateAST()
 // Evaluates the given AST node and returns the result of the original expression.
 double AST::evaluate(Node *node) const
 {
+    if (!node)
+    {
+        printErrorTwo(node->token);
+        return 0;
+    }
     // If the node holds a FLOAT token, simply return its value.
     if (node->token.type == FLOAT)
     {
