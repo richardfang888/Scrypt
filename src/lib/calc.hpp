@@ -12,14 +12,14 @@ public:
     AST(const vector<Token> &tokens);
     ~AST();
 
-    double evaluateAST();
+    double evaluateAST(unordered_map<string, double> &variables);
     Node *getRoot() const;
     Node *makeNode(const Token &token);
     void printInfix() const;
 
 private:
     Node *root;
-    double evaluate(Node *root) const;
+    double evaluate(Node *root, unordered_map<string, double> &variables) const;
     Node* parseInfix(const std::vector<Token>& tokens, int& index);
     Node* parseAssignment(const std::vector<Token>& tokens, int& index);
     Node* parseAddition(const std::vector<Token>& tokens, int& index);
