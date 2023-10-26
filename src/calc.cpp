@@ -4,8 +4,9 @@
 #include <limits>
 #include <cmath>
 
-AST::AST(const vector<Token> &tokens, bool &error)
+AST::AST(const vector<Token> &tokens)
 {
+    error = false;
     if (tokens.empty())
     {
         printErrorTwo(Token{END, "", 0, 1, 1});
@@ -14,7 +15,7 @@ AST::AST(const vector<Token> &tokens, bool &error)
     else
     {
         int index = 0;
-        root = makeTree(tokens, index, error);
+        root = makeTree(tokens, index);
     }
     // checkTree(root, 0, 0, OTHER);
 
@@ -53,25 +54,25 @@ Node *AST::makeNode(const Token &token)
 
 // Recursively creates an AST from a list of tokens,
 // checks for if there are formatting errors on converted S expression
-Node *AST::makeTree(const vector<Token> &tokens, int &index, bool &error)
+Node *AST::makeTree(const vector<Token> &tokens, int &index)
 {
-    return parseInfix(tokens, index, error);
+    return parseInfix(tokens, index);
 }
 
 // Function to parse and build an AST from an infix expression
-Node *AST::parseInfix(const vector<Token> &tokens, int &index, bool &error)
+Node *AST::parseInfix(const vector<Token> &tokens, int &index)
 {
-    return parseAssignment(tokens, index, error);
+    return parseAssignment(tokens, index);
 }
 
 // Function to parse assignment expressions
-Node *AST::parseAssignment(const vector<Token> &tokens, int &index, bool &error)
+Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
 {
-    Node *left = parseAddition(tokens, index, error);
+    Node *left = parseAddition(tokens, index);
     if (match(tokens, index, TokenType::ASSIGN))
     {
         Node *assignNode = makeNode(tokens[index]);
-        Node *right = parseAssignment(tokens, ++index, error);
+        Node *right = parseAssignment(tokens, ++index);
         assignNode->children.push_back(left);
         assignNode->children.push_back(right);
         return assignNode;
@@ -80,13 +81,13 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index, bool &error)
 }
 
 // Function to parse addition and subtraction expressions
-Node *AST::parseAddition(const vector<Token> &tokens, int &index, bool &error)
+Node *AST::parseAddition(const vector<Token> &tokens, int &index)
 {
-    Node *left = parseMultiplication(tokens, index, error);
+    Node *left = parseMultiplication(tokens, index);
     while (match(tokens, index, TokenType::PLUS) || match(tokens, index, TokenType::MINUS))
     {
         Token opToken = tokens[index++];
-        Node *right = parseMultiplication(tokens, index, error);
+        Node *right = parseMultiplication(tokens, index);
         Node *opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
@@ -96,13 +97,13 @@ Node *AST::parseAddition(const vector<Token> &tokens, int &index, bool &error)
 }
 
 // Function to parse multiplication and division expressions
-Node *AST::parseMultiplication(const vector<Token> &tokens, int &index, bool &error)
+Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
 {
-    Node *left = parsePrimary(tokens, index, error);
+    Node *left = parsePrimary(tokens, index);
     while (match(tokens, index, TokenType::TIMES) || match(tokens, index, TokenType::DIVIDES))
     {
         Token opToken = tokens[index++];
-        Node *right = parsePrimary(tokens, index, error);
+        Node *right = parsePrimary(tokens, index);
         Node *opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
@@ -112,7 +113,7 @@ Node *AST::parseMultiplication(const vector<Token> &tokens, int &index, bool &er
 }
 
 // Function to parse primary expressions
-Node *AST::parsePrimary(const vector<Token> &tokens, int &index, bool &error)
+Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
 {
     Token token = tokens[index++];
     if (token.type == TokenType::FLOAT || token.type == TokenType::IDENTIFIER)
@@ -121,7 +122,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index, bool &error)
     }
     else if (token.type == TokenType::LEFT_PAREN)
     {
-        Node *expression = parseAssignment(tokens, index, error);
+        Node *expression = parseAssignment(tokens, index);
         if (!match(tokens, index, TokenType::RIGHT_PAREN))
         {
             // Handle missing closing parenthesis error
@@ -362,9 +363,8 @@ int main(int argc, const char **argv)
         text = "((((x = 3) + (y = 5)) + w) + (z = 145))";
         vector<Token> tokens = readTokens(input);
         checkLexErrors(tokens);
-        bool error = false;
-        AST ast(tokens, error);
-        if (ast.getRoot() != nullptr && !error)
+        AST ast(tokens);
+        if (ast.getRoot() != nullptr && !ast.error)
         {
             ast.printInfix();
         }
