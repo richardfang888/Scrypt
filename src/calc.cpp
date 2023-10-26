@@ -65,7 +65,6 @@ Node* AST::parseInfix(const vector<Token>& tokens, int& index) {
 Node* AST::parseAssignment(const vector<Token>& tokens, int& index) {
     Node* left = parseAddition(tokens, index);
     if (match(tokens, index, TokenType::ASSIGN)) {
-        cout << "ASSIGNMENT" << endl;
         Node* assignNode = makeNode(tokens[index]);
         Node* right = parseAssignment(tokens, ++index);
         assignNode->children.push_back(left);
@@ -79,7 +78,6 @@ Node* AST::parseAssignment(const vector<Token>& tokens, int& index) {
 Node* AST::parseAddition(const vector<Token>& tokens, int& index) {
     Node* left = parseMultiplication(tokens, index);
     while (match(tokens, index, TokenType::PLUS) || match(tokens, index, TokenType::MINUS)) {
-        cout << "PLUS/MINUS" << endl;
         Token opToken = tokens[index++];
         Node* right = parseMultiplication(tokens, index);
         Node* opNode = makeNode(opToken);
@@ -94,7 +92,6 @@ Node* AST::parseAddition(const vector<Token>& tokens, int& index) {
 Node* AST::parseMultiplication(const vector<Token>& tokens, int& index) {
     Node* left = parsePrimary(tokens, index);
     while (match(tokens, index, TokenType::TIMES) || match(tokens, index, TokenType::DIVIDES)) {
-        cout << "TIMES/DIVIDES" << endl;
         Token opToken = tokens[index++];
         Node* right = parsePrimary(tokens, index);
         Node* opNode = makeNode(opToken);
@@ -109,7 +106,6 @@ Node* AST::parseMultiplication(const vector<Token>& tokens, int& index) {
 Node* AST::parsePrimary(const vector<Token>& tokens, int& index) {
     Token token = tokens[index++];
     if (token.type == TokenType::FLOAT || token.type == TokenType::IDENTIFIER) {
-        cout << token.text << endl;
         return makeNode(token);
     } else if (token.type == TokenType::LEFT_PAREN) {
         Node* expression = parseAssignment(tokens, index);
