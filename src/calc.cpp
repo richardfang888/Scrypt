@@ -209,6 +209,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
     // Node is an operator but has no children
     else if (node->children.size() == 0)
     {
+        cout << "operator has no children" << endl;
         printErrorTwo(node->token);
         return numeric_limits<double>::quiet_NaN();
     }
@@ -221,6 +222,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
             if (node->children[i]->token.type != IDENTIFIER)
             {
                 // invalid assignment error
+                cout << "left children not all identifiers" << endl;
                 printErrorTwo(node->token);
                 return numeric_limits<double>::quiet_NaN();
             }
@@ -265,12 +267,14 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
             else
             {
                 // If the operation is unrecognized, print an error message.
+                cout << "op not recognized" << endl;
                 printErrorTwo(opToken);
                 return numeric_limits<double>::quiet_NaN();
             }
         }
         return result;
     }
+    cout << "unreachable" << endl;
     return numeric_limits<double>::quiet_NaN();
 }
 
@@ -359,10 +363,10 @@ int main(int argc, const char **argv)
         checkLexErrors(tokens);
 
         AST ast(tokens);
-        // if (ast.getRoot())
-        // {
-        //     ast.printInfix();
-        // }
+        if (ast.getRoot())
+        {
+            ast.printInfix();
+        }
         double result = ast.evaluateAST(variables);
 
         if (!isnan(result))
