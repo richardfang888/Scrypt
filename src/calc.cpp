@@ -13,7 +13,7 @@ AST::AST(const vector<Token> &tokens)
     }
     int index = 0;
     root = makeTree(tokens, index);
-    checkTree(root, 0, 0, OTHER);
+    // checkTree(root, 0, 0, OTHER);
 
     // CAUSING ERROR (figure out later)
     // if (index != static_cast<int>(tokens.size()) - 1)
