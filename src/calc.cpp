@@ -1,6 +1,5 @@
 #include "lib/calc.hpp"
 #include <iostream>
-#include <unordered_map>
 #include <stack>
 #include <limits>
 #include <cmath>

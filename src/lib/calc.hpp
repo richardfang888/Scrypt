@@ -1,4 +1,5 @@
 #include "lex.hpp"
+#include <unordered_map>
 
 struct Node
 {
