@@ -124,6 +124,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
             // Handle missing closing parenthesis error
             // Implement error handling here
             printErrorTwo(token);
+            root = nullptr;
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
@@ -134,6 +135,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         // Handle unexpected token error
         // Implement error handling here
         printErrorTwo(token);
+        root = nullptr;
         return nullptr;
     }
 }
@@ -355,7 +357,7 @@ int main(int argc, const char **argv)
 
     while (getline(cin, input)) // Keep reading until EOF
     {
-        // text = "x = y = 5";
+        text = "((((x = 3) + (y = 5)) + w) + (z = 145))";
         vector<Token> tokens = readTokens(input);
         checkLexErrors(tokens);
 
