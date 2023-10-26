@@ -227,6 +227,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
             }
             variables[node->children[i]->token.text] = result;
         }
+        return result;
     }
     // Node is a non-assignment operator
     else
@@ -359,7 +360,10 @@ int main(int argc, const char **argv)
         checkLexErrors(tokens);
 
         AST ast(tokens);
-        ast.printInfix();
+        if (ast.getRoot())
+        {
+            ast.printInfix();
+        }
         double result = ast.evaluateAST(variables);
 
         if (!isnan(result))
