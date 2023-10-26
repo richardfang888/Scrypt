@@ -271,6 +271,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
         }
         return result;
     }
+    return 0.0;
 }
 
 Node *AST::getRoot() const
