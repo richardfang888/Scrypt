@@ -184,6 +184,8 @@ double AST::evaluateAST(unordered_map<string, double> &variables)
 // Evaluates the given AST node and returns the result of the original expression.
 double AST::evaluate(Node *node, unordered_map<string, double> &variables)
 {
+    unordered_map<string, double> originalVariables = variables;
+
     if (!node)
     {
         return numeric_limits<double>::quiet_NaN();
@@ -210,6 +212,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
         {
             // Handle error: Unknown identifier
             cout << "Runtime error: unknown identifier " + identifierText << endl;
+            variables = originalVariables;
             return numeric_limits<double>::quiet_NaN();
         }
     }
