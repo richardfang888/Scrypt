@@ -180,7 +180,7 @@ double AST::evaluate(Node *node) const
 {
     if (!node)
     {
-        printErrorTwo(node->token);
+        cout << "Error: node is null" << endl; // temp solution
         return 0;
     }
     // If the node holds a FLOAT token, simply return its value.
@@ -322,9 +322,11 @@ void printErrorTwo(const Token &token)
 int main(int argc, const char **argv)
 {
     string input;
+    string text;
 
     while (getline(cin, input)) // Keep reading until EOF
     {
+        // text = "x = y = 5";
         vector<Token> tokens = readTokens(input);
         checkLexErrors(tokens);
 
