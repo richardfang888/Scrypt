@@ -217,7 +217,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
     else if (node->token.type == ASSIGN)
     {
         double result = evaluate(node->children[node->children.size()-1], variables);
-        for (size_t i = node->children.size() - 2; i >= 0; i--)
+        for (int i = int(node->children.size() - 2); i >= 0; i--)
         {
             if (node->children[i]->token.type != IDENTIFIER)
             {
