@@ -14,7 +14,12 @@ AST::AST(const vector<Token> &tokens)
     else
     {
         int index = 0;
-        root = makeTree(tokens, index);
+        bool error = false;
+        root = makeTree(tokens, index, error);
+        if (error)
+        {
+            root = nullptr;
+        }
     }
     // checkTree(root, 0, 0, OTHER);
 
@@ -53,25 +58,25 @@ Node *AST::makeNode(const Token &token)
 
 // Recursively creates an AST from a list of tokens,
 // checks for if there are formatting errors on converted S expression
-Node *AST::makeTree(const vector<Token> &tokens, int &index)
+Node *AST::makeTree(const vector<Token> &tokens, int &index, bool &error)
 {
-    return parseInfix(tokens, index);
+    return parseInfix(tokens, index, error);
 }
 
 // Function to parse and build an AST from an infix expression
-Node *AST::parseInfix(const vector<Token> &tokens, int &index)
+Node *AST::parseInfix(const vector<Token> &tokens, int &index, bool &error)
 {
-    return parseAssignment(tokens, index);
+    return parseAssignment(tokens, index, error);
 }
 
 // Function to parse assignment expressions
-Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
+Node *AST::parseAssignment(const vector<Token> &tokens, int &index, bool &error)
 {
-    Node *left = parseAddition(tokens, index);
+    Node *left = parseAddition(tokens, index, error);
     if (match(tokens, index, TokenType::ASSIGN))
     {
         Node *assignNode = makeNode(tokens[index]);
-        Node *right = parseAssignment(tokens, ++index);
+        Node *right = parseAssignment(tokens, ++index, error);
         assignNode->children.push_back(left);
         assignNode->children.push_back(right);
         return assignNode;
@@ -80,13 +85,13 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
 }
 
 // Function to parse addition and subtraction expressions
-Node *AST::parseAddition(const vector<Token> &tokens, int &index)
+Node *AST::parseAddition(const vector<Token> &tokens, int &index, bool &error)
 {
-    Node *left = parseMultiplication(tokens, index);
+    Node *left = parseMultiplication(tokens, index, error);
     while (match(tokens, index, TokenType::PLUS) || match(tokens, index, TokenType::MINUS))
     {
         Token opToken = tokens[index++];
-        Node *right = parseMultiplication(tokens, index);
+        Node *right = parseMultiplication(tokens, index, error);
         Node *opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
@@ -96,13 +101,13 @@ Node *AST::parseAddition(const vector<Token> &tokens, int &index)
 }
 
 // Function to parse multiplication and division expressions
-Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
+Node *AST::parseMultiplication(const vector<Token> &tokens, int &index, bool &error)
 {
-    Node *left = parsePrimary(tokens, index);
+    Node *left = parsePrimary(tokens, index, error);
     while (match(tokens, index, TokenType::TIMES) || match(tokens, index, TokenType::DIVIDES))
     {
         Token opToken = tokens[index++];
-        Node *right = parsePrimary(tokens, index);
+        Node *right = parsePrimary(tokens, index, error);
         Node *opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
@@ -112,7 +117,7 @@ Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
 }
 
 // Function to parse primary expressions
-Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
+Node *AST::parsePrimary(const vector<Token> &tokens, int &index, bool &error)
 {
     Token token = tokens[index++];
     if (token.type == TokenType::FLOAT || token.type == TokenType::IDENTIFIER)
@@ -121,14 +126,13 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
     }
     else if (token.type == TokenType::LEFT_PAREN)
     {
-        Node *expression = parseAssignment(tokens, index);
+        Node *expression = parseAssignment(tokens, index, error);
         if (!match(tokens, index, TokenType::RIGHT_PAREN))
         {
             // Handle missing closing parenthesis error
             // Implement error handling here
-            cout << "Missing closing parenthesis" << endl;
+            error = true;
             printErrorTwo(token);
-            root = nullptr;
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
@@ -138,9 +142,8 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
     {
         // Handle unexpected token error
         // Implement error handling here
-        cout << "Unexpected token" << endl;
+        error = true;
         printErrorTwo(token);
-        root = nullptr;
         return nullptr;
     }
 }
@@ -216,7 +219,6 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
     // Node is an operator but has no children
     else if (node->children.size() == 0)
     {
-        cout << "operator has no children" << endl;
         printErrorTwo(node->token);
         return numeric_limits<double>::quiet_NaN();
     }
@@ -229,7 +231,6 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
             if (node->children[i]->token.type != IDENTIFIER)
             {
                 // invalid assignment error
-                cout << "left children not all identifiers" << endl;
                 printErrorTwo(node->token);
                 return numeric_limits<double>::quiet_NaN();
             }
@@ -274,14 +275,12 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
             else
             {
                 // If the operation is unrecognized, print an error message.
-                cout << "op not recognized" << endl;
                 printErrorTwo(opToken);
                 return numeric_limits<double>::quiet_NaN();
             }
         }
         return result;
     }
-    cout << "unreachable" << endl;
     return numeric_limits<double>::quiet_NaN();
 }
 
@@ -368,7 +367,6 @@ int main(int argc, const char **argv)
         text = "((((x = 3) + (y = 5)) + w) + (z = 145))";
         vector<Token> tokens = readTokens(input);
         checkLexErrors(tokens);
-
         AST ast(tokens);
         if (ast.getRoot() != nullptr)
         {

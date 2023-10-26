@@ -11,7 +11,8 @@ AST::AST(const vector<Token> &tokens)
         return;
     }
     int index = 0;
-    root = makeTree(tokens, index, tokens.size() - 1);
+    root = makeTree(tokens, index);
+    printAST(root, 0);
     checkTree(root, 0, 0, OTHER);
     if (index != static_cast<int>(tokens.size()) - 1)
     {
@@ -40,7 +41,7 @@ void AST::deleteNode(Node *node)
 
 // Recursively creates an AST from a list of tokens,
 // checks for if there are formatting errors on converted S expression
-Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
+Node *AST::makeTree(const vector<Token> &tokens, int &index)
 {
     Token token = tokens[index];
 
@@ -68,7 +69,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         index++;
 
         // Check if the token after LEFT_PAREN is a valid operation. If not, throw an error.
-        if (index > eindex || (tokens[index].type != PLUS && tokens[index].type != MINUS &&
+        if (index > tokens.size() - 1 || (tokens[index].type != PLUS && tokens[index].type != MINUS &&
                                tokens[index].type != TIMES && tokens[index].type != DIVIDES && tokens[index].type != ASSIGN))
         {
             printErrorTwo(tokens[index]);
@@ -86,9 +87,9 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
         }
 
         // While there are more tokens inside the parentheses, recursively create child nodes.
-        while (index < eindex && tokens[index].type != RIGHT_PAREN)
+        while (index < tokens.size() - 1 && tokens[index].type != RIGHT_PAREN)
         {
-            node->children.push_back(makeTree(tokens, index, eindex));
+            node->children.push_back(makeTree(tokens, index));
         }
 
         // Error handling for incorrect expressions (like "(+ 1 2" without the closing parenthesis)
@@ -98,7 +99,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index, int eindex)
             deleteNode(node);
             return nullptr;
         }
-        else if (index < eindex && tokens[index].type == RIGHT_PAREN)
+        else if (index < tokens.size() - 1 && tokens[index].type == RIGHT_PAREN)
         {
             index++;
         }
@@ -208,6 +209,21 @@ Node *AST::getRoot() const
     return root;
 }
 
+ void AST::printAST(Node* node, int depth) {
+    if (node == nullptr) {
+        return;
+    }
+
+    // Print the value of the current node
+    cout << node->token.text << "|" << depth << "|||";
+
+    // Recursively print the left and right subtrees
+    for (Node *child : node->children)
+    {
+        printAST(child, depth + 1);
+    }
+}
+
 void AST::printInfix() const
 {
     if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER))
@@ -289,7 +305,7 @@ int main(int argc, const char **argv)
     //     }
     // }
 
-    text = "(= b 2 (+ 2 3 4))";
+    text = "(+ 4 5 6)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
