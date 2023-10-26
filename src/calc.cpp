@@ -12,13 +12,15 @@ AST::AST(const vector<Token> &tokens)
     }
     int index = 0;
     root = makeTree(tokens, index);
-    checkTree(root, 0, 0, OTHER);
-    if (index != static_cast<int>(tokens.size()) - 1)
-    {
-        deleteNode(root);
-        printErrorTwo(tokens[index]);
-        return;
-    }
+    // checkTree(root, 0, 0, OTHER);
+
+    // CAUSING ERROR (figure out later)
+    // if (index != static_cast<int>(tokens.size()) - 1)
+    // {
+    //     deleteNode(root);
+    //     printErrorTwo(tokens[index]);
+    //     return;
+    // }
 }
 
 AST::~AST()
@@ -63,8 +65,9 @@ Node* AST::parseInfix(const vector<Token>& tokens, int& index) {
 Node* AST::parseAssignment(const vector<Token>& tokens, int& index) {
     Node* left = parseAddition(tokens, index);
     if (match(tokens, index, TokenType::ASSIGN)) {
+        cout << "ASSIGNMENT" << endl;
+        Node* assignNode = makeNode(tokens[index]);
         Node* right = parseAssignment(tokens, ++index);
-        Node* assignNode = makeNode(tokens[index - 1]);
         assignNode->children.push_back(left);
         assignNode->children.push_back(right);
         return assignNode;
@@ -76,6 +79,7 @@ Node* AST::parseAssignment(const vector<Token>& tokens, int& index) {
 Node* AST::parseAddition(const vector<Token>& tokens, int& index) {
     Node* left = parseMultiplication(tokens, index);
     while (match(tokens, index, TokenType::PLUS) || match(tokens, index, TokenType::MINUS)) {
+        cout << "PLUS/MINUS" << endl;
         Token opToken = tokens[index++];
         Node* right = parseMultiplication(tokens, index);
         Node* opNode = makeNode(opToken);
@@ -90,6 +94,7 @@ Node* AST::parseAddition(const vector<Token>& tokens, int& index) {
 Node* AST::parseMultiplication(const vector<Token>& tokens, int& index) {
     Node* left = parsePrimary(tokens, index);
     while (match(tokens, index, TokenType::TIMES) || match(tokens, index, TokenType::DIVIDES)) {
+        cout << "TIMES/DIVIDES" << endl;
         Token opToken = tokens[index++];
         Node* right = parsePrimary(tokens, index);
         Node* opNode = makeNode(opToken);
@@ -104,17 +109,19 @@ Node* AST::parseMultiplication(const vector<Token>& tokens, int& index) {
 Node* AST::parsePrimary(const vector<Token>& tokens, int& index) {
     Token token = tokens[index++];
     if (token.type == TokenType::FLOAT || token.type == TokenType::IDENTIFIER) {
+        cout << token.text << endl;
         return makeNode(token);
     } else if (token.type == TokenType::LEFT_PAREN) {
         Node* expression = parseAssignment(tokens, index);
         if (!match(tokens, index, TokenType::RIGHT_PAREN)) {
             // Handle missing closing parenthesis error
-            // You can implement your own error handling here
+            // Implement error handling here
         }
+        ++index; // Increment index to skip the closing parenthesis
         return expression;
     } else {
         // Handle unexpected token error
-        // You can implement your own error handling here
+        // Implement error handling here
         return nullptr;
     }
 }
@@ -155,7 +162,11 @@ double AST::evaluate(Node *node) const
     {
         return stod(node->token.text);
     }
-
+    if (node->token.type == IDENTIFIER)
+    {
+        // change later
+        return 0;
+    }
     // If the node does not have any children, throw an error.
     else if (node->children.size() == 0)
     {
@@ -296,7 +307,7 @@ int main(int argc, const char **argv)
     //     }
     // }
 
-    text = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)";
+    text = "(x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6))";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
