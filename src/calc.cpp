@@ -9,6 +9,7 @@ AST::AST(const vector<Token> &tokens)
     error = false;
     if (tokens.empty())
     {
+        error = true;
         printErrorTwo(Token{END, "", 0, 1, 1});
         return;
     }

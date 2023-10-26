@@ -69,7 +69,7 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index)
         index++;
 
         // Check if the token after LEFT_PAREN is a valid operation. If not, throw an error.
-        if (index > tokens.size() - 1 || (tokens[index].type != PLUS && tokens[index].type != MINUS &&
+        if (index > int(tokens.size() - 1) || (tokens[index].type != PLUS && tokens[index].type != MINUS &&
                                tokens[index].type != TIMES && tokens[index].type != DIVIDES && tokens[index].type != ASSIGN))
         {
             printErrorTwo(tokens[index]);
