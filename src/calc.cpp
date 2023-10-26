@@ -359,10 +359,10 @@ int main(int argc, const char **argv)
         checkLexErrors(tokens);
 
         AST ast(tokens);
-        if (ast.getRoot() && ast.getRoot()->token.type != FLOAT && ast.getRoot()->token.type != IDENTIFIER)
-        {
-            ast.printInfix();
-        }
+        // if (ast.getRoot())
+        // {
+        //     ast.printInfix();
+        // }
         double result = ast.evaluateAST(variables);
 
         if (!isnan(result))
