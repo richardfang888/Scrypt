@@ -124,7 +124,6 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
             // Handle missing closing parenthesis error
             // Implement error handling here
             printErrorTwo(token);
-            root = nullptr;
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
@@ -135,7 +134,6 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         // Handle unexpected token error
         // Implement error handling here
         printErrorTwo(token);
-        root = nullptr;
         return nullptr;
     }
 }
@@ -181,7 +179,6 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables) const
 {
     if (!node)
     {
-        cout << "Error: node is null" << endl; // temp solution
         return numeric_limits<double>::quiet_NaN();
     }
     // If the node holds a FLOAT token, simply return its value.
@@ -362,7 +359,7 @@ int main(int argc, const char **argv)
         checkLexErrors(tokens);
 
         AST ast(tokens);
-        if (ast.getRoot())
+        if (ast.getRoot() && ast.getRoot()->token.type != FLOAT && ast.getRoot()->token.type != IDENTIFIER)
         {
             ast.printInfix();
         }
