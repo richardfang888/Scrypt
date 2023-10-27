@@ -10,6 +10,7 @@ AST::AST(const vector<Token> &tokens)
     if (tokens.empty())
     {
         error = true;
+        cout << "error check" << endl;
         printErrorTwo(Token{END, "", 0, 1, 1});
         return;
     }
