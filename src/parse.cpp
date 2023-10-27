@@ -12,9 +12,8 @@ AST::AST(const vector<Token> &tokens, int &index)
     }
     root = makeTree(tokens, index);
 
-    printAST(root, 0);
-
-    cout << endl;
+    //printAST(root, 0);
+    //cout << endl;
 
     checkTree(root, 0, 0, OTHER);
     if (index != static_cast<int>(tokens.size()) - 1)
@@ -42,7 +41,7 @@ AST::~AST()
 Node AST::makeTree(const vector<Token> &tokens, int &index)
 {
     Token token = tokens[index];
-    cout << "got here" << endl;
+    //cout << "got here" << endl;
     // Base case: if the token is a FLOAT, simply return a new node with that token.
     if (token.type == FLOAT)
     {
@@ -67,7 +66,7 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         index++;
 
         // Check if the token after LEFT_PAREN is a valid operation. If not, throw an error.
-        if ( index > tokens.size() - 1||(tokens[index].type != PLUS && tokens[index].type != MINUS &&
+        if ( index > (int)tokens.size() - 1||(tokens[index].type != PLUS && tokens[index].type != MINUS &&
                                tokens[index].type != TIMES && tokens[index].type != DIVIDES && tokens[index].type != ASSIGN))
         {
             printErrorTwo(tokens[index]);
@@ -81,7 +80,7 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         }
 
         // While there are more tokens inside the parentheses, recursively create child nodes.
-        while (index < tokens.size() - 1 && tokens[index].type != RIGHT_PAREN)
+        while (index < (int)tokens.size() - 1 && tokens[index].type != RIGHT_PAREN)
         {
             node.children.push_back(makeTree(tokens, index));
         }
@@ -91,7 +90,7 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         {
             printErrorTwo(tokens[index - 1]);
         }
-        else if (index < tokens.size() - 1 && tokens[index].type == RIGHT_PAREN)
+        else if (index < (int)tokens.size() - 1 && tokens[index].type == RIGHT_PAREN)
         {
             index++;
         }
@@ -277,17 +276,17 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
     // text = "(= b c (+ 6 3 4))";
-    // text = "(+ 4 5 6)";
+    text = "(+ 4 5 6)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
