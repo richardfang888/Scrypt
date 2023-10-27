@@ -197,6 +197,9 @@ bool AST::checkVar(Node *root)
     {
         for (int i = int(root->children.size() - 2); i >= 0; i--)
         {
+            if (error) {
+                break;
+            }
             if (root->children[i]->token.type != IDENTIFIER)
             {
                 // invalid assignment error
