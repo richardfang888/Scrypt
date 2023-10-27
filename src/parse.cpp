@@ -15,7 +15,7 @@ AST::AST(const vector<Token> &tokens, int &index)
 
     // cout << endl;
 
-    //checkTree(root, root, 0, 0, OTHER);
+    checkTree(root, root, 0, 0, OTHER);
 
     // cout << "here" << endl;
 }
@@ -64,7 +64,7 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         index++;
 
         // Check if the token after LEFT_PAREN is a valid operation. If not, throw an error.
-        if ( index > (int)tokens.size() - 1||(tokens[index].type != PLUS && tokens[index].type != MINUS &&
+        if (index > (int)tokens.size() - 1||(tokens[index].type != PLUS && tokens[index].type != MINUS &&
                                tokens[index].type != TIMES && tokens[index].type != DIVIDES && tokens[index].type != ASSIGN))
         {
             printErrorTwo(tokens[index]);
@@ -87,9 +87,13 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         {
             node.children.push_back(makeTree(tokens, index));
         }
-
+        
+        //cout << tokens[index].text << node.token.text << endl;
+        if(node.children.size() == 1 && node.token.type == ASSIGN){
+            printErrorTwo(tokens[index]);
+        }
         // Error handling for incorrect expressions (like "(+ 1 2" without the closing parenthesis)
-        if (node.children.empty() || (node.children.size() == 1 && node.children[0].token.type != FLOAT))
+        if (node.children.empty() || (node.children.size() == 1 && node.children[0].token.type != FLOAT && node.children[0].token.type != IDENTIFIER))
         {
             printErrorTwo(tokens[index - 1]);
         }
@@ -117,11 +121,13 @@ void AST::checkTree(Node node, Node parent, int childNum, int totalChildren, Tok
     if(OPERATOR == ASSIGN){
         if(childNum != totalChildren-1 && node.token.type != IDENTIFIER){
             //cout << "this error" << endl;
-            if(node.token.type == FLOAT){
+            if(node.token.type == FLOAT || (node.token.type == PLUS || node.token.type == MINUS || node.token.type == TIMES || node.token.type == DIVIDES)){
+                //cout << "HERE3" << endl;
                 printErrorTwo(parent.children[totalChildren-1].token);
             }
             else
             {
+                //cout << "HERE4" << endl;
                 printErrorTwo(node.token);
             }
         }
@@ -314,14 +320,14 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
     //text = "(= b c (+ 6 3 4))";
     //text = "(= a b (+ 6 3 4)) \n (+ 1 a 3)";
@@ -329,6 +335,7 @@ int main(int argc, const char **argv)
     //text = "(+ 4 5 7)";
     //text = "(= a b 3 z)";
     //text = "(=(+x)89)";
+    text = "(= x (+ 3 3) 4) ";
 
 
     tokens = readTokens(text);
