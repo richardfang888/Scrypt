@@ -67,10 +67,12 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         if (index > (int)tokens.size() - 1||(tokens[index].type != PLUS && tokens[index].type != MINUS &&
                                tokens[index].type != TIMES && tokens[index].type != DIVIDES && tokens[index].type != ASSIGN))
         {
+            //cout << "should be op" << endl;
             printErrorTwo(tokens[index]);
         } 
         else if(tokens[index].type == ASSIGN){
             if(tokens[index + 1].type != IDENTIFIER){
+                //cout << "should be ident" << endl;
                 printErrorTwo(tokens[index + 1]);
             }
         }
@@ -79,6 +81,7 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         // Error checking for an empty operation
         if (tokens[index].type == RIGHT_PAREN)
         {
+            //cout << "right paren" << endl;
             printErrorTwo(tokens[index]);
         }
 
@@ -95,6 +98,7 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         // Error handling for incorrect expressions (like "(+ 1 2" without the closing parenthesis)
         if (node.children.empty() || (node.children.size() == 1 && node.children[0].token.type != FLOAT && node.children[0].token.type != IDENTIFIER))
         {
+            //cout << "no closing paren" << endl;
             printErrorTwo(tokens[index - 1]);
         }
         else if (index < (int)tokens.size() - 1 && tokens[index].type == RIGHT_PAREN)
@@ -104,12 +108,14 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         // If the token is neither a FLOAT, IDENTIFIER nor a LEFT_PAREN, it's unexpected.
         else
         {
+            //cout << "unexpected" << endl;
             printErrorTwo(tokens[index]);
         }
         return node;
     }
     else
     {
+        //cout << "unexpected" << endl;
         printErrorTwo(token);
     }
     throw 1;
@@ -235,6 +241,7 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
     // If the node does not have any children, throw an error.
     else if (node.children.size() == 0)
     {
+        cout << "no children" << endl;
         printErrorTwo(node.token);
         return 2;
     }
@@ -320,14 +327,14 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    // while (getline(cin, input))
-    // {
-    //     text += input;
-    //     if (!cin.eof())
-    //     {
-    //         text += '\n';
-    //     }
-    // }
+    while (getline(cin, input))
+    {
+        text += input;
+        if (!cin.eof())
+        {
+            text += '\n';
+        }
+    }
 
     //text = "(= b c (+ 6 3 4))";
     //text = "(= a b (+ 6 3 4)) \n (+ 1 a 3)";
@@ -335,7 +342,7 @@ int main(int argc, const char **argv)
     //text = "(+ 4 5 7)";
     //text = "(= a b 3 z)";
     //text = "(=(+x)89)";
-    text = "(= x (+ 3 3) 4) ";
+    //text = "(= x (+ 3 3) 4) ";
 
 
     tokens = readTokens(text);
