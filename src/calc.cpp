@@ -124,6 +124,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
             error = true;
             if (index < int(tokens.size()))
             {
+                cout << "Missing closing" << endl;
                 printError(tokens[index]);
             }
             return nullptr;
