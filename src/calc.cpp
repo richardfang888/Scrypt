@@ -7,18 +7,8 @@
 AST::AST(const vector<Token> &tokens)
 {
     error = false;
-    if (tokens.empty())
-    {
-        error = true;
-        cout << "error check" << endl;
-        printErrorTwo(Token{END, "", 0, 1, 1});
-        return;
-    }
-    else
-    {
-        int index = 0;
-        root = makeTree(tokens, index);
-    }
+    int index = 0;
+    root = makeTree(tokens, index);
 }
 
 AST::~AST()
@@ -120,8 +110,9 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         {
             // Handle missing closing parenthesis error
             // Implement error handling here
+            cout << "error check" << endl;
             error = true;
-            printErrorTwo(tokens[tokens.size() - 1]);
+            printError(tokens[tokens.size() - 1]);
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
@@ -132,7 +123,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         // Handle unexpected token error
         // Implement error handling here
         error = true;
-        printErrorTwo(token);
+        printError(token);
         return nullptr;
     }
 }
@@ -197,7 +188,7 @@ bool AST::checkVar(Node *root)
             {
                 // invalid assignment error
                 error = true;
-                printErrorTwo(root->token);
+                printError(root->token);
                 return false;
             }
         }
@@ -258,7 +249,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
     else if (node->children.size() == 0)
     {
         error = true;
-        printErrorTwo(node->token);
+        printError(node->token);
         return numeric_limits<double>::quiet_NaN();
     }
     // Node is assignment operator
@@ -271,7 +262,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
             {
                 // invalid assignment error
                 error = true;
-                printErrorTwo(node->token);
+                printError(node->token);
                 return numeric_limits<double>::quiet_NaN();
             }
             variables[node->children[i]->token.text] = result;
@@ -316,7 +307,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
             {
                 // If the operation is unrecognized, print an error message.
                 error = true;
-                printErrorTwo(opToken);
+                printError(opToken);
                 return numeric_limits<double>::quiet_NaN();
             }
         }
@@ -390,7 +381,7 @@ void AST::printInfix(const Node *node) const
 }
 
 // Prints an output 2 error message for a given token
-void printErrorTwo(const Token &token)
+void printError(const Token &token)
 {
     cout << "Unexpected token at line " << token.lineNumber
          << " column " << token.columnNumber << ": "
