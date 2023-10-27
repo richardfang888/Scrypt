@@ -3,6 +3,7 @@
 
 using namespace std;
 
+// Constructor that creates an AST from a list of tokens
 AST::AST(const vector<Token> &tokens, int &index)
 {
     if (tokens.empty())
@@ -12,14 +13,14 @@ AST::AST(const vector<Token> &tokens, int &index)
     }
 
     root = makeTree(tokens, index);
-
+    
     checkTree(root, root, 0, 0, OTHER);
 }
 
+// for debugging purposes (to see the created tree):
 // void AST::printAST(Node node, int depth) {
 //     // Print the value of the current node
 //     cout << node.token.text << "|" << depth << "|||";
-
 //     // Recursively print the left and right subtrees
 //     for (Node child : node.children)
 //     {
@@ -115,6 +116,7 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
     throw 1;
 }
 
+//Checks for formatting errors for ASSIGN expressions
 void AST::checkTree(Node node, Node parent, int childNum, int totalChildren, TokenType OPERATOR) const
 {
     //cout << node.token.text << endl;
@@ -137,6 +139,7 @@ void AST::checkTree(Node node, Node parent, int childNum, int totalChildren, Tok
     }
 }
 
+//Evaluate
 double AST::evaluateAST(std::unordered_map<std::string, double>& variables)
 {
     return evaluate(root, variables);
