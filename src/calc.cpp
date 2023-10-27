@@ -130,7 +130,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
-        if (index < tokens.size() && tokens[index].type != TokenType::END) {
+        if (index < int(tokens.size()) && tokens[index].type != TokenType::END) {
             printError(tokens[index]);
         }
         return expression;
