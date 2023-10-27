@@ -14,9 +14,9 @@ public:
     ~AST();
 
     double evaluateAST(std::unordered_map<std::string, double>& variables);
-    Node getRoot() const;
     void printInfix() const;
-    void printAST(Node node, int depth);
+    //for debugging purposes (to see the created tree):
+    //void printAST(Node node, int depth);
 
 private:
     Node root;
@@ -26,7 +26,5 @@ private:
     void checkTree(Node node, Node parent, int childNum, int totalChildren, TokenType OPERATOR) const;
     void printInfix(const Node node) const;
 };
-
-void checkTokens(const vector<Token> &tokens, int &index);
 
 void printErrorTwo(const Token &token);
