@@ -120,7 +120,8 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
 void AST::checkTree(Node node, Node parent, int childNum, int totalChildren, TokenType OPERATOR) const
 {
     //cout << node.token.text << endl;
-    if(OPERATOR == ASSIGN){
+    if(OPERATOR == ASSIGN)
+    {
         if(childNum != totalChildren-1 && node.token.type != IDENTIFIER){
             //cout << "this error" << endl;
             if(node.token.type == FLOAT || (node.token.type == PLUS || node.token.type == MINUS || node.token.type == TIMES || node.token.type == DIVIDES)){
@@ -133,7 +134,8 @@ void AST::checkTree(Node node, Node parent, int childNum, int totalChildren, Tok
         }
     }
     long unsigned int i = 0;
-    while (i < node.children.size()){
+    while (i < node.children.size())
+    {
         checkTree(node.children[i], node , i, node.children.size(), node.token.type);
         i++;
     }
@@ -343,12 +345,14 @@ int main(int argc, const char **argv)
     std::unordered_map<std::string, double> variables;
 
     // parse the tokens and put into trees
-    while(tokens[index].type != END){
+    while(tokens[index].type != END)
+    {
         AST ast(tokens, index);
         trees.push_back(ast);
     }
     //print and evaluate trees
-    for(auto tree : trees){
+    for(auto tree : trees)
+    {
         tree.printInfix();
         cout << tree.evaluateAST(variables) << endl;
     }
