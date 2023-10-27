@@ -209,6 +209,9 @@ bool AST::checkVar(Node *root)
     // Recursively check the children nodes
     for (Node *child : root->children)
     {
+        if (error) {
+            break;
+        }
         if (!checkVar(child))
         {
             return false;
