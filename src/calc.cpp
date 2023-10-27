@@ -124,7 +124,6 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         // Handle unexpected token error
         // Implement error handling here
         error = true;
-        cout << "error check" << endl;
         printError(token);
         return nullptr;
     }
