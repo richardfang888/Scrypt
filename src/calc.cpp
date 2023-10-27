@@ -173,19 +173,19 @@ void AST::checkTree(Node *node, int childNum, int totalChildren, TokenType OPERA
 }
 
 double AST::evaluateAST(unordered_map<string, double> &variables)
-{
+{   
+    unordered_map<string, double> originalVariables = variables;
+
     if (!root)
     {
         return numeric_limits<double>::quiet_NaN();
     }
-    return evaluate(root, variables);
+    return evaluate(root, variables, originalVariables);
 }
 
 // Evaluates the given AST node and returns the result of the original expression.
-double AST::evaluate(Node *node, unordered_map<string, double> &variables)
+double AST::evaluate(Node *node, unordered_map<string, double> &variables, unordered_map<string, double> &prevVariables)
 {
-    unordered_map<string, double> originalVariables = variables;
-
     if (!node)
     {
         return numeric_limits<double>::quiet_NaN();
@@ -212,7 +212,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
         {
             // Handle error: Unknown identifier
             cout << "Runtime error: unknown identifier " + identifierText << endl;
-            variables = originalVariables;
+            variables = prevVariables;
             return numeric_limits<double>::quiet_NaN();
         }
     }
@@ -226,7 +226,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
     // Node is assignment operator
     else if (node->token.type == ASSIGN)
     {
-        double result = evaluate(node->children[node->children.size()-1], variables);
+        double result = evaluate(node->children[node->children.size()-1], variables, prevVariables);
         for (int i = int(node->children.size() - 2); i >= 0; i--)
         {
             if (node->children[i]->token.type != IDENTIFIER)
@@ -244,26 +244,26 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
     else
     {
         // Iterate over the rest of the children to apply the operation.
-        double result = evaluate(node->children[0], variables);
+        double result = evaluate(node->children[0], variables, prevVariables);
         for (size_t i = 1; i < node->children.size(); i++)
         {
             Token opToken = node->token;
             if (opToken.type == PLUS)
             {
-                result += evaluate(node->children[i], variables);
+                result += evaluate(node->children[i], variables, prevVariables);
             }
             else if (opToken.type == MINUS)
             {
-                result -= evaluate(node->children[i], variables);
+                result -= evaluate(node->children[i], variables, prevVariables);
             }
             else if (opToken.type == TIMES)
             {
-                result *= evaluate(node->children[i], variables);
+                result *= evaluate(node->children[i], variables, prevVariables);
             }
             else if (opToken.type == DIVIDES)
             {
                 // Check for division by zero.
-                double denominator = evaluate(node->children[i], variables);
+                double denominator = evaluate(node->children[i], variables, prevVariables);
                 if (denominator != 0)
                 {
                     result /= denominator;
