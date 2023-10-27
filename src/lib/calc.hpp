@@ -18,6 +18,7 @@ public:
     Node *makeNode(const Token &token);
     void printInfix() const;
     bool error;
+    bool checkTree(Node* root, unordered_map<string, double> &variables) const;
 
 private:
     Node *root;
@@ -29,7 +30,6 @@ private:
     Node* parsePrimary(const std::vector<Token>& tokens, int& index);
     bool match(const std::vector<Token>& tokens, int index, TokenType expectedType);
     Node *makeTree(const vector<Token> &tokens, int &index);
-    void checkTree(Node *node, int childNum, int totalChildren, TokenType OPERATOR) const;
     void deleteNode(Node *node);
     void printInfix(const Node *node) const;
 };

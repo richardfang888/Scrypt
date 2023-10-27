@@ -155,21 +155,35 @@ bool AST::match(const vector<Token> &tokens, int index, TokenType expectedType)
     return tokens[index].type == expectedType;
 }
 
-void AST::checkTree(Node *node, int childNum, int totalChildren, TokenType OPERATOR) const
+bool AST::checkTree(Node *root, unordered_map<string, double> &variables) const
 {
-    // if (OPERATOR == ASSIGN)
-    // {
-    //     if (childNum != totalChildren - 1 && node->token.type != IDENTIFIER)
-    //     {
-    //         printErrorTwo(node->token);
-    //     }
-    // }
-    // long unsigned int i = 0;
-    // while (i < node->children.size())
-    // {
-    //     checkTree(node->children[i], i, node->children.size(), node->token.type);
-    //     i++;
-    // }
+    if (!root)
+    {
+        return true;
+    }
+    // If the node is an IDENTIFIER token, check if it exists in the variables map
+    if (root->token.type == IDENTIFIER)
+    {
+        string identifierText = root->token.text;
+
+        // Check if the identifier exists in the variables unordered_map
+        auto iter = variables.find(identifierText);
+        if (iter == variables.end())
+        {
+            // Handle error: Unknown identifier
+            cout << "Runtime error: unknown identifier " + identifierText << endl;
+            return false;
+        }
+    }
+    // Recursively check the children nodes
+    for (Node* child : root->children)
+    {
+        if (!checkTree(child, variables))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 double AST::evaluateAST(unordered_map<string, double> &variables)
@@ -375,8 +389,11 @@ int main(int argc, const char **argv)
         {
             ast.printInfix();
         }
-        double result = ast.evaluateAST(variables);
-
+        double result = numeric_limits<double>::quiet_NaN();
+        if (ast.checkTree(ast.getRoot(), variables))
+        {
+            result = ast.evaluateAST(variables);
+        }
         if (!isnan(result))
         {
             cout << result << endl;
