@@ -35,4 +35,4 @@ private:
     void printInfix(const Node *node) const;
 };
 
-void printErrorTwo(const Token &token);
+void printError(const Token &token);
