@@ -226,6 +226,15 @@ void checkLexErrors(vector<Token> &tokens)
     }
 }
 
+void checkCalcLexErrors(vector<Token> &tokens)
+{
+    if (tokens.back().type == TokenType::OTHER)
+    {
+        cout << "Syntax error on line " << tokens.back().lineNumber << " column "
+             << tokens.back().columnNumber << "." << endl;
+    }
+}
+
 void printTokens(vector<Token> &tokens)
 {
     for (const Token &token : tokens)
