@@ -25,10 +25,10 @@ private:
     Node *root;
     double evaluate(Node *root, unordered_map<string, double> &variables);
     Node *parseInfix(const std::vector<Token> &tokens, int &index);
-    Node *parseAssignment(const std::vector<Token> &tokens, int &index, int openParenCount);
-    Node *parseAddition(const std::vector<Token> &tokens, int &index, int openParenCount);
-    Node *parseMultiplication(const std::vector<Token> &tokens, int &index, int openParenCount);
-    Node *parsePrimary(const std::vector<Token> &tokens, int &index, int openParenCount);
+    Node *parseAssignment(const std::vector<Token> &tokens, int &index);
+    Node *parseAddition(const std::vector<Token> &tokens, int &index);
+    Node *parseMultiplication(const std::vector<Token> &tokens, int &index);
+    Node *parsePrimary(const std::vector<Token> &tokens, int &index);
     bool match(const std::vector<Token> &tokens, int index, TokenType expectedType);
     Node *makeTree(const vector<Token> &tokens, int &index);
     void deleteNode(Node *node);

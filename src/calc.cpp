@@ -45,20 +45,20 @@ Node *AST::makeTree(const vector<Token> &tokens, int &index)
 // Function to parse and build an AST from an infix expression
 Node *AST::parseInfix(const vector<Token> &tokens, int &index)
 {
-    return parseAssignment(tokens, index, 0);
+    return parseAssignment(tokens, index);
 }
 
 // Function to parse assignment expressions
-Node *AST::parseAssignment(const vector<Token> &tokens, int &index, int openParenCount)
+Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
 {
     if (error) {
         return nullptr;
     }
-    Node *left = parseAddition(tokens, index, openParenCount);
+    Node *left = parseAddition(tokens, index);
     if (match(tokens, index, TokenType::ASSIGN))
     {
         Node *assignNode = makeNode(tokens[index]);
-        Node *right = parseAssignment(tokens, ++index, openParenCount);
+        Node *right = parseAssignment(tokens, ++index);
         assignNode->children.push_back(left);
         assignNode->children.push_back(right);
         return assignNode;
@@ -67,16 +67,16 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index, int openPare
 }
 
 // Function to parse addition and subtraction expressions
-Node *AST::parseAddition(const vector<Token> &tokens, int &index, int openParenCount)
+Node *AST::parseAddition(const vector<Token> &tokens, int &index)
 {
     if (error) {
         return nullptr;
     }
-    Node *left = parseMultiplication(tokens, index, openParenCount);
+    Node *left = parseMultiplication(tokens, index);
     while (match(tokens, index, TokenType::PLUS) || match(tokens, index, TokenType::MINUS))
     {
         Token opToken = tokens[index++];
-        Node *right = parseMultiplication(tokens, index, openParenCount);
+        Node *right = parseMultiplication(tokens, index);
         Node *opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
@@ -86,16 +86,16 @@ Node *AST::parseAddition(const vector<Token> &tokens, int &index, int openParenC
 }
 
 // Function to parse multiplication and division expressions
-Node *AST::parseMultiplication(const vector<Token> &tokens, int &index, int openParenCount)
+Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
 {
     if (error) {
         return nullptr;
     }
-    Node *left = parsePrimary(tokens, index, openParenCount);
+    Node *left = parsePrimary(tokens, index);
     while (match(tokens, index, TokenType::TIMES) || match(tokens, index, TokenType::DIVIDES))
     {
         Token opToken = tokens[index++];
-        Node *right = parsePrimary(tokens, index, openParenCount);
+        Node *right = parsePrimary(tokens, index);
         Node *opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
@@ -105,7 +105,7 @@ Node *AST::parseMultiplication(const vector<Token> &tokens, int &index, int open
 }
 
 // Function to parse primary expressions
-Node *AST::parsePrimary(const vector<Token> &tokens, int &index, int openParenCount)
+Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
 {
     if (error) {
         return nullptr;
@@ -117,7 +117,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index, int openParenCo
     }
     else if (token.type == TokenType::LEFT_PAREN)
     {
-        Node *expression = parseAssignment(tokens, index, openParenCount + 1);
+        Node *expression = parseAssignment(tokens, index);
         if (!match(tokens, index, TokenType::RIGHT_PAREN))
         {
             // Handle missing closing parenthesis error
@@ -131,21 +131,6 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index, int openParenCo
         }
         ++index; // Increment index to skip the closing parenthesis
         return expression;
-    }
-    else if (token.type == TokenType::RIGHT_PAREN)
-    {
-        // Handle extra closing parenthesis error
-        if (openParenCount == 0)
-        {
-            error = true;
-            printError(token);
-            return nullptr;
-        }
-        else
-        {
-            // Decrement the openParenCount and continue parsing
-            return parsePrimary(tokens, index, openParenCount - 1);
-        }
     }
     else
     {
