@@ -12,15 +12,12 @@ AST::AST(const vector<Token> &tokens, int &index)
     }
     root = makeTree(tokens, index);
 
-    //printAST(root, 0);
-    //cout << endl;
+    // printAST(root, 0);
+    // cout << endl;
 
     checkTree(root, 0, 0, OTHER);
-    if (index != static_cast<int>(tokens.size()) - 1)
-    {
-        printErrorTwo(tokens[index]);
-        return;
-    }
+
+    // cout << "here" << endl;
 }
 void AST::printAST(Node node, int depth) {
     // Print the value of the current node
@@ -41,7 +38,7 @@ AST::~AST()
 Node AST::makeTree(const vector<Token> &tokens, int &index)
 {
     Token token = tokens[index];
-    //cout << "got here" << endl;
+    // cout << "got here" << endl;
     // Base case: if the token is a FLOAT, simply return a new node with that token.
     if (token.type == FLOAT)
     {
@@ -110,8 +107,10 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
 
 void AST::checkTree(Node node, int childNum, int totalChildren, TokenType OPERATOR) const
 {
+    //cout << node.token.text << endl;
     if(OPERATOR == ASSIGN){
         if(childNum != totalChildren-1 && node.token.type != IDENTIFIER){
+            cout << "this error" << endl;
             printErrorTwo(node.token);
         }
     }
@@ -285,18 +284,21 @@ int main(int argc, const char **argv)
         }
     }
 
-    // text = "(= b c (+ 6 3 4))";
+    //text = "(= b c (+ 6 3 4))";
+    //text = "(= b c (+ 6 3 4)) \n (+ 1 2 3)";
     // text = "(+ 4 5 6)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
-    int index1 = 0;
-    AST ast1(tokens, index1);
-    ast1.printInfix();
 
-    // int index = 0;
-    // vector<AST> trees;
-    // //std::unordered_map<std::string, double> variables;
+
+    // int index1 = 0;
+    // AST ast1(tokens, index1);
+    // ast1.printInfix();
+
+    int index = 0;
+    vector<AST> trees;
+    std::unordered_map<std::string, double> variables;
 
     // AST ast(tokens, index);
     // trees.push_back(ast);
@@ -304,25 +306,25 @@ int main(int argc, const char **argv)
     // cout << "after infix" << endl;
 
 
-    // while(tokens[index].type != END){
-    //     cout << "length is " << tokens.size() << endl;
-    //     AST ast(tokens, index);
-    //     trees.push_back(ast);
-    //     cout << "index is " << index << endl;
-    // }
+    while(tokens[index].type != END){
+        //cout << "length is " << tokens.size() << endl;
+        AST ast(tokens, index);
+        trees.push_back(ast);
+        //cout << "index is " << index << endl;
+    }
 
     // cout << trees.size() << endl;
     // trees[0].printInfix();
     // cout << "HAHAHAHAHAHAaa" << endl;
 
     
-    // for(auto tree : trees){
-    //     //printAST(tree.getRoot());
-    //     cout << "HERE" << endl;
-    //     tree.printInfix();
-    //     cout << "HERE HERE HERE" << endl;
-    //     //cout << tree.evaluateAST(variables) << endl;
-    // }
+    for(auto tree : trees){
+        //printAST(tree.getRoot());
+        //cout << "HERE" << endl;
+        tree.printInfix();
+        //cout << "HERE HERE HERE" << endl;
+        //cout << tree.evaluateAST(variables) << endl;
+    }
     //ast.printInfix();
     //cout << ast.evaluateAST() << endl;
 
