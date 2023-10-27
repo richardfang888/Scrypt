@@ -380,7 +380,7 @@ int main(int argc, const char **argv)
         AST ast(tokens);
         if (ast.getRoot() != nullptr && !ast.error)
         {
-            ast.printInfix();
+            // ast.printInfix();
         }
         double result = numeric_limits<double>::quiet_NaN();
         if (ast.checkTree(ast.getRoot(), variables))
@@ -389,7 +389,7 @@ int main(int argc, const char **argv)
         }
         if (!isnan(result))
         {
-            cout << result << endl;
+            // cout << result << endl;
         }
     }
 
