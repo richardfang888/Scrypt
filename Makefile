@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-c -std=c++17 -Wall -Wextra # -Werror
+CFLAGS=-c -std=c++17 -Wall -Wextra -Werror
 SRC_DIR=src
 LIB_DIR=$(SRC_DIR)/lib
 

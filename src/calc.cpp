@@ -120,7 +120,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
             // Handle missing closing parenthesis error
             // Implement error handling here
             error = true;
-            printErrorTwo(tokens[index]);
+            printErrorTwo(tokens[tokens.size() - 1]);
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
@@ -154,7 +154,7 @@ bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
     }
     if (root->token.type == ASSIGN)
     {
-        bool check = checkTree(root->children[root->children.size()-1], variables);
+        bool check = checkTree(root->children[root->children.size() - 1], variables);
         return check;
     }
     // If the node is an IDENTIFIER token, check if it exists in the variables map
@@ -172,7 +172,7 @@ bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
         }
     }
     // Recursively check the children nodes
-    for (Node* child : root->children)
+    for (Node *child : root->children)
     {
         if (!checkTree(child, variables))
         {
@@ -183,7 +183,7 @@ bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
 }
 
 double AST::evaluateAST(unordered_map<string, double> &variables)
-{   
+{
     if (!root)
     {
         return numeric_limits<double>::quiet_NaN();
@@ -233,7 +233,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
     // Node is assignment operator
     else if (node->token.type == ASSIGN)
     {
-        double result = evaluate(node->children[node->children.size()-1], variables);
+        double result = evaluate(node->children[node->children.size() - 1], variables);
         for (int i = int(node->children.size() - 2); i >= 0; i--)
         {
             if (node->children[i]->token.type != IDENTIFIER)
@@ -276,7 +276,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
                     result /= denominator;
                 }
                 else
-                {   
+                {
                     cout << "Runtime error: division by zero." << endl;
                     return numeric_limits<double>::quiet_NaN();
                 }
@@ -376,7 +376,7 @@ int main(int argc, const char **argv)
     {
         text = "((((x = 3) + (y = 5)) + w) + (z = 145))";
         vector<Token> tokens = readTokens(input);
-        checkLexErrors(tokens);
+        checkCalcLexErrors(tokens);
         AST ast(tokens);
         if (ast.getRoot() != nullptr && !ast.error)
         {
