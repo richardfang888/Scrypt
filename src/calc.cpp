@@ -117,11 +117,10 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         Node *expression = parseAssignment(tokens, index);
         if (!match(tokens, index, TokenType::RIGHT_PAREN))
         {   
-            Token closingParen = tokens[index];
             // Handle missing closing parenthesis error
             // Implement error handling here
             error = true;
-            printErrorTwo(closingParen);
+            printErrorTwo(token);
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
