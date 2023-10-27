@@ -117,7 +117,7 @@ vector<Token> readTokens(string &input)
             }
             break;
 
-        //handle identifiers 
+        // handle identifiers
         case '_':
         case 'a':
         case 'A':
@@ -181,11 +181,12 @@ vector<Token> readTokens(string &input)
             }
             else
             {
-                if(currToken.type != FLOAT)
+                if (currToken.type != FLOAT)
                 {
                     createToken(currToken, tokens, IDENTIFIER, string(1, c), 1);
                 }
-                else{
+                else
+                {
                     createToken(currToken, tokens, OTHER, "error", 1);
                     return tokens;
                 }
@@ -226,13 +227,15 @@ void checkLexErrors(vector<Token> &tokens)
     }
 }
 
-void checkCalcLexErrors(vector<Token> &tokens)
+bool checkCalcLexErrors(vector<Token> &tokens)
 {
     if (tokens.back().type == TokenType::OTHER)
     {
         cout << "Syntax error on line " << tokens.back().lineNumber << " column "
              << tokens.back().columnNumber << "." << endl;
+        return false;
     }
+    return true;
 }
 
 void printTokens(vector<Token> &tokens)

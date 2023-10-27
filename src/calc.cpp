@@ -376,20 +376,23 @@ int main(int argc, const char **argv)
     {
         text = "((((x = 3) + (y = 5)) + w) + (z = 145))";
         vector<Token> tokens = readTokens(input);
-        checkCalcLexErrors(tokens);
-        AST ast(tokens);
-        if (ast.getRoot() != nullptr && !ast.error)
+
+        if (checkCalcLexErrors(tokens))
         {
-            // ast.printInfix();
-        }
-        double result = numeric_limits<double>::quiet_NaN();
-        if (ast.checkTree(ast.getRoot(), variables))
-        {
-            result = ast.evaluateAST(variables);
-        }
-        if (!isnan(result))
-        {
-            // cout << result << endl;
+            AST ast(tokens);
+            if (ast.getRoot() != nullptr && !ast.error)
+            {
+                ast.printInfix();
+            }
+            double result = numeric_limits<double>::quiet_NaN();
+            if (ast.checkTree(ast.getRoot(), variables))
+            {
+                result = ast.evaluateAST(variables);
+            }
+            if (!isnan(result))
+            {
+                cout << result << endl;
+            }
         }
     }
 

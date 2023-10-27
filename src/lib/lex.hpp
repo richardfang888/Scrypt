@@ -8,4 +8,4 @@ void printTokens(vector<Token> &tokens);
 
 void checkLexErrors(vector<Token> &tokens);
 
-void checkCalcLexErrors(vector<Token> &tokens);
+bool checkCalcLexErrors(vector<Token> &tokens);
