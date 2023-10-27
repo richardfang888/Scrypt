@@ -51,7 +51,8 @@ Node *AST::parseInfix(const vector<Token> &tokens, int &index)
 // Function to parse assignment expressions
 Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
 {
-    if (error) {
+    if (error)
+    {
         return nullptr;
     }
     Node *left = parseAddition(tokens, index);
@@ -69,7 +70,8 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
 // Function to parse addition and subtraction expressions
 Node *AST::parseAddition(const vector<Token> &tokens, int &index)
 {
-    if (error) {
+    if (error)
+    {
         return nullptr;
     }
     Node *left = parseMultiplication(tokens, index);
@@ -88,7 +90,8 @@ Node *AST::parseAddition(const vector<Token> &tokens, int &index)
 // Function to parse multiplication and division expressions
 Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
 {
-    if (error) {
+    if (error)
+    {
         return nullptr;
     }
     Node *left = parsePrimary(tokens, index);
@@ -107,7 +110,8 @@ Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
 // Function to parse primary expressions
 Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
 {
-    if (error) {
+    if (error)
+    {
         return nullptr;
     }
     Token token = tokens[index++];
@@ -132,10 +136,16 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         ++index; // Increment index to skip the closing parenthesis
         return expression;
     }
+    else if (token.type == TokenType::RIGHT_PAREN)
+    {
+        // Handle unexpected closing parenthesis error
+        error = true;
+        printError(token);
+        return nullptr;
+    }
     else
     {
         // Handle unexpected token error
-        // Implement error handling here
         error = true;
         printError(token);
         return nullptr;
@@ -198,7 +208,8 @@ bool AST::checkVar(Node *root)
     {
         for (int i = int(root->children.size() - 2); i >= 0; i--)
         {
-            if (error) {
+            if (error)
+            {
                 break;
             }
             if (root->children[i]->token.type != IDENTIFIER)
@@ -213,7 +224,8 @@ bool AST::checkVar(Node *root)
     // Recursively check the children nodes
     for (Node *child : root->children)
     {
-        if (error) {
+        if (error)
+        {
             break;
         }
         if (!checkVar(child))
