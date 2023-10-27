@@ -127,6 +127,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
                 cout << "Missing closing" << endl;
                 printError(tokens[index]);
             }
+            deleteNode(expression);
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
