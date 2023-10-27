@@ -36,7 +36,6 @@ Node *AST::makeNode(const Token &token)
 }
 
 // Recursively creates an AST from a list of tokens,
-// checks for if there are formatting errors on converted S expression
 Node *AST::makeTree(const vector<Token> &tokens, int &index)
 {
     return parseInfix(tokens, index);
@@ -136,13 +135,6 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         ++index; // Increment index to skip the closing parenthesis
         return expression;
     }
-    else if (token.type == TokenType::RIGHT_PAREN)
-    {
-        // Handle unexpected closing parenthesis error
-        error = true;
-        printError(token);
-        return nullptr;
-    }
     else
     {
         // Handle unexpected token error
@@ -162,7 +154,8 @@ bool AST::match(const vector<Token> &tokens, int index, TokenType expectedType)
     return tokens[index].type == expectedType;
 }
 
-bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
+// Throws runtime error for unknown identifier
+bool AST::checkIden(Node *root, unordered_map<string, double> &variables)
 {
     if (!root)
     {
@@ -170,7 +163,7 @@ bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
     }
     if (root->token.type == ASSIGN)
     {
-        bool check = checkTree(root->children[root->children.size() - 1], variables);
+        bool check = checkIden(root->children[root->children.size() - 1], variables);
         return check;
     }
     // If the node is an IDENTIFIER token, check if it exists in the variables map
@@ -190,7 +183,7 @@ bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
     // Recursively check the children nodes
     for (Node *child : root->children)
     {
-        if (!checkTree(child, variables))
+        if (!checkIden(child, variables))
         {
             return false;
         }
@@ -198,6 +191,7 @@ bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
     return true;
 }
 
+// Throws runtime error for unknown variable
 bool AST::checkVar(Node *root)
 {
     if (!root)
@@ -412,7 +406,7 @@ void AST::printInfix(const Node *node) const
     }
 }
 
-// Prints an output 2 error message for a given token
+// Prints a formatted error message for a given token
 void printError(const Token &token)
 {
     cout << "Unexpected token at line " << token.lineNumber
@@ -428,9 +422,7 @@ int main(int argc, const char **argv)
 
     while (getline(cin, input)) // Keep reading until EOF
     {
-        text = "((((x = 3) + (y = 5)) + w) + (z = 145))";
         vector<Token> tokens = readTokens(input);
-
         if (checkCalcLexErrors(tokens))
         {
             AST ast(tokens);
@@ -441,7 +433,7 @@ int main(int argc, const char **argv)
                     ast.printInfix();
                 }
                 double result = numeric_limits<double>::quiet_NaN();
-                if (ast.checkTree(ast.getRoot(), variables))
+                if (ast.checkIden(ast.getRoot(), variables))
                 {
                     result = ast.evaluateAST(variables);
                 }

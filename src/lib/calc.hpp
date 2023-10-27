@@ -18,7 +18,7 @@ public:
     Node *makeNode(const Token &token);
     void printInfix() const;
     bool error;
-    bool checkTree(Node *root, unordered_map<string, double> &variables);
+    bool checkIden(Node *root, unordered_map<string, double> &variables);
     bool checkVar(Node *root);
 
 private:
