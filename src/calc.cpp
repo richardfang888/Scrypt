@@ -51,6 +51,9 @@ Node *AST::parseInfix(const vector<Token> &tokens, int &index)
 // Function to parse assignment expressions
 Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
 {
+    if (error) {
+        return nullptr;
+    }
     Node *left = parseAddition(tokens, index);
     if (match(tokens, index, TokenType::ASSIGN))
     {
@@ -66,6 +69,9 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
 // Function to parse addition and subtraction expressions
 Node *AST::parseAddition(const vector<Token> &tokens, int &index)
 {
+    if (error) {
+        return nullptr;
+    }
     Node *left = parseMultiplication(tokens, index);
     while (match(tokens, index, TokenType::PLUS) || match(tokens, index, TokenType::MINUS))
     {
@@ -82,6 +88,9 @@ Node *AST::parseAddition(const vector<Token> &tokens, int &index)
 // Function to parse multiplication and division expressions
 Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
 {
+    if (error) {
+        return nullptr;
+    }
     Node *left = parsePrimary(tokens, index);
     while (match(tokens, index, TokenType::TIMES) || match(tokens, index, TokenType::DIVIDES))
     {
@@ -98,6 +107,9 @@ Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
 // Function to parse primary expressions
 Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
 {
+    if (error) {
+        return nullptr;
+    }
     Token token = tokens[index++];
     if (token.type == TokenType::FLOAT || token.type == TokenType::IDENTIFIER)
     {
