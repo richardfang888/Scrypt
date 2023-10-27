@@ -27,4 +27,6 @@ private:
     void printInfix(const Node node) const;
 };
 
+void checkTokens(const vector<Token> &tokens, int &index);
+
 void printErrorTwo(const Token &token);

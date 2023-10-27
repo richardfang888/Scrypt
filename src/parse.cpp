@@ -10,15 +10,16 @@ AST::AST(const vector<Token> &tokens, int &index)
         printErrorTwo(Token{END, "", 0, 1, 1});
         return;
     }
+
     root = makeTree(tokens, index);
 
-    // printAST(root, 0);
     // cout << endl;
 
     checkTree(root, root, 0, 0, OTHER);
 
     // cout << "here" << endl;
 }
+
 void AST::printAST(Node node, int depth) {
     // Print the value of the current node
     cout << node.token.text << "|" << depth << "|||";
@@ -67,6 +68,11 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
                                tokens[index].type != TIMES && tokens[index].type != DIVIDES && tokens[index].type != ASSIGN))
         {
             printErrorTwo(tokens[index]);
+        } 
+        else if(tokens[index].type == ASSIGN){
+            if(tokens[index + 1].type != IDENTIFIER){
+                printErrorTwo(tokens[index + 1]);
+            }
         }
         node.token = tokens[index++];
 
@@ -308,24 +314,25 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
     //text = "(= b c (+ 6 3 4))";
     //text = "(= a b (+ 6 3 4)) \n (+ 1 a 3)";
     //text ="(= a 3)";
     //text = "(+ 4 5 7)";
     //text = "(= a b 3 z)";
+    //text = "(=(+x)89)";
+
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
-
 
     // int index1 = 0;
     // AST ast1(tokens, index1);
