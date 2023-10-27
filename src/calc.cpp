@@ -121,9 +121,9 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         if (!match(tokens, index, TokenType::RIGHT_PAREN))
         {
             // Handle missing closing parenthesis error
-            error = true;
-            if (index < int(tokens.size()))
+            if (index < int(tokens.size()) && !error)
             {
+                error = true;
                 cout << "Missing closing" << endl;
                 printError(tokens[index]);
             }
