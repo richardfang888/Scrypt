@@ -120,7 +120,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
             // Handle missing closing parenthesis error
             // Implement error handling here
             error = true;
-            printErrorTwo(token);
+            printErrorTwo(tokens[tokens.size()-1]);
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
