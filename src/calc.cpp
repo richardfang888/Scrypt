@@ -175,6 +175,7 @@ bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
         auto iter = variables.find(identifierText);
         if (iter == variables.end())
         {
+            printInfix(root);
             // Handle error: Unknown identifier
             cout << "Runtime error: unknown identifier " + identifierText << endl;
             return false;
@@ -378,23 +379,20 @@ void printErrorTwo(const Token &token)
 int main(int argc, const char **argv)
 {
     string input;
-    string text;
+    // string text;
     unordered_map<string, double> variables;
 
     while (getline(cin, input)) // Keep reading until EOF
     {
-        text = "((((x = 3) + (y = 5)) + w) + (z = 145))";
+        // text = "((((x = 3) + (y = 5)) + w) + (z = 145))";
         vector<Token> tokens = readTokens(input);
         checkLexErrors(tokens);
         AST ast(tokens);
-        if (ast.getRoot() != nullptr && !ast.error)
-        {
-            ast.printInfix();
-        }
         double result = numeric_limits<double>::quiet_NaN();
-        if (ast.checkTree(ast.getRoot(), variables))
+        if (ast.getRoot() != nullptr && !ast.error && !ast.checkTree(ast.getRoot(), variables))
         {
             result = ast.evaluateAST(variables);
+            ast.printInfix();
         }
         if (!isnan(result))
         {
