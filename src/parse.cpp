@@ -217,7 +217,7 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
         }
         else{
             cout << "Runtime error: unknown identifier " << node.token.text << endl;
-            //exit(3);
+            exit(3);
         }
     }
     // If the node does not have any children, throw an error.
