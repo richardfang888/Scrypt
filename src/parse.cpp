@@ -15,7 +15,7 @@ AST::AST(const vector<Token> &tokens, int &index)
 
     // cout << endl;
 
-    checkTree(root, root, 0, 0, OTHER);
+    //checkTree(root, root, 0, 0, OTHER);
 
     // cout << "here" << endl;
 }
