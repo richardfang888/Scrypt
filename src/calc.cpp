@@ -182,6 +182,36 @@ bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
     return true;
 }
 
+bool AST::checkVar(Node *root)
+{
+    if (!root)
+    {
+        return true;
+    }
+    if (root->token.type == ASSIGN)
+    {
+        for (int i = int(root->children.size() - 2); i >= 0; i--)
+        {
+            if (root->children[i]->token.type != IDENTIFIER)
+            {
+                // invalid assignment error
+                error = true;
+                printErrorTwo(root->token);
+                return false;
+            }
+        }
+    }
+    // Recursively check the children nodes
+    for (Node *child : root->children)
+    {
+        if (!checkVar(child))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 double AST::evaluateAST(unordered_map<string, double> &variables)
 {
     if (!root)
@@ -380,8 +410,7 @@ int main(int argc, const char **argv)
         if (checkCalcLexErrors(tokens))
         {
             AST ast(tokens);
-            cout << ast.error << endl;
-            if (ast.getRoot() != nullptr && !ast.error)
+            if (ast.getRoot() != nullptr && !ast.error && ast.checkVar(ast.getRoot()))
             {
                 ast.printInfix();
             }
