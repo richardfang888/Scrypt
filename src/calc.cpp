@@ -380,6 +380,7 @@ int main(int argc, const char **argv)
         if (checkCalcLexErrors(tokens))
         {
             AST ast(tokens);
+            cout << ast.error << endl;
             if (ast.getRoot() != nullptr && !ast.error)
             {
                 ast.printInfix();
