@@ -23,7 +23,7 @@ private:
 
     double evaluate(Node root, std::unordered_map<std::string, double>& variables) const;
     Node makeTree(const vector<Token> &tokens, int &index);
-    void checkTree(Node node, int childNum, int totalChildren, TokenType OPERATOR) const;
+    void checkTree(Node node, Node parent, int childNum, int totalChildren, TokenType OPERATOR) const;
     void printInfix(const Node node) const;
 };
 

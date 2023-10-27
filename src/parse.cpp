@@ -15,7 +15,7 @@ AST::AST(const vector<Token> &tokens, int &index)
     // printAST(root, 0);
     // cout << endl;
 
-    checkTree(root, 0, 0, OTHER);
+    checkTree(root, root, 0, 0, OTHER);
 
     // cout << "here" << endl;
 }
@@ -105,18 +105,24 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
     throw 1;
 }
 
-void AST::checkTree(Node node, int childNum, int totalChildren, TokenType OPERATOR) const
+void AST::checkTree(Node node, Node parent, int childNum, int totalChildren, TokenType OPERATOR) const
 {
     //cout << node.token.text << endl;
     if(OPERATOR == ASSIGN){
         if(childNum != totalChildren-1 && node.token.type != IDENTIFIER){
             //cout << "this error" << endl;
-            printErrorTwo(node.token);
+            if(node.token.type == FLOAT){
+                printErrorTwo(parent.children[totalChildren-1].token);
+            }
+            else
+            {
+                printErrorTwo(node.token);
+            }
         }
     }
     long unsigned int i = 0;
     while (i < node.children.size()){
-        checkTree(node.children[i], i, node.children.size(), node.token.type);
+        checkTree(node.children[i], node , i, node.children.size(), node.token.type);
         i++;
     }
 }
@@ -302,19 +308,20 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
     //text = "(= b c (+ 6 3 4))";
     //text = "(= a b (+ 6 3 4)) \n (+ 1 a 3)";
     //text ="(= a 3)";
     //text = "(+ 4 5 7)";
+    text = "(= a b 3 z)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
