@@ -110,7 +110,7 @@ void AST::checkTree(Node node, int childNum, int totalChildren, TokenType OPERAT
     //cout << node.token.text << endl;
     if(OPERATOR == ASSIGN){
         if(childNum != totalChildren-1 && node.token.type != IDENTIFIER){
-            cout << "this error" << endl;
+            //cout << "this error" << endl;
             printErrorTwo(node.token);
         }
     }
@@ -129,64 +129,68 @@ double AST::evaluateAST(std::unordered_map<std::string, double>& variables)
 // Evaluates the given AST node and returns the result of the original expression.
 double AST::evaluate(Node node, std::unordered_map<std::string, double>& variables) const
 {
-    if (node.token.type == FLOAT)
-    {
-        return stod(node.token.text);
-    }
-    else if(node.token.type == IDENTIFIER){
-        if (variables.count(node.token.text) > 0){
-            return variables.at(node.token.text);
-        }
-        else{
-            cout << "Runtime error: unknown identifier " << node.token.text << endl;
-        }
-    }
-
-
-    // If the node does not have any children, throw an error.
-    else if (node.children.size() == 0)
-    {
-        printErrorTwo(node.token);
-        return 2;
-    }
-    else
+    //cout << node.token.text << endl;
+    double result = 0;
+    if(node.token.type == PLUS || node.token.type == MINUS || node.token.type == TIMES || node.token.type == DIVIDES || node.token.type == ASSIGN)
     {
         // Iterate over the rest of the children to apply the operation.
-        double result = evaluate(node.children[0], variables);
-        for (size_t i = 1; i < node.children.size(); i++)
+        // double result = evaluate(node.children[0], variables);
+        for (size_t i = 0; i < node.children.size(); i++)
         {
+            //cout << "CLASSIC CANDY" << endl;
             Token opToken = node.token;
             if (opToken.type == PLUS)
             {
-                result += evaluate(node.children[i], variables);
+                if(i == 0){
+                    result = evaluate(node.children[i], variables);
+                }
+                else{
+                    result += evaluate(node.children[i], variables);
+                }
             }
             else if (opToken.type == MINUS)
             {
-                result -= evaluate(node.children[i], variables);
+                if(i == 0){
+                    result = evaluate(node.children[i], variables);
+                }
+                else{
+                    result -= evaluate(node.children[i], variables);
+                }
             }
             else if (opToken.type == TIMES)
             {
-                result = evaluate(node.children[i], variables);
+                if(i == 0){
+                    result = evaluate(node.children[i], variables);
+                }
+                else{
+                    result *= evaluate(node.children[i], variables);
+                }
             }
             else if (opToken.type == DIVIDES)
             {
                 // Check for division by zero.
-                double denominator = evaluate(node.children[i], variables);
-                if (denominator != 0)
-                {
-                    result /= denominator;
+                if(i == 0){
+                    result = evaluate(node.children[i], variables);
                 }
-                else
-                {
-                    cout << "Runtime error: division by zero." << endl;
-                    exit(3);
+                else{
+                double denominator = evaluate(node.children[i], variables);
+                    if (denominator != 0)
+                    {
+                        result /= denominator;
+                    }
+                    else
+                    {
+                        cout << "Runtime error: division by zero." << endl;
+                        exit(3);
+                    }
                 }
             }
             else if (opToken.type == ASSIGN)
             {
                 result = evaluate(node.children[node.children.size()-1], variables);
                 for(int i = node.children.size()-2; i >= 0; i--){
-                    variables.at(node.children[i].token.text) = result;
+                    //cout << i << endl;
+                    variables[node.children[i].token.text] = result;
                 }
             }
             else
@@ -196,9 +200,32 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
                 return 2;
             }
         }
-        return result;
     }
-    return 2;
+    else if (node.token.type == FLOAT)
+    {
+        return stod(node.token.text);
+    }
+    else if(node.token.type == IDENTIFIER){
+        if (variables.count(node.token.text) > 0){
+            return variables.at(node.token.text);
+        }
+        else{
+            cout << "Runtime error: unknown identifier " << node.token.text << endl;
+            //exit(3);
+        }
+    }
+    // If the node does not have any children, throw an error.
+    else if (node.children.size() == 0)
+    {
+        printErrorTwo(node.token);
+        return 2;
+    }
+    else
+    {
+        cout << "why we here wtf" << endl;
+        return 2;
+    }
+    return result;
 
 }
 
@@ -285,8 +312,9 @@ int main(int argc, const char **argv)
     }
 
     //text = "(= b c (+ 6 3 4))";
-    //text = "(= b c (+ 6 3 4)) \n (+ 1 2 3)";
-    // text = "(+ 4 5 6)";
+    //text = "(= a b (+ 6 3 4)) \n (+ 1 a 3)";
+    //text ="(= a 3)";
+    //text = "(+ 4 5 7)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
@@ -323,7 +351,7 @@ int main(int argc, const char **argv)
         //cout << "HERE" << endl;
         tree.printInfix();
         //cout << "HERE HERE HERE" << endl;
-        //cout << tree.evaluateAST(variables) << endl;
+        cout << tree.evaluateAST(variables) << endl;
     }
     //ast.printInfix();
     //cout << ast.evaluateAST() << endl;
