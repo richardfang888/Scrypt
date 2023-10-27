@@ -286,8 +286,8 @@ int main(int argc, const char **argv)
         }
     }
 
-    // text = "(= b c (+ 6 3 4))";
-    // text = "(+ 4 5 6)";
+    text = "(= b c (+ 6 3 4))";
+    text = "(+ 4 5 6)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
