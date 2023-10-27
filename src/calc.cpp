@@ -137,12 +137,7 @@ bool AST::match(const vector<Token> &tokens, int index, TokenType expectedType)
     {
         return false;
     }
-    if (tokens[index].type == expectedType)
-    {
-        index++;
-        return true;
-    }
-    return false;
+    return tokens[index].type == expectedType;
 }
 
 bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
