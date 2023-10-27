@@ -111,7 +111,10 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
             // Handle missing closing parenthesis error
             // Implement error handling here
             error = true;
-            printError(tokens[tokens.size() - 2]);
+            if (index < tokens.size())
+            {
+                printError(tokens[index]);
+            }
             return nullptr;
         }
         ++index; // Increment index to skip the closing parenthesis
@@ -134,7 +137,12 @@ bool AST::match(const vector<Token> &tokens, int index, TokenType expectedType)
     {
         return false;
     }
-    return tokens[index].type == expectedType;
+    if (tokens[index].type == expectedType)
+    {
+        index++;
+        return true;
+    }
+    return false;
 }
 
 bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
