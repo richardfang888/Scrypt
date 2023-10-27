@@ -321,7 +321,7 @@ int main(int argc, const char **argv)
     //text = "(= a b (+ 6 3 4)) \n (+ 1 a 3)";
     //text ="(= a 3)";
     //text = "(+ 4 5 7)";
-    text = "(= a b 3 z)";
+    //text = "(= a b 3 z)";
 
     tokens = readTokens(text);
     checkLexErrors(tokens);
