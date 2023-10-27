@@ -410,18 +410,21 @@ int main(int argc, const char **argv)
         if (checkCalcLexErrors(tokens))
         {
             AST ast(tokens);
-            if (ast.getRoot() != nullptr && !ast.error && ast.checkVar(ast.getRoot()))
+            if (ast.checkVar(ast.getRoot()))
             {
-                ast.printInfix();
-            }
-            double result = numeric_limits<double>::quiet_NaN();
-            if (ast.checkTree(ast.getRoot(), variables))
-            {
-                result = ast.evaluateAST(variables);
-            }
-            if (!isnan(result))
-            {
-                cout << result << endl;
+                if (ast.getRoot() != nullptr && !ast.error)
+                {
+                    ast.printInfix();
+                }
+                double result = numeric_limits<double>::quiet_NaN();
+                if (ast.checkTree(ast.getRoot(), variables))
+                {
+                    result = ast.evaluateAST(variables);
+                }
+                if (!isnan(result))
+                {
+                    cout << result << endl;
+                }
             }
         }
     }
