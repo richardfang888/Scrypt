@@ -18,15 +18,6 @@ AST::AST(const vector<Token> &tokens)
         int index = 0;
         root = makeTree(tokens, index);
     }
-    // checkTree(root, 0, 0, OTHER);
-
-    // CAUSING ERROR (figure out later)
-    // if (index != static_cast<int>(tokens.size()) - 1)
-    // {
-    //     deleteNode(root);
-    //     printErrorTwo(tokens[index]);
-    //     return;
-    // }
 }
 
 AST::~AST()
@@ -162,7 +153,17 @@ bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
         return true;
     }
     if (root->token.type == ASSIGN)
-    {
+    {   
+        for (size_t i = 0; i < root->children.size() - 1; i++)
+        {
+            Node* child = root->children[i];
+            if (child->token.type != IDENTIFIER)
+            {
+                // Handle error: Invalid assignment
+                printErrorTwo(root->token);
+                return false;
+            }
+        }
         bool check = checkTree(root->children[root->children.size()-1], variables);
         return check;
     }
@@ -176,6 +177,7 @@ bool AST::checkTree(Node *root, unordered_map<string, double> &variables)
         if (iter == variables.end())
         {
             // Handle error: Unknown identifier
+            printInfix(root);
             cout << "Runtime error: unknown identifier " + identifierText << endl;
             return false;
         }
@@ -385,15 +387,12 @@ int main(int argc, const char **argv)
     {
         text = "((((x = 3) + (y = 5)) + w) + (z = 145))";
         vector<Token> tokens = readTokens(input);
+        double result = numeric_limits<double>::quiet_NaN();
         checkLexErrors(tokens);
         AST ast(tokens);
-        if (ast.getRoot() != nullptr && !ast.error)
+        if (ast.getRoot() != nullptr && !ast.error && ast.checkTree(ast.getRoot(), variables))
         {
             ast.printInfix();
-        }
-        double result = numeric_limits<double>::quiet_NaN();
-        if (ast.checkTree(ast.getRoot(), variables))
-        {
             result = ast.evaluateAST(variables);
         }
         if (!isnan(result))
