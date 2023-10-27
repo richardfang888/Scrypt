@@ -18,11 +18,11 @@ public:
     Node *makeNode(const Token &token);
     void printInfix() const;
     bool error;
-    bool checkTree(Node* root, unordered_map<string, double> &variables) const;
+    bool checkTree(Node* root, unordered_map<string, double> &variables);
 
 private:
     Node *root;
-    double evaluate(Node *root, unordered_map<string, double> &variables, unordered_map<string, double> &prevVariables);
+    double evaluate(Node *root, unordered_map<string, double> &variables);
     Node* parseInfix(const std::vector<Token>& tokens, int& index);
     Node* parseAssignment(const std::vector<Token>& tokens, int& index);
     Node* parseAddition(const std::vector<Token>& tokens, int& index);
