@@ -27,7 +27,7 @@ vector<Token> readTokens(string &input)
 {
     vector<Token> tokens;
     Token currToken;
-    currToken.lineNumber = 1;
+    currToken.lineNumber = 0;
     currToken.columnNumber = 1;
 
     for (char c : input)
