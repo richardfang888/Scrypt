@@ -117,6 +117,7 @@ vector<Token> readTokens(string &input)
                 currToken.text += c;
                 currToken.length++;
             }
+            break;
 
         // handle numbers
         case '0':
