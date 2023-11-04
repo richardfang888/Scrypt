@@ -38,12 +38,6 @@ Node *AST::makeNode(const Token &token)
 // Recursively creates an AST from a list of tokens,
 Node *AST::makeTree(const vector<Token> &tokens, int &index)
 {
-    return parseInfix(tokens, index);
-}
-
-// Function to parse and build an AST from an infix expression
-Node *AST::parseInfix(const vector<Token> &tokens, int &index)
-{
     return parseAssignment(tokens, index);
 }
 
@@ -196,12 +190,12 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         ++index; // Increment index to skip the closing parenthesis
         return expression;
     }
-    else
-    {
-        // Handle unexpected token error
-        printError(token, error);
-        return nullptr;
-    }
+    // else
+    // {
+    //     // Handle unexpected token error
+    //     printError(token, error);
+    //     return nullptr;
+    // }
 }
 
 // Utility function to check if the current token matches the expected token type
