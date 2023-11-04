@@ -21,7 +21,10 @@ int main(int argc, const char **argv)
     }
 
     tokens = readTokens(text);
-    printTokens(tokens);
+    if (tokens.back().text != "error")
+    {
+        printTokens(tokens);
+    }
 
     return 0;
 }
