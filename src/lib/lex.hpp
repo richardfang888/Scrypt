@@ -1,11 +1,11 @@
 #include "token.hpp"
 
-void createToken(Token &currToken, vector<Token> &tokens, TokenType type, const string &text, int length);
+void finishToken(Token &currToken, vector<Token> &tokens);
 
 vector<Token> readTokens(string &input);
 
 void printTokens(vector<Token> &tokens);
 
-void checkLexErrors(vector<Token> &tokens);
+void LexError(vector<Token> &tokens, int lineNumber, int columnNumber);
 
-bool checkCalcLexErrors(vector<Token> &tokens);
+// void CalcLexError(int lineNumber, int columnNumber);

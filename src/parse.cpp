@@ -13,8 +13,6 @@ AST::AST(const vector<Token> &tokens, int &index)
     }
 
     root = makeTree(tokens, index);
-    
-    checkTree(root, root, 0, 0, OTHER);
 }
 
 // for debugging purposes (to see the created tree):
@@ -59,13 +57,12 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         index++;
 
         // Check if the token after LEFT_PAREN is a valid operation. If not, throw an error.
-        if (index > (int)tokens.size() - 1||(tokens[index].type != PLUS && tokens[index].type != MINUS &&
-                               tokens[index].type != TIMES && tokens[index].type != DIVIDES && tokens[index].type != ASSIGN))
+        if (index > (int)tokens.size() - 1 || tokens[index].type != OPERATOR)
         {
             //cout << "should be op" << endl;
             printErrorTwo(tokens[index]);
         } 
-        else if(tokens[index].type == ASSIGN){
+        else if(tokens[index].text == "="){
             if(tokens[index + 1].type != IDENTIFIER){
                 //cout << "should be ident" << endl;
                 printErrorTwo(tokens[index + 1]);
@@ -87,7 +84,7 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         }
         
         //cout << tokens[index].text << node.token.text << endl;
-        if(node.children.size() == 1 && node.token.type == ASSIGN){
+        if(node.children.size() == 1 && node.token.text == "="){
             printErrorTwo(tokens[index]);
         }
         // Error handling for incorrect expressions (like "(+ 1 2" without the closing parenthesis)
@@ -116,31 +113,6 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
     throw 1;
 }
 
-//Checks for formatting errors for ASSIGN expressions
-void AST::checkTree(Node node, Node parent, int childNum, int totalChildren, TokenType OPERATOR) const
-{
-    //cout << node.token.text << endl;
-    if(OPERATOR == ASSIGN)
-    {
-        if(childNum != totalChildren-1 && node.token.type != IDENTIFIER){
-            //cout << "this error" << endl;
-            if(node.token.type == FLOAT || (node.token.type == PLUS || node.token.type == MINUS || node.token.type == TIMES || node.token.type == DIVIDES)){
-                printErrorTwo(parent.children[totalChildren-1].token);
-            }
-            else
-            {
-                printErrorTwo(node.token);
-            }
-        }
-    }
-    long unsigned int i = 0;
-    while (i < node.children.size())
-    {
-        checkTree(node.children[i], node , i, node.children.size(), node.token.type);
-        i++;
-    }
-}
-
 //Evaluate
 double AST::evaluateAST(std::unordered_map<std::string, double>& variables)
 {
@@ -152,13 +124,13 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
 {
     // If the token is an operator, apply the correct operation.
     double result = 0;
-    if(node.token.type == PLUS || node.token.type == MINUS || node.token.type == TIMES || node.token.type == DIVIDES || node.token.type == ASSIGN)
+    if(node.token.type == OPERATOR)
     {
         // Iterate over the rest of the children to apply the operation.
         for (size_t i = 0; i < node.children.size(); i++)
         {
             Token opToken = node.token;
-            if (opToken.type == PLUS)
+            if (opToken.text == "+")
             {
                 if(i == 0){
                     result = evaluate(node.children[i], variables);
@@ -167,7 +139,7 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
                     result += evaluate(node.children[i], variables);
                 }
             }
-            else if (opToken.type == MINUS)
+            else if (opToken.text == "-")
             {
                 if(i == 0){
                     result = evaluate(node.children[i], variables);
@@ -176,7 +148,7 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
                     result -= evaluate(node.children[i], variables);
                 }
             }
-            else if (opToken.type == TIMES)
+            else if (opToken.text == "*")
             {
                 if(i == 0){
                     result = evaluate(node.children[i], variables);
@@ -185,7 +157,7 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
                     result *= evaluate(node.children[i], variables);
                 }
             }
-            else if (opToken.type == DIVIDES)
+            else if (opToken.text == "/")
             {
                 // Check for division by zero.
                 if(i == 0){
@@ -204,7 +176,7 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
                     }
                 }
             }
-            else if (opToken.type == ASSIGN)
+            else if (opToken.text == "=")
             {
                 result = evaluate(node.children[node.children.size()-1], variables);
                 for(int i = node.children.size()-2; i >= 0; i--){
@@ -337,7 +309,6 @@ int main(int argc, const char **argv)
 
     // lex and then check for lex errors
     tokens = readTokens(text);
-    checkLexErrors(tokens);
 
     // set up variables for muti expression parsing
     int index = 0;

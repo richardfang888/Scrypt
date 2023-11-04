@@ -1,18 +1,25 @@
 #include "lex.hpp"
+#include "cmath"
 #include <iomanip>
 #include <iostream>
 #include <algorithm>
 
 using namespace std;
 
-// Helper function to create and push tokens
-void createToken(Token &currToken, vector<Token> &tokens, TokenType type, const string &text, int length)
-{
-    currToken.type = type;
-    currToken.text = text;
-    currToken.length = length;
-    tokens.push_back(currToken);
-    currToken.columnNumber += length;
+void finishToken(Token &currToken, vector<Token> &tokens) {
+    currToken.columnNumber += currToken.length;
+    // check hanging decimal point
+    if (currToken.type == FLOAT && currToken.text[currToken.length - 1] == '.') 
+    {
+        LexError(tokens, currToken.lineNumber, currToken.columnNumber);
+    }
+    if (currToken.type != WHITESPACE && currToken.length != 0)
+    {
+        tokens.push_back(currToken);
+    }
+    currToken.length = 0;
+    currToken.type = WHITESPACE;
+    currToken.text = "";
 }
 
 // Converts an input string into a list of tokens representing its content
@@ -20,54 +27,96 @@ vector<Token> readTokens(string &input)
 {
     vector<Token> tokens;
     Token currToken;
-    currToken.type = OTHER;
     currToken.lineNumber = 1;
     currToken.columnNumber = 1;
 
     for (char c : input)
     {
-        if (currToken.type == DOT && !(c >= '0' && c <= '9'))
-        {
-            createToken(currToken, tokens, OTHER, "error", 1);
-            return tokens;
-        }
-
         // handle delimiters
         switch (c)
         {
         case '\n':
-            currToken.type = NEWLINE;
+            finishToken(currToken, tokens);
             currToken.lineNumber++;
             currToken.columnNumber = 1;
             break;
         case ' ':
         case '\t':
-            currToken.type = WHITESPACE;
+            finishToken(currToken, tokens);
             currToken.columnNumber++;
             break;
+
+
         case '(':
-            createToken(currToken, tokens, LEFT_PAREN, "(", 1);
+            finishToken(currToken, tokens);
+            currToken.text += c;
+            currToken.length++;
+            currToken.type = LEFT_PAREN;
+            finishToken(currToken, tokens);
             break;
         case ')':
-            createToken(currToken, tokens, RIGHT_PAREN, ")", 1);
+            finishToken(currToken, tokens);
+            currToken.text += c;
+            currToken.length++;
+            currToken.type = RIGHT_PAREN; 
+            finishToken(currToken, tokens);
             break;
 
         // handle operators
         case '+':
-            createToken(currToken, tokens, PLUS, "+", 1);
-            break;
         case '-':
-            createToken(currToken, tokens, MINUS, "-", 1);
-            break;
         case '*':
-            createToken(currToken, tokens, TIMES, "*", 1);
-            break;
         case '/':
-            createToken(currToken, tokens, DIVIDES, "/", 1);
+        case '%':
+            finishToken(currToken, tokens);
+            currToken.text += c;
+            currToken.length++;
+            currToken.type = OPERATOR;
+            finishToken(currToken, tokens);
             break;
+        
+        // handle logical operators
+        case '&':
+        case '|':
+        case '^':
+            finishToken(currToken, tokens);
+            currToken.text += c;
+            currToken.length++;
+            currToken.type = LOGICAL;
+            finishToken(currToken, tokens);
+            break;
+
+        // handle comparators
+        case '!':
+        case '>':
+        case '<':
+            if (currToken.type != COMPARATOR) {
+                finishToken(currToken, tokens);
+                currToken.type = COMPARATOR;
+            }
+            currToken.text += c;
+            currToken.length++;
+            break;
+        
+        // either operator or comparator
         case '=':
-            createToken(currToken, tokens, ASSIGN, "=", 1);
-            break;
+            // handle == case
+            if (currToken.text == "=") {
+                currToken.type = COMPARATOR;
+            }
+            // handle !=, >=, <=, == comparator cases
+            if (currToken.type == COMPARATOR) {
+                currToken.text += c;
+                currToken.length++;
+                finishToken(currToken, tokens);
+            }
+            // default assingment operator case
+            else {
+                finishToken(currToken, tokens);
+                currToken.type = OPERATOR;
+                currToken.text += c;
+                currToken.length++;
+            }
 
         // handle numbers
         case '0':
@@ -80,41 +129,25 @@ vector<Token> readTokens(string &input)
         case '7':
         case '8':
         case '9':
-            if (currToken.type == IDENTIFIER)
-            {
-                currToken.text += c;
-                currToken.length++;
-                currToken.columnNumber = tokens.back().columnNumber;
-                tokens.pop_back();
-                createToken(currToken, tokens, IDENTIFIER, currToken.text, currToken.length);
+            // deal with numbers in an identifier
+            // if (currToken.type == IDENTFIER) {}
+            if (currToken.type != FLOAT) {
+                finishToken(currToken, tokens);
+                currToken.type = FLOAT;
             }
-            else if (currToken.type == FLOAT || currToken.type == DOT)
-            {
-                currToken.text += c;
-                currToken.length++;
-                currToken.columnNumber = tokens.back().columnNumber;
-                tokens.pop_back();
-                createToken(currToken, tokens, FLOAT, currToken.text, currToken.length);
-            }
-            else
-            {
-                createToken(currToken, tokens, FLOAT, string(1, c), 1);
-            }
+            currToken.text += c;
+            currToken.length++;
             break;
+
         case '.':
             if (currToken.type != FLOAT || currToken.text.find(".") != string::npos)
             {
-                createToken(currToken, tokens, OTHER, "error", 1);
+                finishToken(currToken, tokens);
+                LexError(tokens, currToken.lineNumber, currToken.columnNumber);
                 return tokens;
             }
-            else
-            {
-                currToken.text += c;
-                currToken.length++;
-                currToken.columnNumber = tokens.back().columnNumber;
-                tokens.pop_back();
-                createToken(currToken, tokens, DOT, currToken.text, currToken.length);
-            }
+            currToken.text += c;
+            currToken.length++;
             break;
 
         // handle identifiers
@@ -127,7 +160,6 @@ vector<Token> readTokens(string &input)
         case 'C':
         case 'd':
         case 'D':
-        case 'e':
         case 'E':
         case 'f':
         case 'F':
@@ -171,25 +203,40 @@ vector<Token> readTokens(string &input)
         case 'Y':
         case 'z':
         case 'Z':
-            if (currToken.type == IDENTIFIER)
+            if (currToken.type == FLOAT)
             {
-                currToken.text += c;
-                currToken.length++;
-                currToken.columnNumber = tokens.back().columnNumber;
-                tokens.pop_back();
-                createToken(currToken, tokens, IDENTIFIER, currToken.text, currToken.length);
+                finishToken(currToken, tokens);
+                LexError(tokens, currToken.lineNumber, currToken.columnNumber);
+                return tokens;
             }
-            else
+            if (currToken.type != IDENTIFIER)
             {
-                if (currToken.type != FLOAT)
-                {
-                    createToken(currToken, tokens, IDENTIFIER, string(1, c), 1);
-                }
-                else
-                {
-                    createToken(currToken, tokens, OTHER, "error", 1);
-                    return tokens;
-                }
+                finishToken(currToken, tokens);
+                currToken.type = IDENTIFIER;
+            }
+            currToken.text += c;
+            currToken.length++;
+            break;
+
+        // handle possible boolean
+        case 'e':
+            if (currToken.type == FLOAT)
+            {
+                finishToken(currToken, tokens);
+                LexError(tokens, currToken.lineNumber, currToken.columnNumber);
+                return tokens;
+            }
+            if (currToken.type != IDENTIFIER)
+            {
+                finishToken(currToken, tokens);
+                currToken.type = IDENTIFIER;
+            }
+            currToken.text += c;
+            currToken.length++;
+            if (currToken.text == "true" || currToken.text == "false")
+            {   
+                currToken.type = BOOLEAN;
+                finishToken(currToken, tokens);
             }
             break;
 
@@ -197,45 +244,33 @@ vector<Token> readTokens(string &input)
         default:
             if (!isspace(c))
             {
-                createToken(currToken, tokens, OTHER, string(1, c), 1);
+                finishToken(currToken, tokens);
+                LexError(tokens, currToken.lineNumber, currToken.columnNumber);
                 return tokens;
             }
         }
     }
 
     // post-processing
-    if (!tokens.empty() && tokens.back().type == DOT)
-    {
-        createToken(currToken, tokens, OTHER, "error", 1);
-    }
-    else if (tokens.empty() || tokens.back().type != TokenType::END)
-    {
-        createToken(currToken, tokens, END, "END", 1);
+    if (tokens.empty() || tokens.back().type != END)
+    {   
+        finishToken(currToken, tokens);
+        currToken.type = END;
+        currToken.text = "END";
+        currToken.length++;
+        finishToken(currToken, tokens);
     }
 
     return tokens;
 }
 
 // Checks for lexical errors in the given list of tokens
-void checkLexErrors(vector<Token> &tokens)
+void LexError(vector<Token> &tokens, int lineNumber, int columnNumber)
 {
-    if (tokens.back().type == TokenType::OTHER)
-    {
-        cout << "Syntax error on line " << tokens.back().lineNumber << " column "
-             << tokens.back().columnNumber << "." << endl;
-        exit(1);
-    }
-}
-
-bool checkCalcLexErrors(vector<Token> &tokens)
-{
-    if (tokens.back().type == TokenType::OTHER)
-    {
-        cout << "Syntax error on line " << tokens.back().lineNumber << " column "
-             << tokens.back().columnNumber << "." << endl;
-        return false;
-    }
-    return true;
+    cout << "Syntax error on line " << lineNumber << " column "
+            << columnNumber << "." << endl;
+    tokens.push_back({OTHER, "error", 0, lineNumber, columnNumber});
+    // exit(1);
 }
 
 void printTokens(vector<Token> &tokens)

@@ -5,22 +5,12 @@
 using namespace std;
 
 enum TokenType {
-    // operators
-    PLUS,
-    MINUS,
-    TIMES,
-    DIVIDES,
-    ASSIGN,
-
-    // identifiers
-    IDENTIFIER,
-
-    // numbers
-    FLOAT,
-    DOT,
-
-    // delimiters
-    NEWLINE,
+    OPERATOR, // +, -, *, /, =, %
+    COMPARATOR, // ==, !=, >, <, >=, <=
+    LOGICAL, // &, |, ^
+    IDENTIFIER, // variable
+    FLOAT, // number
+    BOOLEAN, // true, false
     WHITESPACE,
     LEFT_PAREN,
     RIGHT_PAREN,
@@ -31,7 +21,7 @@ enum TokenType {
 };
 
 struct Token {
-    enum TokenType type;
+    enum TokenType type{WHITESPACE};
     string text;
     int length;
     int lineNumber;

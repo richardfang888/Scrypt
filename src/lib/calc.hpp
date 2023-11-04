@@ -29,7 +29,7 @@ private:
     Node *parseAddition(const std::vector<Token> &tokens, int &index);
     Node *parseMultiplication(const std::vector<Token> &tokens, int &index);
     Node *parsePrimary(const std::vector<Token> &tokens, int &index);
-    bool match(const std::vector<Token> &tokens, int index, TokenType expectedType);
+    bool match(const std::vector<Token> &tokens, int index, string expectedType);
     Node *makeTree(const vector<Token> &tokens, int &index);
     void deleteNode(Node *node);
     void printInfix(const Node *node) const;

@@ -21,7 +21,6 @@ int main(int argc, const char **argv)
     }
 
     tokens = readTokens(text);
-    checkLexErrors(tokens);
     printTokens(tokens);
 
     return 0;

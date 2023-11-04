@@ -55,7 +55,7 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
         return nullptr;
     }
     Node *left = parseAddition(tokens, index);
-    if (match(tokens, index, TokenType::ASSIGN))
+    if (match(tokens, index, "="))
     {
         Node *assignNode = makeNode(tokens[index]);
         Node *right = parseAssignment(tokens, ++index);
@@ -74,7 +74,7 @@ Node *AST::parseAddition(const vector<Token> &tokens, int &index)
         return nullptr;
     }
     Node *left = parseMultiplication(tokens, index);
-    while (match(tokens, index, TokenType::PLUS) || match(tokens, index, TokenType::MINUS))
+    while (match(tokens, index, "+") || match(tokens, index, "-"))
     {
         Token opToken = tokens[index++];
         Node *right = parseMultiplication(tokens, index);
@@ -94,7 +94,7 @@ Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
         return nullptr;
     }
     Node *left = parsePrimary(tokens, index);
-    while (match(tokens, index, TokenType::TIMES) || match(tokens, index, TokenType::DIVIDES))
+    while (match(tokens, index, "*") || match(tokens, index, "/"))
     {
         Token opToken = tokens[index++];
         Node *right = parsePrimary(tokens, index);
@@ -121,13 +121,12 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
     else if (token.type == TokenType::LEFT_PAREN)
     {
         Node *expression = parseAssignment(tokens, index);
-        if (!match(tokens, index, TokenType::RIGHT_PAREN))
+        if (!match(tokens, index, ")"))
         {
             // Handle missing closing parenthesis error
             if (index < int(tokens.size()) && !error)
             {
-                error = true;
-                printError(tokens[index]);
+                printError(tokens[index], error);
             }
             deleteNode(expression);
             return nullptr;
@@ -138,20 +137,19 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
     else
     {
         // Handle unexpected token error
-        error = true;
-        printError(token);
+        printError(token, error);
         return nullptr;
     }
 }
 
 // Utility function to check if the current token matches the expected token type
-bool AST::match(const vector<Token> &tokens, int index, TokenType expectedType)
+bool AST::match(const vector<Token> &tokens, int index, string expectedType)
 {
     if (index >= int(tokens.size()))
     {
         return false;
     }
-    return tokens[index].type == expectedType;
+    return tokens[index].text == expectedType;
 }
 
 // Throws runtime error for unknown identifier
@@ -161,7 +159,7 @@ bool AST::checkIden(Node *root, unordered_map<string, double> &variables)
     {
         return true;
     }
-    if (root->token.type == ASSIGN)
+    if (root->token.text == "=")
     {
         bool check = checkIden(root->children[root->children.size() - 1], variables);
         return check;
@@ -198,7 +196,7 @@ bool AST::checkVar(Node *root)
     {
         return true;
     }
-    if (root->token.type == ASSIGN)
+    if (root->token.text == "=")
     {
         for (int i = int(root->children.size() - 2); i >= 0; i--)
         {
@@ -209,8 +207,7 @@ bool AST::checkVar(Node *root)
             if (root->children[i]->token.type != IDENTIFIER)
             {
                 // invalid assignment error
-                error = true;
-                printError(root->token);
+                printError(root->token, error);
                 return false;
             }
         }
@@ -274,12 +271,11 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
     // Node is an operator but has no children
     else if (node->children.size() == 0)
     {
-        error = true;
-        printError(node->token);
+        printError(node->token, error);
         return numeric_limits<double>::quiet_NaN();
     }
     // Node is assignment operator
-    else if (node->token.type == ASSIGN)
+    else if (node->token.text == "=")
     {
         double result = evaluate(node->children[node->children.size() - 1], variables);
         for (int i = int(node->children.size() - 2); i >= 0; i--)
@@ -287,8 +283,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
             if (node->children[i]->token.type != IDENTIFIER)
             {
                 // invalid assignment error
-                error = true;
-                printError(node->token);
+                printError(node->token, error);
                 return numeric_limits<double>::quiet_NaN();
             }
             variables[node->children[i]->token.text] = result;
@@ -303,19 +298,19 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
         for (size_t i = 1; i < node->children.size(); i++)
         {
             Token opToken = node->token;
-            if (opToken.type == PLUS)
+            if (opToken.text == "+")
             {
                 result += evaluate(node->children[i], variables);
             }
-            else if (opToken.type == MINUS)
+            else if (opToken.text == "-")
             {
                 result -= evaluate(node->children[i], variables);
             }
-            else if (opToken.type == TIMES)
+            else if (opToken.text == "*")
             {
                 result *= evaluate(node->children[i], variables);
             }
-            else if (opToken.type == DIVIDES)
+            else if (opToken.text == "/")
             {
                 // Check for division by zero.
                 double denominator = evaluate(node->children[i], variables);
@@ -332,8 +327,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
             else
             {
                 // If the operation is unrecognized, print an error message.
-                error = true;
-                printError(opToken);
+                printError(opToken, error);
                 return numeric_limits<double>::quiet_NaN();
             }
         }
@@ -407,8 +401,9 @@ void AST::printInfix(const Node *node) const
 }
 
 // Prints a formatted error message for a given token
-void printError(const Token &token)
+void printError(const Token &token, bool &error)
 {
+    error = true;
     cout << "Unexpected token at line " << token.lineNumber
          << " column " << token.columnNumber << ": "
          << token.text << endl;
@@ -423,25 +418,27 @@ int main(int argc, const char **argv)
     while (getline(cin, input)) // Keep reading until EOF
     {
         vector<Token> tokens = readTokens(input);
-        if (checkCalcLexErrors(tokens))
+        if (tokens.back().text == "error")
         {
-            AST ast(tokens);
-            if (ast.checkVar(ast.getRoot()))
-            {
-                if (ast.getRoot() != nullptr && !ast.error)
-                {
-                    ast.printInfix();
-                }
-                double result = numeric_limits<double>::quiet_NaN();
-                if (ast.checkIden(ast.getRoot(), variables))
-                {
-                    result = ast.evaluateAST(variables);
-                }
-                if (!isnan(result))
-                {
-                    cout << result << endl;
-                }
-            }
+            continue;
+        }
+        AST ast(tokens);
+        if (!ast.checkVar(ast.getRoot()))
+        {
+            continue;
+        }
+        if (ast.getRoot() != nullptr && !ast.error)
+        {
+            ast.printInfix();
+        }
+        double result = numeric_limits<double>::quiet_NaN();
+        if (ast.checkIden(ast.getRoot(), variables))
+        {
+            result = ast.evaluateAST(variables);
+        }
+        if (!isnan(result))
+        {
+            cout << result << endl;
         }
     }
 
