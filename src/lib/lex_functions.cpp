@@ -7,14 +7,15 @@
 using namespace std;
 
 void finishToken(Token &currToken, vector<Token> &tokens) {
-    // check hanging decimal point
     if (currToken.length == 0) {
         return;
     }
-    if (currToken.type == FLOAT &&currToken.text[currToken.length - 1] == '.') 
+    // check hanging decimal point
+    if (currToken.type == FLOAT && currToken.text[currToken.length - 1] == '.') 
     {   
         currToken.columnNumber += currToken.length;
         LexError(tokens, currToken.lineNumber, currToken.columnNumber);
+        exit(1);
         return;
     }
     if (currToken.type != WHITESPACE)
