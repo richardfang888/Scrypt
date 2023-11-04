@@ -309,12 +309,6 @@ int main(int argc, const char **argv)
 
     // lex and then check for lex errors
     tokens = readTokens(text);
-    cout << tokens.back().text << endl;
-    if (tokens.back().text == "error")
-    {
-        cout << "Lex error" << endl;
-        exit(1);
-    }
 
     // set up variables for muti expression parsing
     int index = 0;
@@ -324,6 +318,10 @@ int main(int argc, const char **argv)
     // parse the tokens and put into trees
     while(tokens[index].type != END)
     {
+        if (tokens.back().text == "error")
+        {
+            exit(1);
+        }
         AST ast(tokens, index);
         trees.push_back(ast);
     }
