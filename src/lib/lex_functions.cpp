@@ -8,13 +8,16 @@ using namespace std;
 
 void finishToken(Token &currToken, vector<Token> &tokens) {
     // check hanging decimal point
-    if (currToken.type == FLOAT && currToken.text[currToken.length - 1] == '.') 
+    if (currToken.length == 0) {
+        return;
+    }
+    if (currToken.type == FLOAT &&currToken.text[currToken.length - 1] == '.') 
     {   
         currToken.columnNumber += currToken.length;
         LexError(tokens, currToken.lineNumber, currToken.columnNumber);
         return;
     }
-    if (currToken.type != WHITESPACE && currToken.length != 0)
+    if (currToken.type != WHITESPACE)
     {
         tokens.push_back(currToken);
     }

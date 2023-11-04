@@ -23,7 +23,7 @@ enum TokenType {
 struct Token {
     enum TokenType type{WHITESPACE};
     string text;
-    int length;
+    int length{0};
     int lineNumber;
     int columnNumber;
 };
