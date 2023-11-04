@@ -21,10 +21,6 @@ int main(int argc, const char **argv)
     }
 
     tokens = readTokens(text);
-    if (tokens.back().text == "error")
-    {
-        exit(1);
-    }
     if (!tokens.empty())
     {
         printTokens(tokens);

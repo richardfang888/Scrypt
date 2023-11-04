@@ -309,8 +309,10 @@ int main(int argc, const char **argv)
 
     // lex and then check for lex errors
     tokens = readTokens(text);
+    cout << tokens.back().text << endl;
     if (tokens.back().text == "error")
     {
+        cout << "Lex error" << endl;
         exit(1);
     }
 
