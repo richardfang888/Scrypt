@@ -309,6 +309,17 @@ int main(int argc, const char **argv)
 
     // lex and then check for lex errors
     tokens = readTokens(text);
+    // try 
+    // {
+    //     tokens = readTokens(text);
+    //     printTokens(tokens);
+    // }
+    // catch(const lexer_error &e)
+    // {
+    //     cout << e.what() << endl;
+    //     exit(1);
+    // }
+    // tokens = readTokens(text);
 
     // set up variables for muti expression parsing
     int index = 0;

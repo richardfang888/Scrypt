@@ -5,6 +5,7 @@
     "variant": "cpp",
     "limits": "cpp",
     "vector": "cpp",
-    "xstring": "cpp"
+    "xstring": "cpp",
+    "string": "cpp"
   }
 }

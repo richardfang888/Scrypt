@@ -418,10 +418,7 @@ int main(int argc, const char **argv)
     while (getline(cin, input)) // Keep reading until EOF
     {
         vector<Token> tokens = readTokens(input);
-        if (tokens.back().text == "error")
-        {
-            continue;
-        }
+
         AST ast(tokens);
         if (!ast.checkVar(ast.getRoot()))
         {

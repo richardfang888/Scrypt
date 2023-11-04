@@ -30,5 +30,16 @@ int main(int argc, const char **argv)
         printTokens(tokens);
     }
 
+    // try 
+    // {
+    //     tokens = readTokens(text);
+    //     printTokens(tokens);
+    // }
+    // catch(const lexer_error &e)
+    // {
+    //     cout << e.what() << endl;
+    //     exit(1);
+    // }
+
     return 0;
 }

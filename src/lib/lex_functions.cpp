@@ -15,7 +15,6 @@ void finishToken(Token &currToken, vector<Token> &tokens) {
     {   
         currToken.columnNumber += currToken.length;
         LexError(tokens, currToken.lineNumber, currToken.columnNumber);
-        exit(1);
         return;
     }
     if (currToken.type != WHITESPACE)
@@ -269,6 +268,7 @@ void LexError(vector<Token> &tokens, int lineNumber, int columnNumber)
     cout << "Syntax error on line " << lineNumber << " column "
             << columnNumber << "." << endl;
     tokens.push_back({OTHER, "error", 0, lineNumber, columnNumber});
+    // throw lexer_error("Syntax error on line " + to_string(lineNumber) + " column " + to_string(columnNumber) + ".");
 }
 
 void printTokens(vector<Token> &tokens)
