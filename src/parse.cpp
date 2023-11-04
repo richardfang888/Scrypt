@@ -309,6 +309,10 @@ int main(int argc, const char **argv)
 
     // lex and then check for lex errors
     tokens = readTokens(text);
+    if (tokens.back().text == "error")
+    {
+        exit(1);
+    }
 
     // set up variables for muti expression parsing
     int index = 0;
