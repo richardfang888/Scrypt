@@ -27,8 +27,8 @@ vector<Token> readTokens(string &input)
 {
     vector<Token> tokens;
     Token currToken;
-    currToken.lineNumber = 0;
-    currToken.columnNumber = 1;
+    currToken.lineNumber = 1;
+    currToken.columnNumber = 0;
 
     for (char c : input)
     {
@@ -38,7 +38,7 @@ vector<Token> readTokens(string &input)
         case '\n':
             finishToken(currToken, tokens);
             currToken.lineNumber++;
-            currToken.columnNumber = 1;
+            currToken.columnNumber = 0;
             break;
         case ' ':
         case '\t':
