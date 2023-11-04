@@ -54,7 +54,7 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
     {
         return nullptr;
     }
-    Node *left = parseAddition(tokens, index);
+    Node *left = parseLogical(tokens, index);
     if (match(tokens, index, "="))
     {
         Node *assignNode = makeNode(tokens[index]);
@@ -65,6 +65,68 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
     }
     return left;
 }
+
+// Function to parse logical expressions
+Node *AST::parseLogical(const vector<Token> &tokens, int &index)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    Node *left = parseEquality(tokens, index);
+    while (match(tokens, index, "&") || match(tokens, index, "|") || match(tokens, index, "^"))
+    {
+        Token opToken = tokens[index++];
+        Node *right = parseEquality(tokens, index);
+        Node *opNode = makeNode(opToken);
+        opNode->children.push_back(left);
+        opNode->children.push_back(right);
+        left = opNode;
+    }
+    return left;
+}
+
+// Function to parse equality expressions
+Node* AST::parseEquality(const vector<Token>& tokens, int& index)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    Node* left = parseComparison(tokens, index);
+    while (match(tokens, index, "==") || match(tokens, index, "!="))
+    {
+        Token opToken = tokens[index++];
+        Node* right = parseComparison(tokens, index);
+        Node* opNode = makeNode(opToken);
+        opNode->children.push_back(left);
+        opNode->children.push_back(right);
+        left = opNode;
+    }
+    return left;
+}
+
+// Function to parse comparison expressions
+Node* AST::parseComparison(const vector<Token>& tokens, int& index)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    Node* left = parseAddition(tokens, index);
+    while (match(tokens, index, "<") || match(tokens, index, "<=") ||
+           match(tokens, index, ">") || match(tokens, index, ">="))
+    {
+        Token opToken = tokens[index++];
+        Node* right = parseAddition(tokens, index);
+        Node* opNode = makeNode(opToken);
+        opNode->children.push_back(left);
+        opNode->children.push_back(right);
+        left = opNode;
+    }
+    return left;
+}
+
 
 // Function to parse addition and subtraction expressions
 Node *AST::parseAddition(const vector<Token> &tokens, int &index)
@@ -86,7 +148,7 @@ Node *AST::parseAddition(const vector<Token> &tokens, int &index)
     return left;
 }
 
-// Function to parse multiplication and division expressions
+// Function to parse multiplication, division, and modulo expressions
 Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
 {
     if (error)
@@ -94,7 +156,7 @@ Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
         return nullptr;
     }
     Node *left = parsePrimary(tokens, index);
-    while (match(tokens, index, "*") || match(tokens, index, "/"))
+    while (match(tokens, index, "*") || match(tokens, index, "/") || match(tokens, index, "%"))
     {
         Token opToken = tokens[index++];
         Node *right = parsePrimary(tokens, index);
@@ -323,6 +385,9 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
                     cout << "Runtime error: division by zero." << endl;
                     return numeric_limits<double>::quiet_NaN();
                 }
+            }
+            else if (opToken.text == "%") {
+                result = fmod(result, evaluate(node->children[i], variables));
             }
             else
             {

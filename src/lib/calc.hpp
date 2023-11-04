@@ -26,6 +26,9 @@ private:
     double evaluate(Node *root, unordered_map<string, double> &variables);
     Node *parseInfix(const std::vector<Token> &tokens, int &index);
     Node *parseAssignment(const std::vector<Token> &tokens, int &index);
+    Node *parseComparison(const std::vector<Token> &tokens, int &index);
+    Node *parseLogical(const std::vector<Token> &tokens, int &index);
+    Node *parseEquality(const std::vector<Token> &tokens, int &index);
     Node *parseAddition(const std::vector<Token> &tokens, int &index);
     Node *parseMultiplication(const std::vector<Token> &tokens, int &index);
     Node *parsePrimary(const std::vector<Token> &tokens, int &index);
