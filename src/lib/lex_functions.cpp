@@ -7,16 +7,18 @@
 using namespace std;
 
 void finishToken(Token &currToken, vector<Token> &tokens) {
-    currToken.columnNumber += currToken.length;
     // check hanging decimal point
     if (currToken.type == FLOAT && currToken.text[currToken.length - 1] == '.') 
-    {
+    {   
+        currToken.columnNumber += currToken.length;
         LexError(tokens, currToken.lineNumber, currToken.columnNumber);
+        return;
     }
     if (currToken.type != WHITESPACE && currToken.length != 0)
     {
         tokens.push_back(currToken);
     }
+    currToken.columnNumber += currToken.length;
     currToken.length = 0;
     currToken.type = WHITESPACE;
     currToken.text = "";
@@ -130,9 +132,7 @@ vector<Token> readTokens(string &input)
         case '7':
         case '8':
         case '9':
-            // deal with numbers in an identifier
-            // if (currToken.type == IDENTFIER) {}
-            if (currToken.type != FLOAT) {
+            if (currToken.type != FLOAT && currToken.type != IDENTIFIER) {
                 finishToken(currToken, tokens);
                 currToken.type = FLOAT;
             }
@@ -204,12 +204,6 @@ vector<Token> readTokens(string &input)
         case 'Y':
         case 'z':
         case 'Z':
-            if (currToken.type == FLOAT)
-            {
-                finishToken(currToken, tokens);
-                LexError(tokens, currToken.lineNumber, currToken.columnNumber);
-                return tokens;
-            }
             if (currToken.type != IDENTIFIER)
             {
                 finishToken(currToken, tokens);
