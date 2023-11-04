@@ -265,7 +265,6 @@ void LexError(vector<Token> &tokens, int lineNumber, int columnNumber)
     cout << "Syntax error on line " << lineNumber << " column "
             << columnNumber << "." << endl;
     tokens.push_back({OTHER, "error", 0, lineNumber, columnNumber});
-    // exit(1);
 }
 
 void printTokens(vector<Token> &tokens)
