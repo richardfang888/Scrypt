@@ -14,6 +14,9 @@ enum TokenType {
     WHITESPACE,
     LEFT_PAREN,
     RIGHT_PAREN,
+    LEFT_BRACE,
+    RIGHT_BRACE,
+    KEYWORD, // while, print, if, else
     END,
 
     // other unexpected tokens (syntax error)

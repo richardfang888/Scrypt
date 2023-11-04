@@ -53,17 +53,28 @@ vector<Token> readTokens(string &input)
 
 
         case '(':
-            finishToken(currToken, tokens);
-            currToken.text += c;
-            currToken.length++;
-            currToken.type = LEFT_PAREN;
-            finishToken(currToken, tokens);
-            break;
         case ')':
+        case '{':
+        case '}':
             finishToken(currToken, tokens);
             currToken.text += c;
             currToken.length++;
-            currToken.type = RIGHT_PAREN; 
+            if (c == '(')
+            {
+                currToken.type = LEFT_PAREN;
+            }
+            else if (c == ')')
+            {
+                currToken.type = RIGHT_PAREN;
+            }
+            else if (c == '{')
+            {
+                currToken.type = LEFT_BRACE;
+            }
+            else if (c == '}')
+            {
+                currToken.type = RIGHT_BRACE;
+            }
             finishToken(currToken, tokens);
             break;
 
@@ -95,10 +106,8 @@ vector<Token> readTokens(string &input)
         case '!':
         case '>':
         case '<':
-            if (currToken.type != COMPARATOR) {
-                finishToken(currToken, tokens);
-                currToken.type = COMPARATOR;
-            }
+            finishToken(currToken, tokens);
+            currToken.type = COMPARATOR;
             currToken.text += c;
             currToken.length++;
             break;
@@ -164,6 +173,7 @@ vector<Token> readTokens(string &input)
         case 'C':
         case 'd':
         case 'D':
+        case 'e':
         case 'E':
         case 'f':
         case 'F':
@@ -214,27 +224,14 @@ vector<Token> readTokens(string &input)
             }
             currToken.text += c;
             currToken.length++;
-            break;
-
-        // handle possible boolean
-        case 'e':
-            if (currToken.type == FLOAT)
+            if (currToken.text == "if" || currToken.text == "print" || currToken.text == "while" 
+                || currToken.text == "else")
             {
-                finishToken(currToken, tokens);
-                LexError(tokens, currToken.lineNumber, currToken.columnNumber);
-                return tokens;
+                currToken.type = KEYWORD;
             }
-            if (currToken.type != IDENTIFIER)
-            {
-                finishToken(currToken, tokens);
-                currToken.type = IDENTIFIER;
-            }
-            currToken.text += c;
-            currToken.length++;
             if (currToken.text == "true" || currToken.text == "false")
-            {   
+            {
                 currToken.type = BOOLEAN;
-                finishToken(currToken, tokens);
             }
             break;
 
