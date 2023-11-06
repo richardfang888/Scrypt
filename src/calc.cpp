@@ -1,6 +1,5 @@
 #include "lib/calc.hpp"
 #include <iostream>
-#include <stack>
 #include <limits>
 #include <cmath>
 
@@ -35,7 +34,7 @@ Node *AST::makeNode(const Token &token)
     return node;
 }
 
-// Recursively creates an AST from a list of tokens,
+// Recursively creates an AST from a list of tokens
 Node *AST::makeTree(const vector<Token> &tokens, int &index)
 {
     return parseAssignment(tokens, index);
@@ -48,7 +47,7 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
     {
         return nullptr;
     }
-    Node *left = parseLogical(tokens, index);
+    Node *left = parseLogicAnd(tokens, index);
     if (match(tokens, index, "="))
     {
         Node *assignNode = makeNode(tokens[index]);
@@ -61,7 +60,45 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
 }
 
 // Function to parse logical expressions
-Node *AST::parseLogical(const vector<Token> &tokens, int &index)
+Node *AST::parseLogicAnd(const vector<Token> &tokens, int &index)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    Node *left = parseLogicXor(tokens, index);
+    while (match(tokens, index, "&") || match(tokens, index, "|") || match(tokens, index, "^"))
+    {
+        Token opToken = tokens[index++];
+        Node *right = parseLogicXor(tokens, index);
+        Node *opNode = makeNode(opToken);
+        opNode->children.push_back(left);
+        opNode->children.push_back(right);
+        left = opNode;
+    }
+    return left;
+}
+
+Node *AST::parseLogicXor(const vector<Token> &tokens, int &index)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    Node *left = parseLogicOr(tokens, index);
+    while (match(tokens, index, "&") || match(tokens, index, "|") || match(tokens, index, "^"))
+    {
+        Token opToken = tokens[index++];
+        Node *right = parseLogicOr(tokens, index);
+        Node *opNode = makeNode(opToken);
+        opNode->children.push_back(left);
+        opNode->children.push_back(right);
+        left = opNode;
+    }
+    return left;
+}
+
+Node *AST::parseLogicOr(const vector<Token> &tokens, int &index)
 {
     if (error)
     {
@@ -107,12 +144,12 @@ Node* AST::parseComparison(const vector<Token>& tokens, int& index)
     {
         return nullptr;
     }
-    Node* left = parseAddition(tokens, index);
+    Node* left = parseAddSub(tokens, index);
     while (match(tokens, index, "<") || match(tokens, index, "<=") ||
            match(tokens, index, ">") || match(tokens, index, ">="))
     {
         Token opToken = tokens[index++];
-        Node* right = parseAddition(tokens, index);
+        Node* right = parseAddSub(tokens, index);
         Node* opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
@@ -123,17 +160,17 @@ Node* AST::parseComparison(const vector<Token>& tokens, int& index)
 
 
 // Function to parse addition and subtraction expressions
-Node *AST::parseAddition(const vector<Token> &tokens, int &index)
+Node *AST::parseAddSub(const vector<Token> &tokens, int &index)
 {
     if (error)
     {
         return nullptr;
     }
-    Node *left = parseMultiplication(tokens, index);
+    Node *left = parseMultDivMod(tokens, index);
     while (match(tokens, index, "+") || match(tokens, index, "-"))
     {
         Token opToken = tokens[index++];
-        Node *right = parseMultiplication(tokens, index);
+        Node *right = parseMultDivMod(tokens, index);
         Node *opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
@@ -143,7 +180,7 @@ Node *AST::parseAddition(const vector<Token> &tokens, int &index)
 }
 
 // Function to parse multiplication, division, and modulo expressions
-Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
+Node *AST::parseMultDivMod(const vector<Token> &tokens, int &index)
 {
     if (error)
     {
@@ -170,7 +207,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         return nullptr;
     }
     Token token = tokens[index++];
-    if (token.type == TokenType::FLOAT || token.type == TokenType::IDENTIFIER)
+    if (token.type == FLOAT || token.type == IDENTIFIER || token.type == BOOLEAN)
     {
         return makeNode(token);
     }
@@ -182,6 +219,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
             // Handle missing closing parenthesis error
             if (index < int(tokens.size()) && !error)
             {
+                cout << "parenthesis" << endl;
                 printError(tokens[index], error);
             }
             deleteNode(expression);
@@ -190,12 +228,13 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         ++index; // Increment index to skip the closing parenthesis
         return expression;
     }
-    // else
-    // {
-    //     // Handle unexpected token error
-    //     printError(token, error);
-    //     return nullptr;
-    // }
+    else
+    {
+        // Handle unexpected token error
+        cout << "primary" << endl;
+        printError(token, error);
+        return nullptr;
+    }
 }
 
 // Utility function to check if the current token matches the expected token type
@@ -209,7 +248,7 @@ bool AST::match(const vector<Token> &tokens, int index, string expectedType)
 }
 
 // Throws runtime error for unknown identifier
-bool AST::checkIden(Node *root, unordered_map<string, double> &variables)
+bool AST::checkIden(Node *root, unordered_map<string, variant<double, bool>> &variables)
 {
     if (!root)
     {
@@ -245,7 +284,7 @@ bool AST::checkIden(Node *root, unordered_map<string, double> &variables)
     return true;
 }
 
-// Throws runtime error for unknown variable
+// Throws error for invalid assignment
 bool AST::checkVar(Node *root)
 {
     if (!root)
@@ -283,7 +322,7 @@ bool AST::checkVar(Node *root)
     return true;
 }
 
-double AST::evaluateAST(unordered_map<string, double> &variables)
+variant<double, bool> AST::evaluateAST(unordered_map<string, variant<double, bool>> &variables)
 {
     if (!root)
     {
@@ -293,7 +332,7 @@ double AST::evaluateAST(unordered_map<string, double> &variables)
 }
 
 // Evaluates the given AST node and returns the result of the original expression.
-double AST::evaluate(Node *node, unordered_map<string, double> &variables)
+variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<double, bool>> &variables)
 {
     if (!node)
     {
@@ -303,6 +342,18 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
     if (node->token.type == FLOAT)
     {
         return stod(node->token.text);
+    }
+    // If the node holds a BOOLEAN token, simply return its value.
+    if (node->token.type == BOOLEAN)
+    {
+        if (node->token.text == "true")
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     // If the node is an IDENTIFIER token, return its value if it exists in the variables map
     // NOTE: This only runs if an IDENTIFIER is found not during assignment
@@ -333,7 +384,7 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
     // Node is assignment operator
     else if (node->token.text == "=")
     {
-        double result = evaluate(node->children[node->children.size() - 1], variables);
+        variant<double, bool> result = evaluate(node->children[node->children.size() - 1], variables);
         for (int i = int(node->children.size() - 2); i >= 0; i--)
         {
             if (node->children[i]->token.type != IDENTIFIER)
@@ -347,32 +398,42 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
         return result;
     }
     // Node is a non-assignment operator
-    else
+    else if (node->token.type == OPERATOR)
     {
+        variant<double, bool> result = evaluate(node->children[0], variables);
+        if (holds_alternative<bool>(result))
+        {
+           // runtime error
+        }
         // Iterate over the rest of the children to apply the operation.
-        double result = evaluate(node->children[0], variables);
         for (size_t i = 1; i < node->children.size(); i++)
         {
+            if (holds_alternative<bool>(result))
+            {
+                // runtime error
+                break;
+            }
             Token opToken = node->token;
+            double resultDouble = get<double>(result);
             if (opToken.text == "+")
             {
-                result += evaluate(node->children[i], variables);
+                resultDouble += get<double>(evaluate(node->children[i], variables));
             }
             else if (opToken.text == "-")
             {
-                result -= evaluate(node->children[i], variables);
+                resultDouble -= get<double>(evaluate(node->children[i], variables));
             }
             else if (opToken.text == "*")
             {
-                result *= evaluate(node->children[i], variables);
+                resultDouble *= get<double>(evaluate(node->children[i], variables));
             }
             else if (opToken.text == "/")
             {
                 // Check for division by zero.
-                double denominator = evaluate(node->children[i], variables);
-                if (denominator != 0)
+                variant<double, bool> denominator = evaluate(node->children[i], variables);
+                if (get<double>(denominator) != 0)
                 {
-                    result /= denominator;
+                    resultDouble /= get<double>(denominator);
                 }
                 else
                 {
@@ -381,14 +442,81 @@ double AST::evaluate(Node *node, unordered_map<string, double> &variables)
                 }
             }
             else if (opToken.text == "%") {
-                result = fmod(result, evaluate(node->children[i], variables));
+                resultDouble = fmod(resultDouble, get<double>(evaluate(node->children[i], variables)));
             }
             else
             {
                 // If the operation is unrecognized, print an error message.
+                cout << "unknown operator " << endl;
                 printError(opToken, error);
                 return numeric_limits<double>::quiet_NaN();
             }
+        }
+        return result;
+    }
+    else if (node->token.type == COMPARATOR) {
+        // Iterate over the rest of the children to apply the operation.
+        variant<double, bool> result = evaluate(node->children[0], variables);
+        for (size_t i = 1; i < node->children.size(); i++)
+        {
+            variant<double, bool> childrenVal = evaluate(node->children[i], variables);
+            if ((holds_alternative<double>(childrenVal) && !holds_alternative<double>(result)) || (!holds_alternative<double>(childrenVal) && holds_alternative<double>(result)))
+            {
+                // runtime error
+            }
+            Token opToken = node->token;
+            if (opToken.text == ">")
+            {
+                result = result > evaluate(node->children[i], variables);
+            }
+            else if (opToken.text == "<")
+            {
+                result = result < evaluate(node->children[i], variables);
+            }
+            else if (opToken.text == ">=")
+            {
+                result =  result >= evaluate(node->children[i], variables);
+            }
+            else if (opToken.text == "<=")
+            {
+                // Check for division by zero.
+                result = result <= evaluate(node->children[i], variables);
+            }
+            else
+            {
+                // If the operation is unrecognized, print an error message.
+                cout << "unknown operator " << endl;
+                printError(opToken, error);
+                return numeric_limits<double>::quiet_NaN();
+            }
+        }
+        return result;
+    }
+    else if (node->token.type == LOGICAL) {
+        // Iterate over the rest of the children to apply the operation.
+        variant<double, bool> result = evaluate(node->children[0], variables);
+        for (size_t i = 1; i < node->children.size(); i++)
+        {
+            variant<double, bool> childrenVal = evaluate(node->children[i], variables);
+            if (holds_alternative<double>(childrenVal) || holds_alternative<double>(result))
+            {
+                // runtime error
+            }
+            Token opToken = node->token;
+            bool resultBool = get<bool>(result);
+            if (opToken.text == "&")
+            {
+                resultBool = get<bool>(result) && get<bool>(evaluate(node->children[i], variables));
+            }
+            else if (opToken.text == "|")
+            {
+                resultBool = get<bool>(result) || get<bool>(evaluate(node->children[i], variables));
+            }
+            else
+            {
+                resultBool = get<bool>(result) != get<bool>(evaluate(node->children[i], variables));
+            }
+            result = resultBool;
         }
         return result;
     }
@@ -402,11 +530,11 @@ Node *AST::getRoot() const
 
 void AST::printInfix() const
 {
-    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER))
+    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER && root->token.type != BOOLEAN))
         cout << "(";
 
     printInfix(root);
-    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER))
+    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER && root->token.type != BOOLEAN))
         cout << ")";
 
     cout << endl;
@@ -427,7 +555,7 @@ void AST::printInfix(const Node *node) const
         else
             cout << node->token.text;
     }
-    else if (node->token.type == IDENTIFIER)
+    else if (node->token.type == IDENTIFIER || node->token.type == BOOLEAN)
     {
         cout << node->token.text;
     }
@@ -446,12 +574,12 @@ void AST::printInfix(const Node *node) const
             {
                 isFirst = false;
             }
-            if (child->token.type != FLOAT && child->token.type != IDENTIFIER)
+            if (child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
             {
                 cout << "(";
             }
             printInfix(child);
-            if (child->token.type != FLOAT && child->token.type != IDENTIFIER)
+            if (child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
             {
                 cout << ")";
             }
@@ -472,7 +600,7 @@ int main(int argc, const char **argv)
 {
     string input;
     string text;
-    unordered_map<string, double> variables;
+    unordered_map<string, variant<double, bool>> variables; // unordered_map<string, double> variables;
 
     while (getline(cin, input)) // Keep reading until EOF
     {
@@ -487,14 +615,24 @@ int main(int argc, const char **argv)
         {
             ast.printInfix();
         }
-        double result = numeric_limits<double>::quiet_NaN();
+        variant<double, bool> result = numeric_limits<double>::quiet_NaN();
         if (ast.checkIden(ast.getRoot(), variables))
         {
             result = ast.evaluateAST(variables);
         }
-        if (!isnan(result))
-        {
-            cout << result << endl;
+        if (holds_alternative<double>(result)) {
+            if (!isnan(get<double>(result)))
+            {
+                cout << get<double>(result) << endl;
+            }
+        }
+        else {
+            if (get<bool>(result)) {
+                cout << "true" << endl;
+            }
+            else {
+                cout << "false" << endl;
+            }
         }
     }
 
