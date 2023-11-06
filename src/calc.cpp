@@ -2,6 +2,7 @@
 #include <iostream>
 #include <limits>
 #include <cmath>
+#include <stack>
 
 AST::AST(const vector<Token> &tokens)
 {
@@ -323,6 +324,40 @@ bool AST::checkVar(Node *root)
     return true;
 }
 
+// check for parentheses errors
+bool AST::checkParen(vector<Token> &tokens)
+{
+    if (error) {
+        return false;
+    }
+    int count = 0;
+    Token lastToken;
+    
+    for (const Token &token : tokens) {
+        if (token.text == "(") {
+            count++;
+        } else if (token.text == ")") {
+            count--;
+            
+            if (count < 0) {
+                // More right parentheses than left parentheses
+                printError(token, error);
+                return false;
+            }
+        }
+        
+        lastToken = token;
+    }
+    
+    if (count > 0) {
+        // More left parentheses than right parentheses
+        printError(lastToken, error);
+        return false;
+    }
+    
+    return true;
+}
+
 variant<double, bool> AST::evaluateAST(unordered_map<string, variant<double, bool>> &variables)
 {
     if (!root)
@@ -463,7 +498,8 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
         }
         return result;
     }
-    else if (node->token.type == COMPARATOR) {
+    else if (node->token.type == COMPARATOR) 
+    {
         // Iterate over the rest of the children to apply the operation.
         variant<double, bool> result = evaluate(node->children[0], variables);
         for (size_t i = 1; i < node->children.size(); i++)
@@ -511,7 +547,8 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
         }
         return result;
     }
-    else if (node->token.type == LOGICAL) {
+    else if (node->token.type == LOGICAL) 
+    {
         // Iterate over the rest of the children to apply the operation.
         variant<double, bool> result = evaluate(node->children[0], variables);
         for (size_t i = 1; i < node->children.size(); i++)
@@ -631,7 +668,7 @@ int main(int argc, const char **argv)
             continue;
         }
         AST ast(tokens);
-        if (!ast.checkVar(ast.getRoot()))
+        if (!ast.checkVar(ast.getRoot()) || !ast.checkParen(tokens))
         {
             continue;
         }

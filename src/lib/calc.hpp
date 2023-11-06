@@ -21,6 +21,7 @@ public:
     bool error;
     bool checkIden(Node *root, unordered_map<string, variant<double, bool>> &variables);
     bool checkVar(Node *root);
+    bool checkParen(vector<Token> &tokens);
 
 private:
     Node *root;
