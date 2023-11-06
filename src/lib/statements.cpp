@@ -235,7 +235,7 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
     {
         return nullptr;
     }
-    Node *left = parseLogical(tokens, index);
+    Node *left = parseLogicOr(tokens, index);
     if (match(tokens, index, "="))
     {
         Node *assignNode = makeNode(tokens[index]);
@@ -248,14 +248,52 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
 }
 
 // Function to parse logical expressions
-Node *AST::parseLogical(const vector<Token> &tokens, int &index)
+Node *AST::parseLogicOr(const vector<Token> &tokens, int &index)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    Node *left = parseLogicXor(tokens, index);
+    while (match(tokens, index, "|"))
+    {
+        Token opToken = tokens[index++];
+        Node *right = parseLogicXor(tokens, index);
+        Node *opNode = makeNode(opToken);
+        opNode->children.push_back(left);
+        opNode->children.push_back(right);
+        left = opNode;
+    }
+    return left;
+}
+
+Node *AST::parseLogicXor(const vector<Token> &tokens, int &index)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    Node *left = parseLogicAnd(tokens, index);
+    while (match(tokens, index, "^"))
+    {
+        Token opToken = tokens[index++];
+        Node *right = parseLogicAnd(tokens, index);
+        Node *opNode = makeNode(opToken);
+        opNode->children.push_back(left);
+        opNode->children.push_back(right);
+        left = opNode;
+    }
+    return left;
+}
+
+Node *AST::parseLogicAnd(const vector<Token> &tokens, int &index)
 {
     if (error)
     {
         return nullptr;
     }
     Node *left = parseEquality(tokens, index);
-    while (match(tokens, index, "&") || match(tokens, index, "|") || match(tokens, index, "^"))
+    while (match(tokens, index, "&"))
     {
         Token opToken = tokens[index++];
         Node *right = parseEquality(tokens, index);
@@ -294,12 +332,12 @@ Node* AST::parseComparison(const vector<Token>& tokens, int& index)
     {
         return nullptr;
     }
-    Node* left = parseAddition(tokens, index);
+    Node* left = parseAddSub(tokens, index);
     while (match(tokens, index, "<") || match(tokens, index, "<=") ||
            match(tokens, index, ">") || match(tokens, index, ">="))
     {
         Token opToken = tokens[index++];
-        Node* right = parseAddition(tokens, index);
+        Node* right = parseAddSub(tokens, index);
         Node* opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
@@ -310,17 +348,17 @@ Node* AST::parseComparison(const vector<Token>& tokens, int& index)
 
 
 // Function to parse addition and subtraction expressions
-Node *AST::parseAddition(const vector<Token> &tokens, int &index)
+Node *AST::parseAddSub(const vector<Token> &tokens, int &index)
 {
     if (error)
     {
         return nullptr;
     }
-    Node *left = parseMultiplication(tokens, index);
+    Node *left = parseMultDivMod(tokens, index);
     while (match(tokens, index, "+") || match(tokens, index, "-"))
     {
         Token opToken = tokens[index++];
-        Node *right = parseMultiplication(tokens, index);
+        Node *right = parseMultDivMod(tokens, index);
         Node *opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
@@ -330,7 +368,7 @@ Node *AST::parseAddition(const vector<Token> &tokens, int &index)
 }
 
 // Function to parse multiplication, division, and modulo expressions
-Node *AST::parseMultiplication(const vector<Token> &tokens, int &index)
+Node *AST::parseMultDivMod(const vector<Token> &tokens, int &index)
 {
     if (error)
     {
@@ -357,7 +395,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         return nullptr;
     }
     Token token = tokens[index++];
-    if (token.type == TokenType::FLOAT || token.type == TokenType::IDENTIFIER)
+    if (token.type == FLOAT || token.type == IDENTIFIER || token.type == BOOLEAN)
     {
         return makeNode(token);
     }
@@ -369,6 +407,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
             // Handle missing closing parenthesis error
             if (index < int(tokens.size()) && !error)
             {
+                // cout << "parenthesis" << endl;
                 printError(tokens[index], error);
             }
             deleteNode(expression);
@@ -377,12 +416,13 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
         ++index; // Increment index to skip the closing parenthesis
         return expression;
     }
-    // else
-    // {
-    //     // Handle unexpected token error
-    //     printError(token, error);
-    //     return nullptr;
-    // }
+    else
+    {
+        // Handle unexpected token error
+        // cout << "primary" << endl;
+        printError(token, error);
+        return nullptr;
+    }
 }
 
 // Utility function to check if the current token matches the expected token type
@@ -396,7 +436,7 @@ bool AST::match(const vector<Token> &tokens, int index, string expectedType)
 }
 
 // Throws runtime error for unknown identifier
-bool AST::checkIden(Node *root, unordered_map<string, double> &variables)
+bool AST::checkIden(Node *root, unordered_map<string, variant<double, bool>> &variables)
 {
     if (!root)
     {
@@ -417,6 +457,7 @@ bool AST::checkIden(Node *root, unordered_map<string, double> &variables)
         if (iter == variables.end())
         {
             // Handle error: Unknown identifier
+            error = true;
             cout << "Runtime error: unknown identifier " + identifierText << endl;
             return false;
         }
@@ -432,7 +473,7 @@ bool AST::checkIden(Node *root, unordered_map<string, double> &variables)
     return true;
 }
 
-// Throws runtime error for unknown variable
+// Throws error for invalid assignment
 bool AST::checkVar(Node *root)
 {
     if (!root)
@@ -467,6 +508,40 @@ bool AST::checkVar(Node *root)
             return false;
         }
     }
+    return true;
+}
+
+// check for parentheses errors
+bool AST::checkParen(vector<Token> &tokens)
+{
+    if (error) {
+        return false;
+    }
+    int count = 0;
+    Token lastToken;
+    
+    for (const Token &token : tokens) {
+        if (token.text == "(") {
+            count++;
+        } else if (token.text == ")") {
+            count--;
+            
+            if (count < 0) {
+                // More right parentheses than left parentheses
+                printError(token, error);
+                return false;
+            }
+        }
+        
+        lastToken = token;
+    }
+    
+    if (count > 0) {
+        // More left parentheses than right parentheses
+        printError(lastToken, error);
+        return false;
+    }
+    
     return true;
 }
 

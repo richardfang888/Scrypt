@@ -27,15 +27,16 @@ void AST::printAll() const
 
 void AST::printInfix() const
 {
-    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER))
+    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER && root->token.type != BOOLEAN))
         cout << "(";
 
     printInfix(root);
-    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER))
+    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER && root->token.type != BOOLEAN))
         cout << ")";
 
     cout << endl;
 }
+
 // Prints the infix notation of a given AST.
 void AST::printInfix(const Node *node) const
 {
@@ -51,7 +52,7 @@ void AST::printInfix(const Node *node) const
         else
             cout << node->token.text;
     }
-    else if (node->token.type == IDENTIFIER)
+    else if (node->token.type == IDENTIFIER || node->token.type == BOOLEAN)
     {
         cout << node->token.text;
     }
@@ -70,12 +71,12 @@ void AST::printInfix(const Node *node) const
             {
                 isFirst = false;
             }
-            if (child->token.type != FLOAT && child->token.type != IDENTIFIER)
+            if (child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
             {
                 cout << "(";
             }
             printInfix(child);
-            if (child->token.type != FLOAT && child->token.type != IDENTIFIER)
+            if (child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
             {
                 cout << ")";
             }
