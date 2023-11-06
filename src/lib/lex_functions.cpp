@@ -154,7 +154,7 @@ vector<Token> readTokens(string &input)
                 vector<Token> empty;
                 return empty;
             }
-            else if (i != int(input.size()) - 1  && !(input[i+1] >= '0' && input[i+1] <= '9'))
+            else if (i == int(input.size()) - 1  || !(input[i+1] >= '0' && input[i+1] <= '9'))
             {
                 currToken.length++;
                 finishToken(currToken, tokens);
