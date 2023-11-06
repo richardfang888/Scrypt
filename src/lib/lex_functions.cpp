@@ -37,7 +37,8 @@ vector<Token> readTokens(string &input)
 
     for (char c : input)
     {
-        if (tokens.size() > 2 && (tokens.back().text == "error" || tokens[tokens.size() - 2].text == "error")) {
+        if ((!tokens.empty() && tokens.back().text == "error" ) || (tokens.size() > 2 && tokens[tokens.size() - 2].text == "error")) 
+        {
             vector<Token> empty;
             return empty;
         }
@@ -253,7 +254,8 @@ vector<Token> readTokens(string &input)
     }
     finishToken(currToken, tokens);
     // post-processing
-    if ((!tokens.empty() && tokens.back().text == "error" ) || (tokens.size() > 2 && tokens[tokens.size() - 2].text == "error")) {
+    if ((!tokens.empty() && tokens.back().text == "error" ) || (tokens.size() > 2 && tokens[tokens.size() - 2].text == "error")) 
+    {
         vector<Token> empty;
         return empty;
     }

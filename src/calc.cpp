@@ -269,6 +269,7 @@ bool AST::checkIden(Node *root, unordered_map<string, variant<double, bool>> &va
         if (iter == variables.end())
         {
             // Handle error: Unknown identifier
+            error = true;
             cout << "Runtime error: unknown identifier " + identifierText << endl;
             return false;
         }
@@ -334,7 +335,7 @@ variant<double, bool> AST::evaluateAST(unordered_map<string, variant<double, boo
 // Evaluates the given AST node and returns the result of the original expression.
 variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<double, bool>> &variables)
 {
-    if (!node)
+    if (!node || error)
     {
         return numeric_limits<double>::quiet_NaN();
     }
@@ -371,6 +372,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
         else
         {
             // Handle error: Unknown identifier
+            error = true;
             cout << "Runtime error: unknown identifier " + identifierText << endl;
             return numeric_limits<double>::quiet_NaN();
         }
@@ -405,6 +407,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
         if (holds_alternative<bool>(result))
         {
             // runtime error
+            error = true;
             cout << "Runtime error: invalid operand type." << endl;
             return numeric_limits<double>::quiet_NaN();
         }
@@ -413,6 +416,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
         {
             if (holds_alternative<bool>(evaluate(node->children[i], variables)))
             {
+                error = true;
                 cout << "Runtime error: invalid operand type." << endl;
                 return numeric_limits<double>::quiet_NaN();
             }
@@ -440,6 +444,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
                 }
                 else
                 {
+                    error = true;
                     cout << "Runtime error: division by zero." << endl;
                     return numeric_limits<double>::quiet_NaN();
                 }
@@ -466,6 +471,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
             variant<double, bool> childrenVal = evaluate(node->children[i], variables);
             if ((holds_alternative<double>(childrenVal) && !holds_alternative<double>(result)) || (!holds_alternative<double>(childrenVal) && holds_alternative<double>(result)))
             {
+                error = true;
                 cout << "Runtime error: invalid operand type." << endl;
                 return numeric_limits<double>::quiet_NaN();
             }
@@ -513,6 +519,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
             variant<double, bool> childrenVal = evaluate(node->children[i], variables);
             if (holds_alternative<double>(childrenVal) || holds_alternative<double>(result))
             {
+                error = true;
                 cout << "Runtime error: invalid operand type." << endl;
                 return numeric_limits<double>::quiet_NaN();
             }
