@@ -251,15 +251,14 @@ vector<Token> readTokens(string &input)
             }
         }
     }
-
+    finishToken(currToken, tokens);
     // post-processing
-    if (tokens.size() > 2 && (tokens.back().text == "error" || tokens[tokens.size() - 2].text == "error")) {
+    if ((!tokens.empty() && tokens.back().text == "error" ) || (tokens.size() > 2 && tokens[tokens.size() - 2].text == "error")) {
         vector<Token> empty;
         return empty;
     }
-    if (tokens.empty() || tokens.back().type != END)
+    else if (tokens.empty() || tokens.back().type != END)
     {   
-        finishToken(currToken, tokens);
         currToken.type = END;
         currToken.text = "END";
         currToken.length++;

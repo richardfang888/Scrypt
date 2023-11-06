@@ -405,7 +405,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
         if (holds_alternative<bool>(result))
         {
             // runtime error
-            cout << "Runtime error: invalid operand type" << endl;
+            cout << "Runtime error: invalid operand type." << endl;
             return numeric_limits<double>::quiet_NaN();
         }
         // Iterate over the rest of the children to apply the operation.
@@ -413,7 +413,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
         {
             if (holds_alternative<bool>(evaluate(node->children[i], variables)))
             {
-                cout << "Runtime error: invalid operand type" << endl;
+                cout << "Runtime error: invalid operand type." << endl;
                 return numeric_limits<double>::quiet_NaN();
             }
             Token opToken = node->token;
@@ -466,7 +466,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
             variant<double, bool> childrenVal = evaluate(node->children[i], variables);
             if ((holds_alternative<double>(childrenVal) && !holds_alternative<double>(result)) || (!holds_alternative<double>(childrenVal) && holds_alternative<double>(result)))
             {
-                cout << "Runtime error: invalid operand type" << endl;
+                cout << "Runtime error: invalid operand type." << endl;
                 return numeric_limits<double>::quiet_NaN();
             }
             Token opToken = node->token;
@@ -513,7 +513,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
             variant<double, bool> childrenVal = evaluate(node->children[i], variables);
             if (holds_alternative<double>(childrenVal) || holds_alternative<double>(result))
             {
-                cout << "Runtime error: invalid operand type" << endl;
+                cout << "Runtime error: invalid operand type." << endl;
                 return numeric_limits<double>::quiet_NaN();
             }
             Token opToken = node->token;
