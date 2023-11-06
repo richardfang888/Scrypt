@@ -23,7 +23,6 @@ struct WhileNode : public Node
 {
     Token token;
     Node* condition;
-    bool hasElse;
     vector<Node *> statements;
 };
 
@@ -42,7 +41,11 @@ public:
     double evaluateAST(unordered_map<string, double> &variables);
     Node *getRoot() const;
     Node *makeNode(const Token &token);
+    void printAll() const;
     void printInfix() const;
+    void printIfElse() const;
+    void printWhile() const;
+    void printPrint() const;
     bool error;
     bool checkIden(Node *root, unordered_map<string, double> &variables);
     bool checkVar(Node *root);
@@ -69,7 +72,11 @@ private:
     bool match(const std::vector<Token> &tokens, int index, string expectedType);
     Node *makeTree(const vector<Token> &tokens, int &index);
     void deleteNode(Node *node);
+    void printAll(const Node *node) const;
     void printInfix(const Node *node) const;
+    void printIfElse(const Node *node) const;
+    void printWhile(const Node *node) const;
+    void printPrint(const Node *node) const;
 };
 
 void printError(const Token &token, bool &error);

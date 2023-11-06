@@ -1,4 +1,4 @@
-#include "lib/scrypt.hpp"
+#include "lib/format.hpp"
 #include <unordered_map>
 #include <iostream>
 #include <stack>
@@ -6,6 +6,24 @@
 #include <cmath>
 
 using namespace std;
+
+
+void AST::printAll() const
+{
+    if (dynamic_cast<WhileNode *>(node)) {
+        // Node is a WhileNode
+        printWhile();
+    } else if (dynamic_cast<IfElseNode *>(node)) {
+        // Node is an IfElseNode
+        printIfElse();
+    } else if (dynamic_cast<PrintNode *>(node)) {
+        // Node is a PrintNode
+        printPrint();
+    } else {
+        // Node is a normal Node
+        printInfix();
+    }
+}
 
 void AST::printInfix() const
 {
@@ -18,7 +36,6 @@ void AST::printInfix() const
 
     cout << endl;
 }
-
 // Prints the infix notation of a given AST.
 void AST::printInfix(const Node *node) const
 {
@@ -73,37 +90,20 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
     //test cases:
-    //text = "(= b c (+ 6 3 4))";
-    //text = "(= a b (+ 6 3 4)) \n (+ 1 a 3)";
-    //text ="(= a 3)";
-    //text = "(+ 4 5 7)";
-    //text = "(= a b 3 z)";
-    //text = "(=(+x)89)";
-    //text = "(= x (+ 3 3) 4) ";
+    text = "x = 42";
 
-    // lex and then check for lex errors
+    // lex
     tokens = readTokens(text);
-    // try 
-    // {
-    //     tokens = readTokens(text);
-    //     printTokens(tokens);
-    // }
-    // catch(const lexer_error &e)
-    // {
-    //     cout << e.what() << endl;
-    //     exit(1);
-    // }
-    // tokens = readTokens(text);
 
     // set up variables for muti expression parsing
     int index = 0;
@@ -113,7 +113,7 @@ int main(int argc, const char **argv)
     {
         exit(1);
     }
-
+    
     // parse the tokens and put into trees
     while(tokens[index].type != END)
     {
@@ -123,7 +123,7 @@ int main(int argc, const char **argv)
     //print and evaluate trees
     for(auto tree : trees)
     {
-        tree.printInfix();
+        tree.printAll();
     }
 
     return 0;

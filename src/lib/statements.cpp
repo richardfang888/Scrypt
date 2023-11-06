@@ -193,11 +193,11 @@ Node *AST::parseExpression(const vector<Token> &tokens, int &index)
         return nullptr;
     }
     int startOfExpression = index;
-    vector<Token> TokensExpression;
+    vector<Token> tokensExpression;
 
     bool braceCheck = false;
 
-    if(startOfExpression > 0 && match(tokens, startOfExpression - 1, "{"))
+    if(startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while")|| match(tokens, startOfExpression, "if")))
     {
         braceCheck = true;
     }
@@ -206,11 +206,27 @@ Node *AST::parseExpression(const vector<Token> &tokens, int &index)
     {
         Token currToken = tokens[x];
         Token nextToken = tokens[x + 1];
-        TokensExpression.push_back(currToken);
+        tokensExpression.push_back(currToken);
 
+        if(braceCheck)
+        {
+            if(nextToken.type == LEFT_BRACE)
+            {
+                index = x;
+                break;
+            }
+        }
+        else
+        {
+            if(nextToken.lineNumber != currToken.lineNumber || nextToken.type == END)
+            {
+                index = x;
+                break;
+            }
+        }
     }
-
-    return parseAssignment(tokens, index);
+    int assignIndex = 0;
+    return parseAssignment(tokensExpression, assignIndex);
 }
 // Function to parse assignment expressions
 Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
