@@ -513,7 +513,8 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
             variant<double, bool> childrenVal = evaluate(node->children[i], variables);
             if (holds_alternative<double>(childrenVal) || holds_alternative<double>(result))
             {
-                // runtime error
+                cout << "Runtime error: invalid operand type" << endl;
+                return numeric_limits<double>::quiet_NaN();
             }
             Token opToken = node->token;
             bool resultBool = get<bool>(result);
