@@ -15,6 +15,7 @@ void finishToken(Token &currToken, vector<Token> &tokens) {
     {   
         currToken.columnNumber += currToken.length;
         LexError(tokens, currToken.lineNumber, currToken.columnNumber);
+        cout << "here" << endl;
         return;
     }
     if (currToken.type != WHITESPACE)
