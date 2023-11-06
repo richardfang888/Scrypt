@@ -10,13 +10,6 @@ void finishToken(Token &currToken, vector<Token> &tokens) {
     if (currToken.length == 0) {
         return;
     }
-    // check hanging decimal point
-    if (currToken.type == FLOAT && currToken.text[currToken.length - 1] == '.') 
-    {   
-        currToken.columnNumber += currToken.length;
-        LexError(tokens, currToken.lineNumber, currToken.columnNumber);
-        return;
-    }
     if (currToken.type != WHITESPACE)
     {
         tokens.push_back(currToken);
@@ -35,8 +28,10 @@ vector<Token> readTokens(string &input)
     currToken.lineNumber = 1;
     currToken.columnNumber = 1;
 
-    for (char c : input)
+    for (int i = 0; i < int(input.size()); i++)
     {
+        char c = input[i];
+
         // handle delimiters
         switch (c)
         {
@@ -50,7 +45,6 @@ vector<Token> readTokens(string &input)
             finishToken(currToken, tokens);
             currToken.columnNumber++;
             break;
-
 
         case '(':
         case ')':
@@ -157,7 +151,16 @@ vector<Token> readTokens(string &input)
             {
                 finishToken(currToken, tokens);
                 LexError(tokens, currToken.lineNumber, currToken.columnNumber);
-                return tokens;
+                vector<Token> empty;
+                return empty;
+            }
+            else if (i == int(input.size()) - 1  || !(input[i+1] >= '0' && input[i+1] <= '9'))
+            {
+                currToken.length++;
+                finishToken(currToken, tokens);
+                LexError(tokens, currToken.lineNumber, currToken.columnNumber);
+                vector<Token> empty;
+                return empty;
             }
             currToken.text += c;
             currToken.length++;
@@ -241,15 +244,20 @@ vector<Token> readTokens(string &input)
             {
                 finishToken(currToken, tokens);
                 LexError(tokens, currToken.lineNumber, currToken.columnNumber);
-                return tokens;
+                vector<Token> empty;
+                return empty;
             }
         }
     }
-
+    finishToken(currToken, tokens);
     // post-processing
-    if (tokens.empty() || tokens.back().type != END)
+    if ((!tokens.empty() && tokens.back().text == "error" ) || (tokens.size() > 2 && tokens[tokens.size() - 2].text == "error")) 
+    {
+        vector<Token> empty;
+        return empty;
+    }
+    else if (tokens.empty() || tokens.back().type != END)
     {   
-        finishToken(currToken, tokens);
         currToken.type = END;
         currToken.text = "END";
         currToken.length++;
@@ -265,7 +273,6 @@ void LexError(vector<Token> &tokens, int lineNumber, int columnNumber)
     cout << "Syntax error on line " << lineNumber << " column "
             << columnNumber << "." << endl;
     tokens.push_back({OTHER, "error", 0, lineNumber, columnNumber});
-    // throw lexer_error("Syntax error on line " + to_string(lineNumber) + " column " + to_string(columnNumber) + ".");
 }
 
 void printTokens(vector<Token> &tokens)
