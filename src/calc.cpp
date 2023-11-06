@@ -484,6 +484,14 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
                 // Check for division by zero.
                 result = result <= evaluate(node->children[i], variables);
             }
+            else if (opToken.text == "==")
+            {
+                result = result == evaluate(node->children[i], variables);
+            }
+            else if (opToken.text == "!=")
+            {
+                result = result != evaluate(node->children[i], variables);
+            }
             else
             {
                 // If the operation is unrecognized, print an error message.
