@@ -219,7 +219,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
             // Handle missing closing parenthesis error
             if (index < int(tokens.size()) && !error)
             {
-                cout << "parenthesis" << endl;
+                // cout << "parenthesis" << endl;
                 printError(tokens[index], error);
             }
             deleteNode(expression);
@@ -231,7 +231,7 @@ Node *AST::parsePrimary(const vector<Token> &tokens, int &index)
     else
     {
         // Handle unexpected token error
-        cout << "primary" << endl;
+        // cout << "primary" << endl;
         printError(token, error);
         return nullptr;
     }
@@ -450,7 +450,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
             else
             {
                 // If the operation is unrecognized, print an error message.
-                cout << "unknown operator " << endl;
+                // cout << "unknown operator " << endl;
                 printError(opToken, error);
                 return numeric_limits<double>::quiet_NaN();
             }
@@ -498,7 +498,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
             else
             {
                 // If the operation is unrecognized, print an error message.
-                cout << "unknown operator " << endl;
+                // cout << "unknown operator " << endl;
                 printError(opToken, error);
                 return numeric_limits<double>::quiet_NaN();
             }
