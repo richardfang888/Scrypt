@@ -37,6 +37,11 @@ vector<Token> readTokens(string &input)
 
     for (char c : input)
     {
+        if (tokens.size() > 2 && (tokens.back().type == OTHER || tokens[tokens.size() - 2].type == OTHER)) {
+            vector<Token> empty;
+            return empty;
+        }
+        
         // handle delimiters
         switch (c)
         {
@@ -50,7 +55,6 @@ vector<Token> readTokens(string &input)
             finishToken(currToken, tokens);
             currToken.columnNumber++;
             break;
-
 
         case '(':
         case ')':
@@ -157,7 +161,8 @@ vector<Token> readTokens(string &input)
             {
                 finishToken(currToken, tokens);
                 LexError(tokens, currToken.lineNumber, currToken.columnNumber);
-                return tokens;
+                vector<Token> empty;
+                return empty;
             }
             currToken.text += c;
             currToken.length++;
@@ -241,7 +246,8 @@ vector<Token> readTokens(string &input)
             {
                 finishToken(currToken, tokens);
                 LexError(tokens, currToken.lineNumber, currToken.columnNumber);
-                return tokens;
+                vector<Token> empty;
+                return empty;
             }
         }
     }

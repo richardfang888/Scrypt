@@ -47,7 +47,7 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
     {
         return nullptr;
     }
-    Node *left = parseLogicAnd(tokens, index);
+    Node *left = parseLogicOr(tokens, index);
     if (match(tokens, index, "="))
     {
         Node *assignNode = makeNode(tokens[index]);
@@ -60,14 +60,14 @@ Node *AST::parseAssignment(const vector<Token> &tokens, int &index)
 }
 
 // Function to parse logical expressions
-Node *AST::parseLogicAnd(const vector<Token> &tokens, int &index)
+Node *AST::parseLogicOr(const vector<Token> &tokens, int &index)
 {
     if (error)
     {
         return nullptr;
     }
     Node *left = parseLogicXor(tokens, index);
-    while (match(tokens, index, "&") || match(tokens, index, "|") || match(tokens, index, "^"))
+    while (match(tokens, index, "|"))
     {
         Token opToken = tokens[index++];
         Node *right = parseLogicXor(tokens, index);
@@ -85,11 +85,11 @@ Node *AST::parseLogicXor(const vector<Token> &tokens, int &index)
     {
         return nullptr;
     }
-    Node *left = parseLogicOr(tokens, index);
-    while (match(tokens, index, "&") || match(tokens, index, "|") || match(tokens, index, "^"))
+    Node *left = parseLogicAnd(tokens, index);
+    while (match(tokens, index, "^"))
     {
         Token opToken = tokens[index++];
-        Node *right = parseLogicOr(tokens, index);
+        Node *right = parseLogicAnd(tokens, index);
         Node *opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
@@ -98,14 +98,14 @@ Node *AST::parseLogicXor(const vector<Token> &tokens, int &index)
     return left;
 }
 
-Node *AST::parseLogicOr(const vector<Token> &tokens, int &index)
+Node *AST::parseLogicAnd(const vector<Token> &tokens, int &index)
 {
     if (error)
     {
         return nullptr;
     }
     Node *left = parseEquality(tokens, index);
-    while (match(tokens, index, "&") || match(tokens, index, "|") || match(tokens, index, "^"))
+    while (match(tokens, index, "&"))
     {
         Token opToken = tokens[index++];
         Node *right = parseEquality(tokens, index);
@@ -404,15 +404,17 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
         variant<double, bool> result = evaluate(node->children[0], variables);
         if (holds_alternative<bool>(result))
         {
-           // runtime error
+            // runtime error
+            cout << "Runtime error: invalid operand type" << endl;
+            return numeric_limits<double>::quiet_NaN();
         }
         // Iterate over the rest of the children to apply the operation.
         for (size_t i = 1; i < node->children.size(); i++)
         {
             if (holds_alternative<bool>(result))
             {
-                // runtime error
-                break;
+                cout << "Runtime error: invalid operand type" << endl;
+                return numeric_limits<double>::quiet_NaN();
             }
             Token opToken = node->token;
             double resultDouble = get<double>(result);
@@ -464,7 +466,8 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
             variant<double, bool> childrenVal = evaluate(node->children[i], variables);
             if ((holds_alternative<double>(childrenVal) && !holds_alternative<double>(result)) || (!holds_alternative<double>(childrenVal) && holds_alternative<double>(result)))
             {
-                // runtime error
+                cout << "Runtime error: invalid operand type" << endl;
+                return numeric_limits<double>::quiet_NaN();
             }
             Token opToken = node->token;
             if (opToken.text == ">")
@@ -615,7 +618,10 @@ int main(int argc, const char **argv)
     while (getline(cin, input)) // Keep reading until EOF
     {
         vector<Token> tokens = readTokens(input);
-
+        if (tokens.empty() || tokens.back().text == "error")
+        {
+            continue;
+        }
         AST ast(tokens);
         if (!ast.checkVar(ast.getRoot()))
         {

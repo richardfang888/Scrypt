@@ -9,6 +9,7 @@
     "string": "cpp",
     "unordered_map": "cpp",
     "tuple": "cpp",
-    "utility": "cpp"
+    "utility": "cpp",
+    "ostream": "cpp"
   }
 }
