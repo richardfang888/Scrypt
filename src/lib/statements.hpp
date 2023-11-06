@@ -1,5 +1,6 @@
 #include "lex.hpp"
 #include <unordered_map>
+#include <variant>
 
 struct Node
 {

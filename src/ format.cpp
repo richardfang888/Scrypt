@@ -10,19 +10,61 @@ using namespace std;
 
 void AST::printAll() const
 {
-    if (dynamic_cast<WhileNode *>(node)) {
+    if (typeid(*root) == typeid(IfElseNode)) {
         // Node is a WhileNode
         printWhile();
-    } else if (dynamic_cast<IfElseNode *>(node)) {
+    } else if (typeid(*root) == typeid(WhileNode)) {
         // Node is an IfElseNode
         printIfElse();
-    } else if (dynamic_cast<PrintNode *>(node)) {
+    } else if (typeid(*root) == typeid(PrintNode)) {
         // Node is a PrintNode
         printPrint();
     } else {
         // Node is a normal Node
         printInfix();
     }
+}
+
+void AST::printIfElse() const
+{
+    if (root)
+        cout << "if";
+    printIfElse(root);
+
+    cout << endl;
+}
+
+void AST::printIfElse(const Node *node) const
+{
+    
+}
+
+void AST::printWhile() const
+{
+    if (root)
+        cout << "while";
+    printWhile(root);
+
+    cout << endl;
+}
+
+void AST::printWhile(const Node *node) const
+{
+
+}
+
+void AST::printPrint() const
+{
+    if (root)
+        cout << "print";
+    printPrint(root);
+
+    cout << endl;
+}
+
+void AST::printPrint(const Node *node) const
+{
+
 }
 
 void AST::printInfix() const
