@@ -391,6 +391,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
             {
                 // invalid assignment error
                 printError(node->token, error);
+
                 return numeric_limits<double>::quiet_NaN();
             }
             variables[node->children[i]->token.text] = result;
@@ -451,6 +452,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
                 printError(opToken, error);
                 return numeric_limits<double>::quiet_NaN();
             }
+            result = resultDouble;
         }
         return result;
     }
