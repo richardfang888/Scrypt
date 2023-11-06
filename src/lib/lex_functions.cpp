@@ -273,14 +273,13 @@ vector<Token> readTokens(string &input)
 // Checks for lexical errors in the given list of tokens
 void LexError(vector<Token> &tokens, int lineNumber, int columnNumber)
 {
-    if (!tokens.empty() && tokens.back().text == "error")
+    if ((!tokens.empty() && tokens.back().text == "error" ) || (tokens.size() > 2 && tokens[tokens.size() - 2].text == "error"))
     {
         return;
     }
     cout << "Syntax error on line " << lineNumber << " column "
             << columnNumber << "." << endl;
     tokens.push_back({OTHER, "error", 0, lineNumber, columnNumber});
-    // throw lexer_error("Syntax error on line " + to_string(lineNumber) + " column " + to_string(columnNumber) + ".");
 }
 
 void printTokens(vector<Token> &tokens)
