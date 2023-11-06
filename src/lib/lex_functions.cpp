@@ -37,11 +37,11 @@ vector<Token> readTokens(string &input)
 
     for (char c : input)
     {
-        if (tokens.size() > 2 && (tokens.back().type == OTHER || tokens[tokens.size() - 2].type == OTHER)) {
+        if (tokens.size() > 2 && (tokens.back().text == "error" || tokens[tokens.size() - 2].text == "error")) {
             vector<Token> empty;
             return empty;
         }
-        
+
         // handle delimiters
         switch (c)
         {
@@ -253,6 +253,10 @@ vector<Token> readTokens(string &input)
     }
 
     // post-processing
+    if (tokens.size() > 2 && (tokens.back().text == "error" || tokens[tokens.size() - 2].text == "error")) {
+        vector<Token> empty;
+        return empty;
+    }
     if (tokens.empty() || tokens.back().type != END)
     {   
         finishToken(currToken, tokens);

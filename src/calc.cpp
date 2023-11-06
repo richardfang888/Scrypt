@@ -411,7 +411,7 @@ variant<double, bool> AST::evaluate(Node *node, unordered_map<string, variant<do
         // Iterate over the rest of the children to apply the operation.
         for (size_t i = 1; i < node->children.size(); i++)
         {
-            if (holds_alternative<bool>(result))
+            if (holds_alternative<bool>(evaluate(node->children[i], variables)))
             {
                 cout << "Runtime error: invalid operand type" << endl;
                 return numeric_limits<double>::quiet_NaN();
