@@ -17,7 +17,7 @@ public:
     variant<double, bool> evaluateAST(unordered_map<string, variant<double, bool>> &variables);
     Node *getRoot() const;
     Node *makeNode(const Token &token);
-    void printInfix() const;
+    void printInfix(const Node *node) const;
     bool error;
     bool checkIden(Node *root, unordered_map<string, variant<double, bool>> &variables);
     bool checkVar(Node *root);
