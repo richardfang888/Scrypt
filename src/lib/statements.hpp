@@ -5,11 +5,9 @@
 struct Node
 {
     Token token;
-    vector<Node *> children;    
+    vector<Node *> children;
+    virtual ~Node() = default;
 };
-
-// 4 node types that inherit form struct Node
-//
 
 struct IfElseNode : public Node
 {
@@ -18,6 +16,7 @@ struct IfElseNode : public Node
     bool hasElse;
     vector<Node *> statementsTrue;
     vector<Node *> statementsFalse;
+    virtual ~IfElseNode() = default;
 };
 
 struct WhileNode : public Node
@@ -25,12 +24,14 @@ struct WhileNode : public Node
     Token token;
     Node* condition;
     vector<Node *> statements;
+    virtual ~WhileNode() = default;
 };
 
 struct PrintNode : public Node
 {
     Token token;
     Node* expression;
+    virtual ~PrintNode() = default;
 };
 
 class AST
@@ -43,10 +44,10 @@ public:
     Node *getRoot() const;
     Node *makeNode(const Token &token);
     void printAll() const;
-    void printInfix() const;
-    void printIfElse() const;
-    void printWhile() const;
-    void printPrint() const;
+    void printInfix(const Node *node) const;
+    void printIfElse(const Node *node) const;
+    void printWhile(const Node *node) const;
+    void printPrint(const Node *node) const;
     bool error;
     bool checkIden(Node *root, unordered_map<string, variant<double, bool>> &variables);
     bool checkVar(Node *root);
@@ -77,10 +78,10 @@ private:
     Node *makeTree(const vector<Token> &tokens, int &index);
     void deleteNode(Node *node);
     void printAll(const Node *node) const;
-    void printInfix(const Node *node) const;
-    void printIfElse(const Node *node) const;
-    void printWhile(const Node *node) const;
-    void printPrint(const Node *node) const;
+    void printInfixHelper(const Node *node) const;
+    void printIfElseHelper(const Node *node) const;
+    void printWhileHelper(const Node *node) const;
+    void printPrintHelper(const Node *node) const;
 };
 
 void printError(const Token &token, bool &error);

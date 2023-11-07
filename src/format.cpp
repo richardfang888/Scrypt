@@ -12,75 +12,116 @@ void AST::printAll() const
 {
     if (typeid(*root) == typeid(IfElseNode)) {
         // Node is a WhileNode
-        printWhile();
+        printWhile(root);
     } else if (typeid(*root) == typeid(WhileNode)) {
         // Node is an IfElseNode
-        printIfElse();
+        printIfElse(root);
     } else if (typeid(*root) == typeid(PrintNode)) {
         // Node is a PrintNode
-        printPrint();
+        printPrint(root);
     } else {
         // Node is a normal Node
-        printInfix();
+        printInfix(root);
     }
 }
 
-void AST::printIfElse() const
+void AST::printAll(const Node *node) const
 {
-    if (root)
-        cout << "if";
-    printIfElse(root);
-
-    cout << endl;
+    if (typeid(*node) == typeid(IfElseNode)) {
+        // Node is a WhileNode
+        printWhile(node);
+    } else if (typeid(*node) == typeid(WhileNode)) {
+        // Node is an IfElseNode
+        printIfElse(node);
+    } else if (typeid(*node) == typeid(PrintNode)) {
+        // Node is a PrintNode
+        printPrint(node);
+    } else {
+        // Node is a normal Node
+        printInfix(node);
+    }
 }
 
 void AST::printIfElse(const Node *node) const
 {
-    
+    if (node)
+        cout << "if ";
+    const IfElseNode* ifElseNode = dynamic_cast<const IfElseNode*>(node);
+    if (ifElseNode) {
+        printInfix(ifElseNode->condition);
+        cout << " {" << endl;
+        printWhile(node);
+        for(int i = 0; i < ifElseNode->statementsTrue.size() - 1; i++) {
+            printAll(ifElseNode->statementsTrue[i]);
+        }
+        cout << "}" << endl;
+        if(ifElseNode->hasElse) {
+            cout << "else {" << endl;
+            printWhile(node);
+            for(int i = 0; i < ifElseNode->statementsFalse.size() - 1; i++) {
+                printAll(ifElseNode->statementsFalse[i]);
+            }
+            cout << "}" << endl;
+        }
+    }
 }
 
-void AST::printWhile() const
+void AST::printIfElseHelper(const Node *node) const
 {
-    if (root)
-        cout << "while";
-    printWhile(root);
-
-    cout << endl;
+    
 }
 
 void AST::printWhile(const Node *node) const
 {
-
+    if (node)
+        cout << "while ";
+    const WhileNode* whileNode = dynamic_cast<const WhileNode*>(node);
+    if (whileNode) {
+        printInfix(whileNode->condition);
+        cout << " {" << endl;
+        printWhile(root);
+        for(int i = 0; i < whileNode->statements.size() - 1; i++) {
+            printAll(whileNode->statements[i]);
+        }
+        cout << "}" << endl;
+    }
 }
 
-void AST::printPrint() const
+void AST::printWhileHelper(const Node *node) const
 {
-    if (root)
-        cout << "print";
-    printPrint(root);
-
-    cout << endl;
+    
 }
 
 void AST::printPrint(const Node *node) const
 {
+    if (node)
+        cout << "print ";
+    const PrintNode* printNode = dynamic_cast<const PrintNode*>(node);
+    if (printNode) {
+        printInfix(printNode->expression);
+        cout << endl;
+    }
+}
+
+void AST::printPrintHelper(const Node *node) const
+{
 
 }
 
-void AST::printInfix() const
+void AST::printInfix(const Node *node) const
 {
-    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER && root->token.type != BOOLEAN))
+    if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
         cout << "(";
 
-    printInfix(root);
-    if (root && (root->token.type != FLOAT && root->token.type != IDENTIFIER && root->token.type != BOOLEAN))
+    printInfixHelper(node);
+    if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
         cout << ")";
 
     cout << endl;
 }
 
 // Prints the infix notation of a given AST.
-void AST::printInfix(const Node *node) const
+void AST::printInfixHelper(const Node *node) const
 {
     if (!node)
     {
@@ -117,7 +158,7 @@ void AST::printInfix(const Node *node) const
             {
                 cout << "(";
             }
-            printInfix(child);
+            printInfixHelper(child);
             if (child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
             {
                 cout << ")";
