@@ -7,8 +7,8 @@
 AST::AST(const vector<Token> &tokens, int &index)
 {
     error = false;
-    int index = index;
-    root = makeTree(tokens, index);
+    int ind = index;
+    root = makeTree(tokens, ind);
 }
 
 AST::~AST()
