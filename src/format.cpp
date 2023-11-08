@@ -8,47 +8,48 @@
 using namespace std;
 
 
-void AST::printAll()
+void printAll(Node *node)
 {
-    printInfix(root);
-    cout << "Root token text: " << root->token.text << endl;
-    if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(root)) {
-        cout << "printing a if expression:" << endl;
+    //printInfix(node);
+    //cout << "node token text: " << node->token.text << endl;
+    if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(node)) {
+        //cout << "printing a if expression:" << endl;
         // Node is a WhileNode
         printIfElse(iENode);
-    } else if (WhileNode *wNode = dynamic_cast<WhileNode*>(root)) {
+    } else if (WhileNode *wNode = dynamic_cast<WhileNode*>(node)) {
         // Node is an IfElseNode
-        cout << "printing a while expression:" << endl;
+        //cout << "printing a while expression:" << endl;
         printWhile(wNode);
-    } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(root)) {
-        cout << "printing a print expression:" << endl;
+    } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
+        //cout << "printing a print expression:" << endl;
         // Node is a PrintNode
         printPrint(pNode);
     } else {
-        cout << "Printing a infix expression:" << endl;
-        // Node is a normal Node
-        printInfix(root);
-    }
-}
-
-void AST::printAll(const Node *node)
-{
-    if (typeid(*node) == typeid(IfElseNode)) {
-        // Node is a WhileNode
-        printWhile(node);
-    } else if (typeid(*node) == typeid(WhileNode)) {
-        // Node is an IfElseNode
-        printIfElse(node);
-    } else if (typeid(*node) == typeid(PrintNode)) {
-        // Node is a PrintNode
-        printPrint(node);
-    } else {
+        //cout << "Printing a infix expression:" << endl;
         // Node is a normal Node
         printInfix(node);
+        cout << endl;
     }
 }
 
-void AST::printIfElse(const Node *node) 
+// void printAll(const Node *node)
+// {
+//     if (typeid(*node) == typeid(IfElseNode)) {
+//         // Node is a WhileNode
+//         printWhile(node);
+//     } else if (typeid(*node) == typeid(WhileNode)) {
+//         // Node is an IfElseNode
+//         printIfElse(node);
+//     } else if (typeid(*node) == typeid(PrintNode)) {
+//         // Node is a PrintNode
+//         printPrint(node);
+//     } else {
+//         // Node is a normal Node
+//         printInfix(node);
+//     }
+// }
+
+void printIfElse(const Node *node) 
 {
     if (node)
         cout << "if ";
@@ -72,12 +73,12 @@ void AST::printIfElse(const Node *node)
     }
 }
 
-// void AST::printIfElseHelper(const Node *node) const
+// void printIfElseHelper(const Node *node) const
 // {
 
 // }
 
-void AST::printWhile(const Node *node) 
+void printWhile(const Node *node) 
 {
     if (node)
         cout << "while ";
@@ -85,20 +86,20 @@ void AST::printWhile(const Node *node)
     if (whileNode) {
         printInfix(whileNode->condition);
         cout << " {" << endl;
-        printWhile(root);
-        for(size_t i = 0; i < whileNode->statements.size() - 1; i++) {
+        for(size_t i = 0; i < whileNode->statements.size(); i++) {
+            cout << "   ";
             printAll(whileNode->statements[i]);
         }
         cout << "}" << endl;
     }
 }
 
-// void AST::printWhileHelper(const Node *node) const
+// void printWhileHelper(const Node *node) const
 // {
 
 // }
 
-void AST::printPrint(const Node *node) 
+void printPrint(const Node *node) 
 {
     if (node)
         cout << "print ";
@@ -109,12 +110,12 @@ void AST::printPrint(const Node *node)
     }
 }
 
-// void AST::printPrintHelper(const Node *node) const
+// void printPrintHelper(const Node *node) const
 // {
 
 // }
 
-void AST::printInfix(const Node *node) 
+void printInfix(const Node *node) 
 {
     if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
         cout << "(";
@@ -122,20 +123,19 @@ void AST::printInfix(const Node *node)
     if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
         cout << ")";
 
-    cout << endl;
 }
 
 // Prints the infix notation of a given AST.
-void AST::printInfixHelper(const Node *node) const
+void printInfixHelper(const Node *node)
 {
-    cout << "in infix notation:" << endl;
+    //cout << "in infix notation:" << endl;
     if (!node)
     {
         return;
     }
     else if (node->token.type == FLOAT)
     {
-        cout << "in infix notation float:" << endl;
+        //cout << "in infix notation float:" << endl;
         double val = stod(node->token.text);
         if (val == static_cast<int>(val))
             cout << static_cast<int>(val);
@@ -145,24 +145,24 @@ void AST::printInfixHelper(const Node *node) const
     else if (node->token.type == IDENTIFIER || node->token.type == BOOLEAN)
     {
 
-        cout << "in infix notation iden:" << endl;
+        //cout << "in infix notation iden:" << endl;
         cout << node->token.text;
     }
     else
     {
-        cout << "in infix notation else:" << endl;
+        //cout << "in infix notation else:" << endl;
         bool isFirst = true;
-        for (size_t i = 0; i < node->children.size(); i++)
-        {
-            cout << "children text:" << node->children[i]->token.text << endl;
-        }
+        // for (size_t i = 0; i < node->children.size(); i++)
+        // {
+        //     cout << "children text:" << node->children[i]->token.text << endl;
+        // }
         //dafssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
         for (const auto &child : node->children)
         {
-            cout << "in infix notation before helper before ifs:" << endl;
+            //cout << "in infix notation before helper before ifs:" << endl;
             if (!child)
                 continue;
-            cout << "in infix notation before past if 1:" << endl;
+            //cout << "in infix notation before past if 1:" << endl;
             if (!isFirst)
             {
                 cout << " " << node->token.text << " ";
@@ -171,12 +171,12 @@ void AST::printInfixHelper(const Node *node) const
             {
                 isFirst = false;
             }
-            cout << "in infix notation before past if 2:" << endl;
+            //cout << "in infix notation before past if 2:" << endl;
             if (child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
             {
                 cout << "(";
             }
-            cout << "in infix notation before helper:" << endl;
+            //cout << "in infix notation before helper:" << endl;
             printInfixHelper(child);
             if (child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
             {
@@ -184,7 +184,7 @@ void AST::printInfixHelper(const Node *node) const
             }
         }
     }
-    cout << "in infix notation end of it:" << endl;
+    //cout << "in infix notation end of it:" << endl;
 }
 
 
@@ -194,19 +194,20 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
     //test cases:
     //text = "x = 42";
+    //text = "x = 42 \n 5 + 7";
     //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n print steps \n";
-    //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n } ";
+    //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n x = 1 \n } ";
     //text = "steps = 0 \n while steps < 3 { \n steps = steps + 1 \n } ";
 
     // lex
@@ -215,36 +216,36 @@ int main(int argc, const char **argv)
     // set up variables for muti expression parsing
     
     int index = 0;
-    vector<AST> trees;
+    vector<Node*> trees;
     std::unordered_map<std::string, double> variables;
-    if (tokens.back().text == "error")
+    if (tokens.back().text == "error") //
     {
         exit(1);
     }
-    
+    cout << "HERE" << endl;
     //parse the tokens and put into trees
     while(tokens[index].type != END)
     {
-        cout<< "from main" << index << endl;
-        AST ast(tokens, index);
-        trees.push_back(ast);
+        Node *root;
+        root = makeTree(tokens, index); 
+        trees.push_back(root);
         index ++;
-    }
+    } 
     cout << "Trees length " << trees.size() << "" << endl;
+    // cout << "Size: " << trees[0].getRoot()->children.size() << endl;
+    // cout << "nullptr?: " << (trees[0].getRoot()->children[0] == nullptr) << endl;
+    // cout << "Children text: " << trees[0].getRoot()->children[0]->token.text << endl; //line that causes error
 
-    cout << "Size: " << trees[0].getRoot()->children.size() << endl;
-    cout << "Root type: " << trees[0].getRoot()->children[0]->token.text << endl;
 
-
-    for (size_t i = 0; i < trees.size(); i++)
-    {
-        cout << "Root type: " << typeid(trees[i].getRoot()).name() << endl;
-    }
+    // for (size_t i = 0; i < trees.size(); i++)
+    // {
+    //     cout << "Root type: " << typeid(trees[i].getRoot()).name() << endl;
+    // }
     //print and evaluate trees
     for (size_t i = 0; i < trees.size(); i++)
     {
-        cout << "right before segfault3" << endl;
-        trees[i].printAll();
+        //cout << "right before segfault3" << endl;
+        printAll(trees[i]);
     }
 
     return 0;

@@ -33,56 +33,49 @@ struct PrintNode : public Node
     virtual ~PrintNode() = default;
 };
 
-class AST
-{
-public:
-    AST(const vector<Token> &tokens, int &index);
-    ~AST();
-
-    variant<double, bool> evaluateAST(unordered_map<string, variant<double, bool>> &variables);
-    Node *getRoot() const;
+ variant<double, bool> evaluateAST(unordered_map<string, variant<double, bool>> &variables);
+    //Node *getRoot() const;
     Node *makeNode(const Token &token);
     WhileNode *makeWhileNode(const Token &token);
 
-    void printAll() ;
+    //void printAll() ;
     void printInfix(const Node *node) ;
     void printIfElse(const Node *node) ;
     void printWhile(const Node *node) ;
     void printPrint(const Node *node) ;
-    bool error;
-    bool checkIden(Node *root, unordered_map<string, variant<double, bool>> &variables);
-    bool checkVar(Node *root);
-    bool checkParen(vector<Token> &tokens);
+    //bool error;
+    bool checkIden(Node *root, unordered_map<string, variant<double, bool>> &variables, bool &error);
+    bool checkVar(Node *root, bool &error);
+    bool checkParen(vector<Token> &tokens, bool &error);
 
-private:
-    Node *root;
+    //Node *root;
     variant<double, bool> evaluate(Node *root, unordered_map<string, variant<double, bool>> &variables);
 
-    Node *parseAll(const vector<Token> &tokens, int &index);
+    Node *parseAll(const vector<Token> &tokens, int &index, bool &error);
 
-    IfElseNode *parseIf(const vector<Token> &tokens, int &index);
-    WhileNode *parseWhile(const vector<Token> &tokens, int &index);
-    PrintNode *parsePrint(const vector<Token> &tokens, int &index);
+    IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error);
+    WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error);
+    PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error);
 
-    Node *parseExpression(const vector<Token> &tokens, int &index);
+    Node *parseExpression(const vector<Token> &tokens, int &index, bool &error);
 
-    Node *parseAssignment(const std::vector<Token> &tokens, int &index);
-    Node *parseComparison(const std::vector<Token> &tokens, int &index);
-    Node *parseLogicAnd(const std::vector<Token> &tokens, int &index);
-    Node *parseLogicXor(const std::vector<Token> &tokens, int &index);
-    Node *parseLogicOr(const std::vector<Token> &tokens, int &index);
-    Node *parseEquality(const std::vector<Token> &tokens, int &index);
-    Node *parseAddSub(const std::vector<Token> &tokens, int &index);
-    Node *parseMultDivMod(const std::vector<Token> &tokens, int &index);
-    Node *parsePrimary(const std::vector<Token> &tokens, int &index);
+    Node *parseAssignment(const std::vector<Token> &tokens, int &index, bool &error);
+    Node *parseComparison(const std::vector<Token> &tokens, int &index, bool &error);
+    Node *parseLogicAnd(const std::vector<Token> &tokens, int &index, bool &error);
+    Node *parseLogicXor(const std::vector<Token> &tokens, int &index, bool &error);
+    Node *parseLogicOr(const std::vector<Token> &tokens, int &index, bool &error);
+    Node *parseEquality(const std::vector<Token> &tokens, int &index, bool &error);
+    Node *parseAddSub(const std::vector<Token> &tokens, int &index, bool &error);
+    Node *parseMultDivMod(const std::vector<Token> &tokens, int &index, bool &error);
+    Node *parsePrimary(const std::vector<Token> &tokens, int &index, bool &error);
     bool match(const std::vector<Token> &tokens, int index, string expectedType);
     Node *makeTree(const vector<Token> &tokens, int &index);
     void deleteNode(Node *node);
-    void printAll(const Node *node) ;
-    void printInfixHelper(const Node *node) const;
-    // void printIfElseHelper(const Node *node) const;
-    // void printWhileHelper(const Node *node) const;
-    // void printPrintHelper(const Node *node) const;
-};
+    void printAll(Node *node) ;
+    void printInfixHelper(const Node *node);
+    // void printIfElseHelper(const Node *node) ;
+    // void printWhileHelper(const Node *node) ;
+    // void printPrintHelper(const Node *node) ;
+
 
 void printError(const Token &token, bool &error);
