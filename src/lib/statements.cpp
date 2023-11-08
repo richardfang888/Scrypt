@@ -40,18 +40,18 @@ WhileNode *makeWhileNode(const Token &token)
     wNode->token = token;
     return wNode;
 }
-// Node makeNode(const Token &token)
-// {
-//     Node node;
-//     node.token = token;
-//     return node;
-// }
-// Node makeNode(const Token &token)
-// {
-//     Node node;
-//     node.token = token;
-//     return node;
-// }
+IfElseNode *makeIfElseNode(const Token &token)
+{
+    IfElseNode *iFNode = new IfElseNode();
+    iFNode->token = token;
+    return iFNode;
+}
+PrintNode *makePrintNode(const Token &token)
+{
+    PrintNode *pNode = new PrintNode();
+    pNode->token = token;
+    return pNode;
+}
 
 // Recursively creates an AST from a list of tokens,
 Node *makeTree(const vector<Token> &tokens, int &index)
@@ -94,12 +94,13 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
         return nullptr;
     }
     // make a new if/esle node
-    IfElseNode *IENode = nullptr; // for testing
+    IfElseNode *IENode = makeIfElseNode(tokens[index]); // for testing
     // skip token
     index ++;
     // if/esle node's condition = parse expression 
     IENode->condition = parseExpression(tokens, index, error);
     // check if the conditionn is a boolean
+    index ++;
 
     // check if there is an open bracket
     if(match(tokens, index, "{"))
@@ -110,7 +111,6 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
     {
         // if not throw error
         printError(tokens[index], error);
-        return nullptr;
     }
     // keep parseAlling until close bracket
     while(!match(tokens, index, "}")){
@@ -119,11 +119,16 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
         if (node != nullptr) {
             IENode->statementsTrue.push_back(node);
         }
+        index ++;
     }
     // if false
+    index ++;
+    //cout << "token text: " << tokens[index].text << endl;
     if(match(tokens, index, "else"))
     {
+        //cout << "AM IN ELSEE HERHESRHAERASDFADF" << endl;
         IENode->hasElse = true;
+        index ++;
         // check if there is an open bracket
         if(match(tokens, index, "{"))
         {
@@ -133,7 +138,6 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
         {
             // if not throw error
             printError(tokens[index], error);
-            return nullptr;
         }
         // keep parseAlling until close bracket
         while(!match(tokens, index, "}")){
@@ -141,6 +145,7 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
             if (node != nullptr) {
                 IENode->statementsFalse.push_back(node);
             }
+            index ++;
         }
     } else
     {
@@ -158,7 +163,7 @@ WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
     }
     // make a new if/esle node
     WhileNode *WNode = makeWhileNode(tokens[index]);
-    cout << "WNode text: " << WNode->token.text << endl;
+    //cout << "WNode text: " << WNode->token.text << endl;
     // skip token
     index ++;
     // if/esle node's condition = parse expression 
@@ -166,7 +171,7 @@ WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
     WNode->condition = parseExpression(tokens, index, error);
     index ++;
     // check if the conditionn is a boolean
-    cout << "got past parseExpression" << endl;
+    //cout << "got past parseExpression" << endl;
     // check if there is an open bracket
     if(match(tokens, index, "{"))
     {
@@ -178,7 +183,7 @@ WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
         printError(tokens[index], error);
     }
     // keep parseAlling until close bracket
-    cout << "WHILE Index is " << index << endl;
+    //cout << "WHILE Index is " << index << endl;
     while(!match(tokens, index, "}")){
         // each parseAll will return a node that will be pushed into while node's vector
         Node *node = parseAll(tokens, index, error);
@@ -193,7 +198,7 @@ WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
 
     }
     // return the while node
-    cout << "WNode text: " << WNode->token.text << endl;
+    //cout << "WNode text: " << WNode->token.text << endl;
     return WNode;
 }
 
@@ -204,19 +209,22 @@ PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error)
         return nullptr;
     }
     // make a new print node
-    PrintNode *PNode = nullptr; // for testing
+    cout << "token text: " << tokens[index].text << endl;
+    PrintNode *PNode = makePrintNode(tokens[index]); // for testing
     // skip token
     index ++;
     // if/esle node's condition = parse expression 
+    cout << "IN PRINTNING LFG" << endl;
+    cout << "token text: " << tokens[index].text << endl;
     PNode->expression = parseExpression(tokens, index, error);
-
+    cout << "token text AFTER: " << tokens[index].text << endl;
     // return the print node
     return PNode;
 }
 
 Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
 {
-    cout << "gets to parse expression" << endl;
+    cout << "Gets to PARSE EXPRESSION " << tokens[index].text << endl;
     if (error)
     {
         return nullptr;
@@ -226,7 +234,7 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
 
     bool braceCheck = false;
 
-    if(startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while")|| match(tokens, startOfExpression, "if")))
+    if(startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while")|| match(tokens, startOfExpression - 1, "if")))
     {
         braceCheck = true;
     }

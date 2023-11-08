@@ -8,26 +8,30 @@
 using namespace std;
 
 
-void printAll(Node *node)
+void printAll(Node *node, int &depth)
 {
     //printInfix(node);
     //cout << "node token text: " << node->token.text << endl;
+    for(int j = 0; j < depth; j++)
+    {
+        cout << "   ";
+    }
     if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(node)) {
         //cout << "printing a if expression:" << endl;
         // Node is a WhileNode
-        printIfElse(iENode);
+        printIfElse(iENode, depth);
     } else if (WhileNode *wNode = dynamic_cast<WhileNode*>(node)) {
         // Node is an IfElseNode
         //cout << "printing a while expression:" << endl;
-        printWhile(wNode);
+        printWhile(wNode, depth);
     } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
         //cout << "printing a print expression:" << endl;
         // Node is a PrintNode
-        printPrint(pNode);
+        printPrint(pNode, depth);
     } else {
         //cout << "Printing a infix expression:" << endl;
         // Node is a normal Node
-        printInfix(node);
+        printInfix(node, depth);
         cout << endl;
     }
 }
@@ -49,24 +53,35 @@ void printAll(Node *node)
 //     }
 // }
 
-void printIfElse(const Node *node) 
+void printIfElse(const Node *node, int &depth) 
 {
     if (node)
         cout << "if ";
     const IfElseNode* ifElseNode = dynamic_cast<const IfElseNode*>(node);
     if (ifElseNode) {
-        printInfix(ifElseNode->condition);
+        printInfix(ifElseNode->condition, depth);
         cout << " {" << endl;
-        printWhile(node);
-        for(size_t i = 0; i < ifElseNode->statementsTrue.size() - 1; i++) {
-            printAll(ifElseNode->statementsTrue[i]);
+        depth ++;
+        for(size_t i = 0; i < ifElseNode->statementsTrue.size(); i++) {
+            printAll(ifElseNode->statementsTrue[i], depth);
+        }
+        for(int j = 0; j < depth - 1; j++)
+        {
+            cout << "   ";
         }
         cout << "}" << endl;
         if(ifElseNode->hasElse) {
+            for(int j = 0; j < depth - 1; j++)
+            {
+                cout << "   ";
+            }
             cout << "else {" << endl;
-            printWhile(node);
-            for(size_t i = 0; i < ifElseNode->statementsFalse.size() - 1; i++) {
-                printAll(ifElseNode->statementsFalse[i]);
+            for(size_t i = 0; i < ifElseNode->statementsFalse.size(); i++) {
+                printAll(ifElseNode->statementsFalse[i], depth);
+            }
+            for(int j = 0; j < depth - 1; j++)
+            {
+                cout << "   ";
             }
             cout << "}" << endl;
         }
@@ -78,17 +93,17 @@ void printIfElse(const Node *node)
 
 // }
 
-void printWhile(const Node *node) 
+void printWhile(const Node *node, int &depth) 
 {
     if (node)
         cout << "while ";
     const WhileNode* whileNode = dynamic_cast<const WhileNode*>(node);
     if (whileNode) {
-        printInfix(whileNode->condition);
+        printInfix(whileNode->condition, depth);
         cout << " {" << endl;
+        depth ++;
         for(size_t i = 0; i < whileNode->statements.size(); i++) {
-            cout << "   ";
-            printAll(whileNode->statements[i]);
+            printAll(whileNode->statements[i], depth);
         }
         cout << "}" << endl;
     }
@@ -99,13 +114,13 @@ void printWhile(const Node *node)
 
 // }
 
-void printPrint(const Node *node) 
+void printPrint(const Node *node, int &depth) 
 {
     if (node)
         cout << "print ";
     const PrintNode* printNode = dynamic_cast<const PrintNode*>(node);
     if (printNode) {
-        printInfix(printNode->expression);
+        printInfix(printNode->expression, depth);
         cout << endl;
     }
 }
@@ -115,7 +130,7 @@ void printPrint(const Node *node)
 
 // }
 
-void printInfix(const Node *node) 
+void printInfix(const Node *node, int &depth) 
 {
     if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
         cout << "(";
@@ -194,22 +209,24 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    // while (getline(cin, input))
-    // {
-    //     text += input;
-    //     if (!cin.eof())
-    //     {
-    //         text += '\n';
-    //     }
-    // }
+    while (getline(cin, input))
+    {
+        text += input;
+        if (!cin.eof())
+        {
+            text += '\n';
+        }
+    }
 
     //test cases:
+    //text = "x \n 42";
     //text = "x = 42";
     //text = "x = 42 \n 5 + 7";
     //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n print steps \n";
-    //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n x = 1 \n } ";
-    //text = "steps = 0 \n while steps < 3 { \n steps = steps + 1 \n } ";
-
+    //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n ";
+    //text = "steps = 0 \n while steps < 3 { \n steps = steps + 1 \n 5 / 9 \n } \n 4 - 7 ";
+    //text = "x = 42 \n steps = 0 \n if steps < 3 { \n steps = steps + 1 \n } \n else { \n x = 3 * x + 1 \n }";
+    //text = "6 \n print 6";
     // lex
     tokens = readTokens(text);
 
@@ -245,7 +262,8 @@ int main(int argc, const char **argv)
     for (size_t i = 0; i < trees.size(); i++)
     {
         //cout << "right before segfault3" << endl;
-        printAll(trees[i]);
+        int depth = 0;
+        printAll(trees[i], depth);
     }
 
     return 0;

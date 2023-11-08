@@ -35,14 +35,17 @@ struct PrintNode : public Node
 
  variant<double, bool> evaluateAST(unordered_map<string, variant<double, bool>> &variables);
     //Node *getRoot() const;
+
     Node *makeNode(const Token &token);
     WhileNode *makeWhileNode(const Token &token);
+    IfElseNode *makeIfElseNode(const Token &token);
+    PrintNode *makePrintNode(const Token &token);
 
-    //void printAll() ;
-    void printInfix(const Node *node) ;
-    void printIfElse(const Node *node) ;
-    void printWhile(const Node *node) ;
-    void printPrint(const Node *node) ;
+    void printAll(Node *node, int &depth) ;
+    void printInfix(const Node *node, int &depth) ;
+    void printIfElse(const Node *node, int &depth) ;
+    void printWhile(const Node *node, int &depth) ;
+    void printPrint(const Node *node, int &depth) ;
     //bool error;
     bool checkIden(Node *root, unordered_map<string, variant<double, bool>> &variables, bool &error);
     bool checkVar(Node *root, bool &error);
@@ -71,7 +74,6 @@ struct PrintNode : public Node
     bool match(const std::vector<Token> &tokens, int index, string expectedType);
     Node *makeTree(const vector<Token> &tokens, int &index);
     void deleteNode(Node *node);
-    void printAll(Node *node) ;
     void printInfixHelper(const Node *node);
     // void printIfElseHelper(const Node *node) ;
     // void printWhileHelper(const Node *node) ;
