@@ -80,9 +80,9 @@ private:
     void deleteNode(Node *node);
     void printAll(const Node *node) ;
     void printInfixHelper(const Node *node) const;
-    void printIfElseHelper(const Node *node) const;
-    void printWhileHelper(const Node *node) const;
-    void printPrintHelper(const Node *node) const;
+    // void printIfElseHelper(const Node *node) const;
+    // void printWhileHelper(const Node *node) const;
+    // void printPrintHelper(const Node *node) const;
 };
 
 void printError(const Token &token, bool &error);

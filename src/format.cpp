@@ -23,7 +23,7 @@ void AST::printAll()
     } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(root)) {
         cout << "printing a print expression:" << endl;
         // Node is a PrintNode
-        printPrint(root);
+        printPrint(pNode);
     } else {
         cout << "Printing a infix expression:" << endl;
         // Node is a normal Node
@@ -57,14 +57,14 @@ void AST::printIfElse(const Node *node)
         printInfix(ifElseNode->condition);
         cout << " {" << endl;
         printWhile(node);
-        for(int i = 0; i < ifElseNode->statementsTrue.size() - 1; i++) {
+        for(size_t i = 0; i < ifElseNode->statementsTrue.size() - 1; i++) {
             printAll(ifElseNode->statementsTrue[i]);
         }
         cout << "}" << endl;
         if(ifElseNode->hasElse) {
             cout << "else {" << endl;
             printWhile(node);
-            for(int i = 0; i < ifElseNode->statementsFalse.size() - 1; i++) {
+            for(size_t i = 0; i < ifElseNode->statementsFalse.size() - 1; i++) {
                 printAll(ifElseNode->statementsFalse[i]);
             }
             cout << "}" << endl;
@@ -86,7 +86,7 @@ void AST::printWhile(const Node *node)
         printInfix(whileNode->condition);
         cout << " {" << endl;
         printWhile(root);
-        for(int i = 0; i < whileNode->statements.size() - 1; i++) {
+        for(size_t i = 0; i < whileNode->statements.size() - 1; i++) {
             printAll(whileNode->statements[i]);
         }
         cout << "}" << endl;
