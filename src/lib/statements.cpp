@@ -93,7 +93,7 @@ IfElseNode *AST::parseIf(const vector<Token> &tokens, int &index)
         return nullptr;
     }
     // make a new if/esle node
-    IfElseNode *IENode;
+    IfElseNode *IENode = nullptr; // for testing
     // skip token
     index ++;
     // if/esle node's condition = parse expression 
@@ -203,7 +203,7 @@ PrintNode *AST::parsePrint(const vector<Token> &tokens, int &index)
         return nullptr;
     }
     // make a new print node
-    PrintNode *PNode;
+    PrintNode *PNode = nullptr; // for testing
     // skip token
     index ++;
     // if/esle node's condition = parse expression 

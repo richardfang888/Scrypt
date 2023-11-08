@@ -72,10 +72,10 @@ void AST::printIfElse(const Node *node)
     }
 }
 
-void AST::printIfElseHelper(const Node *node) const
-{
+// void AST::printIfElseHelper(const Node *node) const
+// {
 
-}
+// }
 
 void AST::printWhile(const Node *node) 
 {
@@ -93,10 +93,10 @@ void AST::printWhile(const Node *node)
     }
 }
 
-void AST::printWhileHelper(const Node *node) const
-{
+// void AST::printWhileHelper(const Node *node) const
+// {
 
-}
+// }
 
 void AST::printPrint(const Node *node) 
 {
@@ -109,10 +109,10 @@ void AST::printPrint(const Node *node)
     }
 }
 
-void AST::printPrintHelper(const Node *node) const
-{
+// void AST::printPrintHelper(const Node *node) const
+// {
 
-}
+// }
 
 void AST::printInfix(const Node *node) 
 {
@@ -194,17 +194,17 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    // while (getline(cin, input))
-    // {
-    //     text += input;
-    //     if (!cin.eof())
-    //     {
-    //         text += '\n';
-    //     }
-    // }
+    while (getline(cin, input))
+    {
+        text += input;
+        if (!cin.eof())
+        {
+            text += '\n';
+        }
+    }
 
     //test cases:
-    text = "x = 42";
+    //text = "x = 42";
     //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n print steps \n";
     //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n } ";
     //text = "steps = 0 \n while steps < 3 { \n steps = steps + 1 \n } ";
