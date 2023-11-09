@@ -33,30 +33,18 @@ struct PrintNode : public Node
     virtual ~PrintNode() = default;
 };
 
- variant<double, bool> evaluateAST(unordered_map<string, variant<double, bool>> &variables);
-//Node *getRoot() const;
-
 Node *makeNode(const Token &token);
 WhileNode *makeWhileNode(const Token &token);
 IfElseNode *makeIfElseNode(const Token &token);
 PrintNode *makePrintNode(const Token &token);
-
-//bool error;
 bool checkIden(Node *root, unordered_map<string, variant<double, bool>> &variables, bool &error);
 bool checkVar(Node *root, bool &error);
 bool checkParen(vector<Token> &tokens, bool &error);
-
-//Node *root;
-variant<double, bool> evaluate(Node *root, unordered_map<string, variant<double, bool>> &variables);
-
 Node *parseAll(const vector<Token> &tokens, int &index, bool &error);
-
 IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error);
 WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error);
 PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error);
-
 Node *parseExpression(const vector<Token> &tokens, int &index, bool &error);
-
 Node *parseAssignment(const std::vector<Token> &tokens, int &index, bool &error);
 Node *parseComparison(const std::vector<Token> &tokens, int &index, bool &error);
 Node *parseLogicAnd(const std::vector<Token> &tokens, int &index, bool &error);
@@ -71,6 +59,4 @@ Node *makeTree(const vector<Token> &tokens, int &index);
 void deleteNode(Node *node);
 void deleteNodeAll(Node *node);
 void printInfixHelper(const Node *node);
-
-
 void printErrorStatement(const Token &token, bool &error);
