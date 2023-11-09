@@ -354,14 +354,14 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    // while (getline(cin, input))
-    // {
-    //     text += input;
-    //     if (!cin.eof())
-    //     {
-    //         text += '\n';
-    //     }
-    // }
+    while (getline(cin, input))
+    {
+        text += input;
+        if (!cin.eof())
+        {
+            text += '\n';
+        }
+    }
 
     //test cases:
     //text = "x \n 42";
@@ -378,7 +378,7 @@ int main(int argc, const char **argv)
     //text = "print 22/7 \n";
     //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n print steps \n";
     //text = "print a = 49 \n print b = 21 \n while a != b {\n if a > b {\n a = a - b \n } \n else if b > a {\n b = b - a \n } \n } \n print a \n";
-    text = "a = 12 \n b = 14 \n c = true \n \n while c { \n print a \n if a < b { \n a = a + 7 \n } \n else if a > b { \n b = b + 5 \n } \n else { \n c = 0\n } \n }";
+    // text = "a = 12 \n b = 14 \n c = true \n \n while c { \n print a \n if a < b { \n a = a + 7 \n } \n else if a > b { \n b = b + 5 \n } \n else { \n c = 0\n } \n }";
 
     // lex
     tokens = readTokens(text);
