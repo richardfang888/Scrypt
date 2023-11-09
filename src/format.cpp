@@ -210,6 +210,32 @@ void printInfixHelper(const Node *node)
     //cout << "in infix notation end of it:" << endl;
 }
 
+void deleteNodeAll(Node *node){
+    if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(node)) {
+        deleteNodeAll(iENode->condition);
+        for(Node* child : iENode->statementsTrue) {
+            deleteNodeAll(child);
+        }
+        for(Node* child : iENode->statementsFalse) {
+            deleteNodeAll(child);
+        }
+        delete iENode;
+    } else if (WhileNode *wNode = dynamic_cast<WhileNode*>(node)) {
+        deleteNodeAll(wNode->condition);
+        for(Node* child : wNode->statements) {
+            deleteNodeAll(child);
+        }
+        delete wNode;
+    } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
+        deleteNodeAll(pNode->expression);
+        delete pNode;
+    } else {
+        for(Node* child : node->children) {
+            deleteNodeAll(child);
+        }
+        delete node;
+    }
+}
 
 int main(int argc, const char **argv)
 {
@@ -217,14 +243,14 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
     //test cases:
     //text = "x \n 42";
@@ -260,15 +286,7 @@ int main(int argc, const char **argv)
         index ++;
     } 
     //cout << "Trees length " << trees.size() << "" << endl;
-    // cout << "Size: " << trees[0].getRoot()->children.size() << endl;
-    // cout << "nullptr?: " << (trees[0].getRoot()->children[0] == nullptr) << endl;
-    // cout << "Children text: " << trees[0].getRoot()->children[0]->token.text << endl; //line that causes error
 
-
-    // for (size_t i = 0; i < trees.size(); i++)
-    // {
-    //     cout << "Root type: " << typeid(trees[i].getRoot()).name() << endl;
-    // }
     //print and evaluate trees
     for (size_t i = 0; i < trees.size(); i++)
     {
@@ -276,6 +294,9 @@ int main(int argc, const char **argv)
         int depth = 0;
         printAll(trees[i], depth);
     }
-
+    for (size_t i = 0; i < trees.size(); i++)
+    {  
+        deleteNodeAll(trees[i]);
+    }
     return 0;
 }
