@@ -209,22 +209,18 @@ PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error)
         return nullptr;
     }
     // make a new print node
-    cout << "token text: " << tokens[index].text << endl;
     PrintNode *PNode = makePrintNode(tokens[index]); // for testing
     // skip token
     index ++;
     // if/esle node's condition = parse expression 
-    cout << "IN PRINTNING LFG" << endl;
-    cout << "token text: " << tokens[index].text << endl;
     PNode->expression = parseExpression(tokens, index, error);
-    cout << "token text AFTER: " << tokens[index].text << endl;
     // return the print node
     return PNode;
 }
 
 Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
 {
-    cout << "Gets to PARSE EXPRESSION " << tokens[index].text << endl;
+    //cout << "Gets to PARSE EXPRESSION " << tokens[index].text << endl;
     if (error)
     {
         return nullptr;
@@ -261,12 +257,12 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
         }
     }
     int assignIndex = 0;
-    cout << "tokensExpression size is: " << tokensExpression.size() << endl;
-    for(size_t i = 0; i < tokensExpression.size(); i++)
-    {
-        cout << "value in index " << i << " is: " << tokensExpression[i].text << " ";
-    }
-    cout << endl << "Index is: "  << index << endl;
+    // cout << "tokensExpression size is: " << tokensExpression.size() << endl;
+    // for(size_t i = 0; i < tokensExpression.size(); i++)
+    // {
+    //     cout << "value in index " << i << " is: " << tokensExpression[i].text << " ";
+    // }
+    // cout << endl << "Index is: "  << index << endl;
     return parseAssignment(tokensExpression, assignIndex, error);
 }
 // Function to parse assignment expressions

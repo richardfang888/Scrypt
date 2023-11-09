@@ -239,7 +239,7 @@ int main(int argc, const char **argv)
     {
         exit(1);
     }
-    cout << "HERE" << endl;
+    //cout << "HERE" << endl;
     //parse the tokens and put into trees
     while(tokens[index].type != END)
     {
@@ -248,7 +248,7 @@ int main(int argc, const char **argv)
         trees.push_back(root);
         index ++;
     } 
-    cout << "Trees length " << trees.size() << "" << endl;
+    //cout << "Trees length " << trees.size() << "" << endl;
     // cout << "Size: " << trees[0].getRoot()->children.size() << endl;
     // cout << "nullptr?: " << (trees[0].getRoot()->children[0] == nullptr) << endl;
     // cout << "Children text: " << trees[0].getRoot()->children[0]->token.text << endl; //line that causes error
