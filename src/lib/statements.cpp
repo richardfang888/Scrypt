@@ -591,11 +591,33 @@ bool checkParen(vector<Token> &tokens, bool &error)
     return true;
 }
 
-// Node *getRoot() const
-// {
-//     return root;
-// }
-// Prints a formatted error message for a given token
+void deleteNodeAll(Node *node){
+    if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(node)) {
+        deleteNodeAll(iENode->condition);
+        for(Node* child : iENode->statementsTrue) {
+            deleteNodeAll(child);
+        }
+        for(Node* child : iENode->statementsFalse) {
+            deleteNodeAll(child);
+        }
+        delete iENode;
+    } else if (WhileNode *wNode = dynamic_cast<WhileNode*>(node)) {
+        deleteNodeAll(wNode->condition);
+        for(Node* child : wNode->statements) {
+            deleteNodeAll(child);
+        }
+        delete wNode;
+    } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
+        deleteNodeAll(pNode->expression);
+        delete pNode;
+    } else {
+        for(Node* child : node->children) {
+            deleteNodeAll(child);
+        }
+        delete node;
+    }
+}
+
 void printErrorStatement(const Token &token, bool &error)
 {
     error = true;

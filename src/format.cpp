@@ -210,33 +210,6 @@ void printInfixHelper(const Node *node)
     //cout << "in infix notation end of it:" << endl;
 }
 
-void deleteNodeAll(Node *node){
-    if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(node)) {
-        deleteNodeAll(iENode->condition);
-        for(Node* child : iENode->statementsTrue) {
-            deleteNodeAll(child);
-        }
-        for(Node* child : iENode->statementsFalse) {
-            deleteNodeAll(child);
-        }
-        delete iENode;
-    } else if (WhileNode *wNode = dynamic_cast<WhileNode*>(node)) {
-        deleteNodeAll(wNode->condition);
-        for(Node* child : wNode->statements) {
-            deleteNodeAll(child);
-        }
-        delete wNode;
-    } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
-        deleteNodeAll(pNode->expression);
-        delete pNode;
-    } else {
-        for(Node* child : node->children) {
-            deleteNodeAll(child);
-        }
-        delete node;
-    }
-}
-
 int main(int argc, const char **argv)
 {
     string input;
@@ -271,7 +244,6 @@ int main(int argc, const char **argv)
     
     int index = 0;
     vector<Node*> trees;
-    std::unordered_map<std::string, double> variables;
     if (tokens.empty() || tokens.back().text == "error") //
     {
         exit(1);

@@ -7,14 +7,23 @@
 
 using namespace std;
 
-// variant<double, bool> AST::evaluateAST(unordered_map<string, variant<double, bool>> &variables)
-// {
-//     if (!&root)
-//     {
-//         return numeric_limits<double>::quiet_NaN();
-//     }
-//     return evaluate(root, variables);
-// }
+void evaluateAll(Node *node, unordered_map<string, variant<double, bool>> &variables)
+{
+    bool error = false;
+    if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(node)) {
+        // Node is a WhileNode
+        evaluateIfElse(iENode, variables);
+    } else if (WhileNode *wNode = dynamic_cast<WhileNode*>(node)) {
+        // Node is an IfElseNode
+        evaluateWhile(wNode, variables);
+    } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
+        // Node is a PrintNode
+        evaluatePrint(pNode, variables);
+    } else {
+        // Node is a normal Node
+        evaluateExpression(node, variables, error);
+    }
+}
 
 // Evaluates an if else block.
 variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, variant<double, bool>> &variables) 
@@ -318,6 +327,63 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
 
 int main(int argc, const char **argv)
 {
+    string input;
+    string text;
+    vector<Token> tokens;
 
+    while (getline(cin, input))
+    {
+        text += input;
+        if (!cin.eof())
+        {
+            text += '\n';
+        }
+    }
+
+    //test cases:
+    //text = "x \n 42";
+    //text = "x = 42";
+    //text = "x = 42 \n 5 + 7";
+    //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n print steps \n";
+    text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n ";
+    //text = "steps = 0 \n while steps < 3 { \n steps = steps + 1 \n 5 / 9 \n } \n 4 - 7 ";
+    //text = "x = 42 \n steps = 0 \n if steps < 3 { \n steps = steps + 1 \n } \n else { \n x = 3 * x + 1 \n }";
+    //text = "x = 42 \n steps = 0 \n if steps < 3 { \n steps = steps + 1 \n } \n ";
+    //text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n  if fizz & buzz { \n if buzz { \n print 333555 \n } \n else { \n print 333 \n } \n } \n else if buzz { \n print 555 \n } \n else { \n print val \n }";
+    //text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n  if fizz & buzz { \n if buzz { \n print 333555 \n } \n else { \n print 333 \n } \n } \n ";
+    //text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n 4 + 5";
+    // lex
+    tokens = readTokens(text);
+
+    // set up variables for muti expression parsing
+    
+    int index = 0;
+    vector<Node*> trees;
+    std::unordered_map<string, variant<double, bool>> variables;
+    if (tokens.empty() || tokens.back().text == "error") //
+    {
+        exit(1);
+    }
+    //cout << "HERE" << endl;
+    //parse the tokens and put into trees
+    while(tokens[index].type != END)
+    {
+        Node *root;
+        root = makeTree(tokens, index); 
+        trees.push_back(root);
+        index ++;
+    } 
+    //cout << "Trees length " << trees.size() << "" << endl;
+
+    //print and evaluate trees
+    for (size_t i = 0; i < trees.size(); i++)
+    {
+        //cout << "right before segfault3" << endl;
+        evaluateAll(trees[i], variables);
+    }
+    for (size_t i = 0; i < trees.size(); i++)
+    {  
+        deleteNodeAll(trees[i]);
+    }
     return 0;
 }

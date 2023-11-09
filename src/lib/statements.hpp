@@ -69,10 +69,8 @@ Node *parsePrimary(const std::vector<Token> &tokens, int &index, bool &error);
 bool match(const std::vector<Token> &tokens, int index, string expectedType);
 Node *makeTree(const vector<Token> &tokens, int &index);
 void deleteNode(Node *node);
+void deleteNodeAll(Node *node);
 void printInfixHelper(const Node *node);
-// void printIfElseHelper(const Node *node) ;
-// void printWhileHelper(const Node *node) ;
-// void printPrintHelper(const Node *node) ;
 
 
 void printErrorStatement(const Token &token, bool &error);
