@@ -12,23 +12,30 @@ void evaluateAll(Node *node, unordered_map<string, variant<double, bool>> &varia
     bool error = false;
     if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(node)) {
         // Node is a WhileNode
-        evaluateIfElse(iENode, variables);
+        // cout << "if exp" << endl;
+        evaluateIfElse(iENode, variables, error);
     } else if (WhileNode *wNode = dynamic_cast<WhileNode*>(node)) {
         // Node is an IfElseNode
-        evaluateWhile(wNode, variables);
+        // cout << "while exp" << endl;
+        evaluateWhile(wNode, variables, error);
     } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
         // Node is a PrintNode
-        evaluatePrint(pNode, variables);
+        // cout << "print exp" << endl;
+        evaluatePrint(pNode, variables, error);
     } else {
         // Node is a normal Node
+        // cout << "normal exp" << endl;
         evaluateExpression(node, variables, error);
     }
 }
 
 // Evaluates an if else block.
-variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, variant<double, bool>> &variables) 
+variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error) 
 {
-    bool error = false;
+    if (!node || error)
+    {
+        return numeric_limits<double>::quiet_NaN();
+    }
     variant<double, bool> condResult = evaluateExpression(node->condition, variables, error);
     if (holds_alternative<double>(condResult))
     {
@@ -41,18 +48,21 @@ variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, var
     {
         if (get<bool>(condResult))
         {
+            // cout << "if cond true" << endl;
             for (Node* statement : node->statementsTrue)
             {
-                evaluateExpression(statement, variables, error);
+                evaluateAll(statement, variables);
             }
         }
         else
         {
+            // cout << "if false" << endl;
             if (node->hasElse)
             {
+                // cout << "got to else" << endl;
                 for (Node* statement : node->statementsFalse)
                 {
-                    evaluateExpression(statement, variables, error);
+                    evaluateAll(statement, variables);
                 }
             }
             else
@@ -66,9 +76,12 @@ variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, var
 }
 
 // Evaluates a while loop.
-variant<double, bool> evaluateWhile(WhileNode *node, unordered_map<string, variant<double, bool>> &variables) 
+variant<double, bool> evaluateWhile(WhileNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error) 
 {
-    bool error = false;
+    if (!node || error)
+    {
+        return numeric_limits<double>::quiet_NaN();
+    }
     variant<double, bool> condResult = evaluateExpression(node->condition, variables, error);
     if (holds_alternative<double>(condResult))
     {
@@ -93,9 +106,12 @@ variant<double, bool> evaluateWhile(WhileNode *node, unordered_map<string, varia
 }
 
 // Evaluates a print statement.
-variant<double, bool> evaluatePrint(PrintNode *node, unordered_map<string, variant<double, bool>> &variables) 
+variant<double, bool> evaluatePrint(PrintNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error) 
 {
-    bool error = false;
+    if (!node || error)
+    {
+        return numeric_limits<double>::quiet_NaN();
+    }
     variant<double, bool> result = evaluateExpression(node->expression, variables, error);
     if (holds_alternative<double>(result))
     {
@@ -157,6 +173,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
     // Node is an operator but has no children
     else if (node->children.size() == 0)
     {
+        // cout << "no children" << endl;
         printErrorStatement(node->token, error);
         return numeric_limits<double>::quiet_NaN();
     }
@@ -168,7 +185,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
         {
             if (node->children[i]->token.type != IDENTIFIER)
             {
-                // invalid assignment error
+                // cout << "invalid identifier" << endl;
                 printErrorStatement(node->token, error);
 
                 return numeric_limits<double>::quiet_NaN();
@@ -232,7 +249,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             else
             {
                 // If the operation is unrecognized, print an error message.
-                // cout << "unknown operator " << endl;
+                // cout << "unknown logical " << endl;
                 printErrorStatement(opToken, error);
                 return numeric_limits<double>::quiet_NaN();
             }
@@ -331,14 +348,14 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    // while (getline(cin, input))
-    // {
-    //     text += input;
-    //     if (!cin.eof())
-    //     {
-    //         text += '\n';
-    //     }
-    // }
+    while (getline(cin, input))
+    {
+        text += input;
+        if (!cin.eof())
+        {
+            text += '\n';
+        }
+    }
 
     //test cases:
     //text = "x \n 42";
@@ -349,7 +366,7 @@ int main(int argc, const char **argv)
     //text = "steps = 0 \n while steps < 3 { \n steps = steps + 1 \n 5 / 9 \n } \n 4 - 7 ";
     //text = "x = 42 \n steps = 0 \n if steps < 3 { \n steps = steps + 1 \n } \n else { \n x = 3 * x + 1 \n }";
     //text = "x = 42 \n steps = 0 \n if steps < 3 { \n steps = steps + 1 \n } \n ";
-    text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n  if fizz & buzz { \n if buzz { \n print 333555 \n } \n else { \n print 333 \n } \n } \n else if buzz { \n print 555 \n } \n else { \n print val \n }";
+    // text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n  if fizz & buzz { \n if buzz { \n print 333555 \n } \n else { \n print 333 \n } \n } \n else if buzz { \n print 555 \n } \n else { \n print val \n }";
     //text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n  if fizz & buzz { \n if buzz { \n print 333555 \n } \n else { \n print 333 \n } \n } \n ";
     //text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n 4 + 5";
     // lex
