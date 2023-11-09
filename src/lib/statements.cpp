@@ -115,7 +115,7 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
     // keep parseAlling until close bracket
     while(!match(tokens, index, "}")){
         // each parseAll will return a node that will be pushed into if/esle node's vector
-        cout << "token text: " << tokens[index].text << endl;
+        //cout << "token text: " << tokens[index].text << endl;
         Node *node = parseAll(tokens, index, error);
         if (node != nullptr) {
             IENode->statementsTrue.push_back(node);
@@ -135,19 +135,27 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
         {
             // if so skip token
             index ++;
-        } else
-        {
-            // if not throw error
-            printError(tokens[index], error);
-        }
-        // keep parseAlling until close bracket
-        while(!match(tokens, index, "}")){
+            while(!match(tokens, index, "}")){
+            Node *node = parseAll(tokens, index, error);
+                if (node != nullptr) {
+                    IENode->statementsFalse.push_back(node);
+                }
+            //cout << "token text: " << tokens[index].text << endl;
+            index ++;
+            }
+        } else if (match(tokens, index, "if")) {
+            //cout << "got here at least" << endl;
             Node *node = parseAll(tokens, index, error);
             if (node != nullptr) {
                 IENode->statementsFalse.push_back(node);
             }
-            index ++;
+            //cout << "token text: " << tokens[index].text << endl;     
+            
+        } else{
+            // if not throw error
+            printError(tokens[index], error);
         }
+        // keep parseAlling until close bracket
     } else
     {
         index --;
