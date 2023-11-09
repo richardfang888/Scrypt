@@ -14,7 +14,7 @@ void printAll(Node *node, int &depth)
     //cout << "node token text: " << node->token.text << endl;
     for(int j = 0; j < depth; j++)
     {
-        cout << "   ";
+        cout << "    ";
     }
     if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(node)) {
         //cout << "printing a if expression:" << endl;
@@ -68,13 +68,13 @@ void printIfElse(const Node *node, int &depth)
         depth --;
         for(int j = 0; j < depth; j++)
         {
-            cout << "   ";
+            cout << "    ";
         }
         cout << "}" << endl;
         if(ifElseNode->hasElse) {
             for(int j = 0; j < depth; j++)
             {
-                cout << "   ";
+                cout << "    ";
             }
             cout << "else {" << endl;
             depth ++;
@@ -84,7 +84,7 @@ void printIfElse(const Node *node, int &depth)
             depth --;
             for(int j = 0; j < depth; j++)
             {
-                cout << "   ";
+                cout << "    ";
             }
             cout << "}" << endl;
         }
@@ -111,7 +111,7 @@ void printWhile(const Node *node, int &depth)
         depth --;
         for(int j = 0; j < depth; j++)
         {
-            cout << "   ";
+            cout << "    ";
         }
         cout << "}" << endl;
     }
