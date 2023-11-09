@@ -7,9 +7,8 @@
 
 using namespace std;
 
-void evaluateAll(Node *node, unordered_map<string, variant<double, bool>> &variables)
+void evaluateAll(Node *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
 {
-    bool error = false;
     if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(node)) {
         // Node is a WhileNode
         // cout << "if exp" << endl;
@@ -51,7 +50,7 @@ variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, var
             // cout << "if cond true" << endl;
             for (Node* statement : node->statementsTrue)
             {
-                evaluateAll(statement, variables);
+                evaluateAll(statement, variables, error);
             }
         }
         else
@@ -62,7 +61,7 @@ variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, var
                 // cout << "got to else" << endl;
                 for (Node* statement : node->statementsFalse)
                 {
-                    evaluateAll(statement, variables);
+                    evaluateAll(statement, variables, error);
                 }
             }
             else
@@ -96,9 +95,16 @@ variant<double, bool> evaluateWhile(WhileNode *node, unordered_map<string, varia
         {
             for (Node* statement : node->statements)
             {
-                evaluateExpression(statement, variables, error);
+                evaluateAll(statement, variables, error);
             }
             condResult = evaluateExpression(node->condition, variables, error);
+            if (holds_alternative<double>(condResult))
+            {
+                // runtime error
+                error = true;
+                cout << "Runtime error: condition is not a bool." << endl;
+                return numeric_limits<double>::quiet_NaN();
+            }
         }
     }
     // dummy return -> can make it void if needed
@@ -171,12 +177,12 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
         }
     }
     // Node is an operator but has no children
-    // else if (node->children.size() == 0)
-    // {
-    //     // cout << "no children" << endl;
-    //     printErrorStatement(node->token, error);
-    //     return numeric_limits<double>::quiet_NaN();
-    // }
+    else if (node->children.size() == 0)
+    {
+        // cout << "no children" << endl;
+        printErrorStatement(node->token, error);
+        return numeric_limits<double>::quiet_NaN();
+    }
     // Node is assignment operator
     else if (node->token.text == "=")
     {
@@ -348,27 +354,32 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
     //test cases:
     //text = "x \n 42";
     //text = "x = 42";
     //text = "x = 42 \n 5 + 7";
-    //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n print steps \n";
     //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n ";
-    //text = "steps = 0 \n while steps < 3 { \n steps = steps + 1 \n 5 / 9 \n } \n 4 - 7 ";
+    //text = "steps = 0 \n while steps < 3 { \n steps = steps + 1 \n print steps \n 5 / 9 \n } \n 4 - 7 ";
     //text = "x = 42 \n steps = 0 \n if steps < 3 { \n steps = steps + 1 \n } \n else { \n x = 3 * x + 1 \n }";
     //text = "x = 42 \n steps = 0 \n if steps < 3 { \n steps = steps + 1 \n } \n ";
     // text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n  if fizz & buzz { \n if buzz { \n print 333555 \n } \n else { \n print 333 \n } \n } \n else if buzz { \n print 555 \n } \n else { \n print val \n }";
     //text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n  if fizz & buzz { \n if buzz { \n print 333555 \n } \n else { \n print 333 \n } \n } \n ";
     //text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n 4 + 5";
+    //text = "some_var = 17 \n print some_var \n \n while some_var > 1.00 { \n some_var = some_var / 2 \n print some_var} \n";
+    //text = "print 22/7 \n";
+    //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n print steps \n";
+    //text = "print a = 49 \n print b = 21 \n while a != b {\n if a > b {\n a = a - b \n } \n else if b > a {\n b = b - a \n } \n } \n print a \n";
+    text = "a = 12 \n b = 14 \n c = true \n \n while c { \n print a \n if a < b { \n a = a + 7 \n } \n else if a > b { \n b = b + 5 \n } \n else { \n c = 0\n } \n }";
+
     // lex
     tokens = readTokens(text);
 
@@ -395,7 +406,8 @@ int main(int argc, const char **argv)
     //print and evaluate trees
     for (size_t i = 0; i < trees.size(); i++)
     {
-        evaluateAll(trees[i], variables);
+        bool error = false;
+        evaluateAll(trees[i], variables, error);
     }
     for (size_t i = 0; i < trees.size(); i++)
     {  
