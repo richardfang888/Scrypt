@@ -171,12 +171,12 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
         }
     }
     // Node is an operator but has no children
-    else if (node->children.size() == 0)
-    {
-        // cout << "no children" << endl;
-        printErrorStatement(node->token, error);
-        return numeric_limits<double>::quiet_NaN();
-    }
+    // else if (node->children.size() == 0)
+    // {
+    //     // cout << "no children" << endl;
+    //     printErrorStatement(node->token, error);
+    //     return numeric_limits<double>::quiet_NaN();
+    // }
     // Node is assignment operator
     else if (node->token.text == "=")
     {
