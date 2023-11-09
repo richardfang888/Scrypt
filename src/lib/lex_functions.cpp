@@ -263,7 +263,7 @@ vector<Token> readTokens(string &input)
         currToken.length++;
         finishToken(currToken, tokens);
     }
-
+    
     return tokens;
 }
 
