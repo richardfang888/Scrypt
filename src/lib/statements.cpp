@@ -110,7 +110,7 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
     } else
     {
         // if not throw error
-        printError(tokens[index], error);
+        printErrorStatement(tokens[index], error);
     }
     // keep parseAlling until close bracket
     while(!match(tokens, index, "}")){
@@ -153,7 +153,7 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
             
         } else{
             // if not throw error
-            printError(tokens[index], error);
+            printErrorStatement(tokens[index], error);
         }
         // keep parseAlling until close bracket
     } else
@@ -192,7 +192,7 @@ WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
     } else
     {
         // if not throw error
-        printError(tokens[index], error);
+        printErrorStatement(tokens[index], error);
     }
     // keep parseAlling until close bracket
     //cout << "WHILE Index is " << index << endl;
@@ -456,7 +456,7 @@ Node *parsePrimary(const vector<Token> &tokens, int &index, bool &error)
             if (index < int(tokens.size()) && !error)
             {
                 // cout << "parenthesis" << endl;
-                printError(tokens[index], error);
+                printErrorStatement(tokens[index], error);
             }
             deleteNode(expression);
             return nullptr;
@@ -468,7 +468,7 @@ Node *parsePrimary(const vector<Token> &tokens, int &index, bool &error)
     {
         // Handle unexpected token error
         // cout << "primary" << endl;
-        printError(token, error);
+        printErrorStatement(token, error);
         return nullptr;
     }
 }
@@ -538,7 +538,7 @@ bool checkVar(Node *root, bool &error)
             if (root->children[i]->token.type != IDENTIFIER)
             {
                 // invalid assignment error
-                printError(root->token, error);
+                printErrorStatement(root->token, error);
                 return false;
             }
         }
@@ -574,7 +574,7 @@ bool checkParen(vector<Token> &tokens, bool &error)
             
             if (count < 0) {
                 // More right parentheses than left parentheses
-                printError(token, error);
+                printErrorStatement(token, error);
                 return false;
             }
         }
@@ -584,7 +584,7 @@ bool checkParen(vector<Token> &tokens, bool &error)
     
     if (count > 0) {
         // More left parentheses than right parentheses
-        printError(lastToken, error);
+        printErrorStatement(lastToken, error);
         return false;
     }
     
@@ -596,7 +596,7 @@ bool checkParen(vector<Token> &tokens, bool &error)
 //     return root;
 // }
 // Prints a formatted error message for a given token
-void printError(const Token &token, bool &error)
+void printErrorStatement(const Token &token, bool &error)
 {
     error = true;
     cout << "Unexpected token at line " << token.lineNumber

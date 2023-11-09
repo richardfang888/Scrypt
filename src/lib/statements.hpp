@@ -75,4 +75,4 @@ void printInfixHelper(const Node *node);
 // void printPrintHelper(const Node *node) ;
 
 
-void printError(const Token &token, bool &error);
+void printErrorStatement(const Token &token, bool &error);

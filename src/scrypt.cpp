@@ -148,7 +148,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
     // Node is an operator but has no children
     else if (node->children.size() == 0)
     {
-        printError(node->token, error);
+        printErrorStatement(node->token, error);
         return numeric_limits<double>::quiet_NaN();
     }
     // Node is assignment operator
@@ -160,7 +160,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             if (node->children[i]->token.type != IDENTIFIER)
             {
                 // invalid assignment error
-                printError(node->token, error);
+                printErrorStatement(node->token, error);
 
                 return numeric_limits<double>::quiet_NaN();
             }
@@ -224,7 +224,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             {
                 // If the operation is unrecognized, print an error message.
                 // cout << "unknown operator " << endl;
-                printError(opToken, error);
+                printErrorStatement(opToken, error);
                 return numeric_limits<double>::quiet_NaN();
             }
             result = resultDouble;
@@ -274,7 +274,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             {
                 // If the operation is unrecognized, print an error message.
                 // cout << "unknown operator " << endl;
-                printError(opToken, error);
+                printErrorStatement(opToken, error);
                 return numeric_limits<double>::quiet_NaN();
             }
         }
