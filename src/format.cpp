@@ -272,7 +272,7 @@ int main(int argc, const char **argv)
     int index = 0;
     vector<Node*> trees;
     std::unordered_map<std::string, double> variables;
-    if (!tokens.empty() && tokens.back().text == "error") //
+    if (tokens.empty() || tokens.back().text == "error") //
     {
         exit(1);
     }
