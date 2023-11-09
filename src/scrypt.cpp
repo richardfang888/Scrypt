@@ -41,6 +41,7 @@ variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, var
         // runtime error
         error = true;
         cout << "Runtime error: condition is not a bool." << endl;
+        exit(3);
         return numeric_limits<double>::quiet_NaN();
     }
     else if (holds_alternative<bool>(condResult)) 
@@ -87,6 +88,7 @@ variant<double, bool> evaluateWhile(WhileNode *node, unordered_map<string, varia
         // runtime error
         error = true;
         cout << "Runtime error: condition is not a bool." << endl;
+        exit(3);
         return numeric_limits<double>::quiet_NaN();
     }
     else if (holds_alternative<bool>(condResult)) 
@@ -103,6 +105,7 @@ variant<double, bool> evaluateWhile(WhileNode *node, unordered_map<string, varia
                 // runtime error
                 error = true;
                 cout << "Runtime error: condition is not a bool." << endl;
+                exit(3);
                 return numeric_limits<double>::quiet_NaN();
             }
         }
@@ -173,6 +176,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             // Handle error: Unknown identifier
             error = true;
             cout << "Runtime error: unknown identifier " + identifierText << endl;
+            exit(3);
             return numeric_limits<double>::quiet_NaN();
         }
     }
@@ -209,6 +213,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             // runtime error
             error = true;
             cout << "Runtime error: invalid operand type." << endl;
+            exit(3);
             return numeric_limits<double>::quiet_NaN();
         }
         // Iterate over the rest of the children to apply the operation.
@@ -218,6 +223,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             {
                 error = true;
                 cout << "Runtime error: invalid operand type." << endl;
+                exit(3);
                 return numeric_limits<double>::quiet_NaN();
             }
             Token opToken = node->token;
@@ -246,6 +252,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
                 {
                     error = true;
                     cout << "Runtime error: division by zero." << endl;
+                    exit(3);
                     return numeric_limits<double>::quiet_NaN();
                 }
             }
@@ -274,6 +281,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             {
                 error = true;
                 cout << "Runtime error: invalid operand type." << endl;
+                exit(3);
                 return numeric_limits<double>::quiet_NaN();
             }
             Token opToken = node->token;
@@ -323,6 +331,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             {
                 error = true;
                 cout << "Runtime error: invalid operand type." << endl;
+                exit(3);
                 return numeric_limits<double>::quiet_NaN();
             }
             Token opToken = node->token;
