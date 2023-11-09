@@ -103,7 +103,7 @@ variant<double, bool> evaluatePrint(PrintNode *node, unordered_map<string, varia
 // Evaluates an expression given the root of the expression's AST.
 variant<double, bool> evaluateExpression(Node *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
 {
-    if (!&node || error)
+    if (!node || error)
     {
         return numeric_limits<double>::quiet_NaN();
     }
