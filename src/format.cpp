@@ -31,7 +31,7 @@ void printAll(Node *node, int &depth)
     } else {
         //cout << "Printing a infix expression:" << endl;
         // Node is a normal Node
-        printInfix(node, depth);
+        printInfix(node);
         cout << endl;
     }
 }
@@ -59,27 +59,30 @@ void printIfElse(const Node *node, int &depth)
         cout << "if ";
     const IfElseNode* ifElseNode = dynamic_cast<const IfElseNode*>(node);
     if (ifElseNode) {
-        printInfix(ifElseNode->condition, depth);
+        printInfix(ifElseNode->condition);
         cout << " {" << endl;
         depth ++;
         for(size_t i = 0; i < ifElseNode->statementsTrue.size(); i++) {
             printAll(ifElseNode->statementsTrue[i], depth);
         }
-        for(int j = 0; j < depth - 1; j++)
+        depth --;
+        for(int j = 0; j < depth; j++)
         {
             cout << "   ";
         }
         cout << "}" << endl;
         if(ifElseNode->hasElse) {
-            for(int j = 0; j < depth - 1; j++)
+            for(int j = 0; j < depth; j++)
             {
                 cout << "   ";
             }
             cout << "else {" << endl;
+            depth ++;
             for(size_t i = 0; i < ifElseNode->statementsFalse.size(); i++) {
                 printAll(ifElseNode->statementsFalse[i], depth);
             }
-            for(int j = 0; j < depth - 1; j++)
+            depth --;
+            for(int j = 0; j < depth; j++)
             {
                 cout << "   ";
             }
@@ -99,11 +102,16 @@ void printWhile(const Node *node, int &depth)
         cout << "while ";
     const WhileNode* whileNode = dynamic_cast<const WhileNode*>(node);
     if (whileNode) {
-        printInfix(whileNode->condition, depth);
+        printInfix(whileNode->condition);
         cout << " {" << endl;
         depth ++;
         for(size_t i = 0; i < whileNode->statements.size(); i++) {
             printAll(whileNode->statements[i], depth);
+        }
+        depth --;
+        for(int j = 0; j < depth; j++)
+        {
+            cout << "   ";
         }
         cout << "}" << endl;
     }
@@ -120,7 +128,7 @@ void printPrint(const Node *node, int &depth)
         cout << "print ";
     const PrintNode* printNode = dynamic_cast<const PrintNode*>(node);
     if (printNode) {
-        printInfix(printNode->expression, depth);
+        printInfix(printNode->expression);
         cout << endl;
     }
 }
@@ -130,7 +138,7 @@ void printPrint(const Node *node, int &depth)
 
 // }
 
-void printInfix(const Node *node, int &depth) 
+void printInfix(const Node *node) 
 {
     if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
         cout << "(";
@@ -226,7 +234,10 @@ int main(int argc, const char **argv)
     //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n ";
     //text = "steps = 0 \n while steps < 3 { \n steps = steps + 1 \n 5 / 9 \n } \n 4 - 7 ";
     //text = "x = 42 \n steps = 0 \n if steps < 3 { \n steps = steps + 1 \n } \n else { \n x = 3 * x + 1 \n }";
-    //text = "6 \n print 6";
+    //text = "x = 42 \n steps = 0 \n if steps < 3 { \n steps = steps + 1 \n } \n ";
+    //text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n  if fizz & buzz { \n if buzz { \n print 333555 \n } \n else { \n print 333 \n } \n } \n if buzz { \n print 555 \n } \n else { \n print val \n }";
+    //text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n  if fizz & buzz { \n if buzz { \n print 333555 \n } \n else { \n print 333 \n } \n } \n ";
+    //text = "val  = 105 \n fizz = val % 3 == 0 \n buzz = false \n if val % 5 == 0 { \n buzz = true \n } \n 4 + 5";
     // lex
     tokens = readTokens(text);
 

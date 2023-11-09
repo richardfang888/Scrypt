@@ -69,7 +69,7 @@ Node *parseAll(const vector<Token> &tokens, int &index, bool &error)
     // check first token
     // for each respective token parse them and if not assume assignment
     if(match(tokens, index, "if"))
-    {
+    {      
         return parseIf(tokens, index, error);
     }
     else if(match(tokens, index, "while"))
@@ -115,6 +115,7 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
     // keep parseAlling until close bracket
     while(!match(tokens, index, "}")){
         // each parseAll will return a node that will be pushed into if/esle node's vector
+        cout << "token text: " << tokens[index].text << endl;
         Node *node = parseAll(tokens, index, error);
         if (node != nullptr) {
             IENode->statementsTrue.push_back(node);
@@ -149,9 +150,12 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
         }
     } else
     {
+        index --;
         IENode->hasElse = false;
     }
     // return the if/else node
+    //cout << "IENode text: " << IENode->token.text << endl;
+    //cout << "token text RIGHT BEFORE RETURN: " << tokens[index].text << endl;
     return IENode;
 }
 
