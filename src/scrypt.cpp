@@ -345,7 +345,7 @@ int main(int argc, const char **argv)
     //text = "x = 42";
     //text = "x = 42 \n 5 + 7";
     //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n print steps \n";
-    text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n ";
+    //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n ";
     //text = "steps = 0 \n while steps < 3 { \n steps = steps + 1 \n 5 / 9 \n } \n 4 - 7 ";
     //text = "x = 42 \n steps = 0 \n if steps < 3 { \n steps = steps + 1 \n } \n else { \n x = 3 * x + 1 \n }";
     //text = "x = 42 \n steps = 0 \n if steps < 3 { \n steps = steps + 1 \n } \n ";
@@ -378,7 +378,6 @@ int main(int argc, const char **argv)
     //print and evaluate trees
     for (size_t i = 0; i < trees.size(); i++)
     {
-        //cout << "right before segfault3" << endl;
         evaluateAll(trees[i], variables);
     }
     for (size_t i = 0; i < trees.size(); i++)
