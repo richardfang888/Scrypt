@@ -72,6 +72,21 @@ vector<Token> readTokens(string &input)
             finishToken(currToken, tokens);
             break;
 
+        case ';':
+            finishToken(currToken, tokens);
+            currToken.text += c;
+            currToken.length++;
+            currToken.type = SEMICOLON;
+            finishToken(currToken, tokens);
+            break;
+        case ',':
+            finishToken(currToken, tokens);
+            currToken.text += c;    
+            currToken.length++;
+            currToken.type = COMMA;
+            finishToken(currToken, tokens);
+            break;
+
         // handle operators
         case '+':
         case '-':
