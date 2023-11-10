@@ -15,18 +15,7 @@ AST::AST(const vector<Token> &tokens, int &index)
     root = makeTree(tokens, index);
 }
 
-// for debugging purposes (to see the created tree):
-// void AST::printAST(Node node, int depth) {
-//     // Print the value of the current node
-//     cout << node.token.text << "|" << depth << "|||";
-//     // Recursively print the left and right subtrees
-//     for (Node child : node.children)
-//     {
-//         printAST(child, depth + 1);
-//     }
-// }
-
-AST::~AST(){ }
+AST::~AST() {}
 
 // Recursively creates an AST from a list of tokens,
 // checks for if there are formatting errors on converted S expression
@@ -59,12 +48,14 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         // Check if the token after LEFT_PAREN is a valid operation. If not, throw an error.
         if (index > (int)tokens.size() - 1 || tokens[index].type != OPERATOR)
         {
-            //cout << "should be op" << endl;
+            // cout << "should be op" << endl;
             printErrorTwo(tokens[index]);
-        } 
-        else if(tokens[index].text == "="){
-            if(tokens[index + 1].type != IDENTIFIER){
-                //cout << "should be ident" << endl;
+        }
+        else if (tokens[index].text == "=")
+        {
+            if (tokens[index + 1].type != IDENTIFIER)
+            {
+                // cout << "should be ident" << endl;
                 printErrorTwo(tokens[index + 1]);
             }
         }
@@ -73,7 +64,7 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         // Error checking for an empty operation
         if (tokens[index].type == RIGHT_PAREN)
         {
-            //cout << "right paren" << endl;
+            // cout << "right paren" << endl;
             printErrorTwo(tokens[index]);
         }
 
@@ -82,15 +73,16 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         {
             node.children.push_back(makeTree(tokens, index));
         }
-        
-        //cout << tokens[index].text << node.token.text << endl;
-        if(node.children.size() == 1 && node.token.text == "="){
+
+        // cout << tokens[index].text << node.token.text << endl;
+        if (node.children.size() == 1 && node.token.text == "=")
+        {
             printErrorTwo(tokens[index]);
         }
         // Error handling for incorrect expressions (like "(+ 1 2" without the closing parenthesis)
         if (node.children.empty() || (node.children.size() == 1 && node.children[0].token.type != FLOAT && node.children[0].token.type != IDENTIFIER))
         {
-            //cout << "no closing paren" << endl;
+            // cout << "no closing paren" << endl;
             printErrorTwo(tokens[index - 1]);
         }
         else if (index < (int)tokens.size() - 1 && tokens[index].type == RIGHT_PAREN)
@@ -100,31 +92,31 @@ Node AST::makeTree(const vector<Token> &tokens, int &index)
         // If the token is neither a FLOAT, IDENTIFIER nor a LEFT_PAREN, it's unexpected.
         else
         {
-            //cout << "unexpected" << endl;
+            // cout << "unexpected" << endl;
             printErrorTwo(tokens[index]);
         }
         return node;
     }
     else
     {
-        //cout << "unexpected" << endl;
+        // cout << "unexpected" << endl;
         printErrorTwo(token);
     }
     throw 1;
 }
 
-//Evaluate
-double AST::evaluateAST(std::unordered_map<std::string, double>& variables)
+// Evaluate
+double AST::evaluateAST(std::unordered_map<std::string, double> &variables)
 {
     return evaluate(root, variables);
 }
 
 // Evaluates the given AST node and returns the result of the original expression while storing the variables.
-double AST::evaluate(Node node, std::unordered_map<std::string, double>& variables) const
+double AST::evaluate(Node node, std::unordered_map<std::string, double> &variables) const
 {
     // If the token is an operator, apply the correct operation.
     double result = 0;
-    if(node.token.type == OPERATOR)
+    if (node.token.type == OPERATOR)
     {
         // Iterate over the rest of the children to apply the operation.
         for (size_t i = 0; i < node.children.size(); i++)
@@ -132,39 +124,47 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
             Token opToken = node.token;
             if (opToken.text == "+")
             {
-                if(i == 0){
+                if (i == 0)
+                {
                     result = evaluate(node.children[i], variables);
                 }
-                else{
+                else
+                {
                     result += evaluate(node.children[i], variables);
                 }
             }
             else if (opToken.text == "-")
             {
-                if(i == 0){
+                if (i == 0)
+                {
                     result = evaluate(node.children[i], variables);
                 }
-                else{
+                else
+                {
                     result -= evaluate(node.children[i], variables);
                 }
             }
             else if (opToken.text == "*")
             {
-                if(i == 0){
+                if (i == 0)
+                {
                     result = evaluate(node.children[i], variables);
                 }
-                else{
+                else
+                {
                     result *= evaluate(node.children[i], variables);
                 }
             }
             else if (opToken.text == "/")
             {
                 // Check for division by zero.
-                if(i == 0){
+                if (i == 0)
+                {
                     result = evaluate(node.children[i], variables);
                 }
-                else{
-                double denominator = evaluate(node.children[i], variables);
+                else
+                {
+                    double denominator = evaluate(node.children[i], variables);
                     if (denominator != 0)
                     {
                         result /= denominator;
@@ -178,8 +178,9 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
             }
             else if (opToken.text == "=")
             {
-                result = evaluate(node.children[node.children.size()-1], variables);
-                for(int i = node.children.size()-2; i >= 0; i--){
+                result = evaluate(node.children[node.children.size() - 1], variables);
+                for (int i = node.children.size() - 2; i >= 0; i--)
+                {
                     variables[node.children[i].token.text] = result;
                 }
             }
@@ -196,12 +197,15 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
     {
         return stod(node.token.text);
     }
-    else if(node.token.type == IDENTIFIER){
-        //Check for runtime error
-        if (variables.count(node.token.text) > 0){
+    else if (node.token.type == IDENTIFIER)
+    {
+        // Check for runtime error
+        if (variables.count(node.token.text) > 0)
+        {
             return variables.at(node.token.text);
         }
-        else{
+        else
+        {
             cout << "Runtime error: unknown identifier " << node.token.text << endl;
             exit(3);
         }
@@ -218,7 +222,6 @@ double AST::evaluate(Node node, std::unordered_map<std::string, double>& variabl
         return 2;
     }
     return result;
-
 }
 
 void AST::printInfix() const
@@ -298,28 +301,8 @@ int main(int argc, const char **argv)
         }
     }
 
-    //test cases:
-    //text = "(= b c (+ 6 3 4))";
-    //text = "(= a b (+ 6 3 4)) \n (+ 1 a 3)";
-    //text ="(= a 3)";
-    //text = "(+ 4 5 7)";
-    //text = "(= a b 3 z)";
-    //text = "(=(+x)89)";
-    //text = "(= x (+ 3 3) 4) ";
-
     // lex and then check for lex errors
     tokens = readTokens(text);
-    // try 
-    // {
-    //     tokens = readTokens(text);
-    //     printTokens(tokens);
-    // }
-    // catch(const lexer_error &e)
-    // {
-    //     cout << e.what() << endl;
-    //     exit(1);
-    // }
-    // tokens = readTokens(text);
 
     // set up variables for muti expression parsing
     int index = 0;
@@ -327,7 +310,7 @@ int main(int argc, const char **argv)
     std::unordered_map<std::string, double> variables;
 
     // parse the tokens and put into trees
-    while(tokens[index].type != END)
+    while (tokens[index].type != END)
     {
         if (tokens.back().text == "error")
         {
@@ -336,8 +319,9 @@ int main(int argc, const char **argv)
         AST ast(tokens, index);
         trees.push_back(ast);
     }
-    //print and evaluate trees
-    for(auto tree : trees)
+
+    // print and evaluate trees
+    for (auto tree : trees)
     {
         tree.printInfix();
         cout << tree.evaluateAST(variables) << endl;

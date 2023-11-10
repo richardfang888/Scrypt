@@ -4,7 +4,6 @@
 #include <limits>
 #include <cmath>
 
-
 void deleteNode(Node *node)
 {
     if (node)
@@ -58,15 +57,15 @@ Node *parseAll(const vector<Token> &tokens, int &index, bool &error)
     }
     // check first token
     // for each respective token parse them and if not assume assignment
-    if(match(tokens, index, "if"))
-    {      
+    if (match(tokens, index, "if"))
+    {
         return parseIf(tokens, index, error);
     }
-    else if(match(tokens, index, "while"))
+    else if (match(tokens, index, "while"))
     {
         return parseWhile(tokens, index, error);
     }
-    else if(match(tokens, index, "print"))
+    else if (match(tokens, index, "print"))
     {
         return parsePrint(tokens, index, error);
     }
@@ -85,64 +84,74 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
     // make a new if/esle node
     IfElseNode *IENode = makeIfElseNode(tokens[index]); // for testing
     // skip token
-    index ++;
-    // if/esle node's condition = parse expression 
+    index++;
+    // if/esle node's condition = parse expression
     IENode->condition = parseExpression(tokens, index, error);
     // check if the conditionn is a boolean
-    index ++;
+    index++;
 
     // check if there is an open bracket
-    if(match(tokens, index, "{"))
+    if (match(tokens, index, "{"))
     {
         // if so skip token
-        index ++;
-    } else
+        index++;
+    }
+    else
     {
         // if not throw error
         printErrorStatement(tokens[index], error);
     }
     // keep parseAlling until close bracket
-    while(!match(tokens, index, "}")){
+    while (!match(tokens, index, "}"))
+    {
         // each parseAll will return a node that will be pushed into if/esle node's vector
         Node *node = parseAll(tokens, index, error);
-        if (node != nullptr) {
+        if (node != nullptr)
+        {
             IENode->statementsTrue.push_back(node);
         }
-        index ++;
+        index++;
     }
     // if false
-    index ++;
-    if(match(tokens, index, "else"))
+    index++;
+    if (match(tokens, index, "else"))
     {
         IENode->hasElse = true;
-        index ++;
+        index++;
         // check if there is an open bracket
-        if(match(tokens, index, "{"))
+        if (match(tokens, index, "{"))
         {
             // if so skip token
-            index ++;
-            while(!match(tokens, index, "}")){
-            Node *node = parseAll(tokens, index, error);
-                if (node != nullptr) {
+            index++;
+            while (!match(tokens, index, "}"))
+            {
+                Node *node = parseAll(tokens, index, error);
+                if (node != nullptr)
+                {
                     IENode->statementsFalse.push_back(node);
                 }
-            index ++;
+                index++;
             }
-        } else if (match(tokens, index, "if")) {
+        }
+        else if (match(tokens, index, "if"))
+        {
             // run code for else if
             Node *node = parseAll(tokens, index, error);
-            if (node != nullptr) {
+            if (node != nullptr)
+            {
                 IENode->statementsFalse.push_back(node);
             }
-            
-        } else{
+        }
+        else
+        {
             // if not throw error
             printErrorStatement(tokens[index], error);
         }
         // keep parseAlling until close bracket
-    } else
+    }
+    else
     {
-        index --;
+        index--;
         IENode->hasElse = false;
     }
     // return the if/else node
@@ -158,29 +167,31 @@ WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
     // make a new if/esle node
     WhileNode *WNode = makeWhileNode(tokens[index]);
     // skip token
-    index ++;
+    index++;
     // make the vector
     WNode->condition = parseExpression(tokens, index, error);
-    index ++;
+    index++;
     // check if there is an open bracket
-    if(match(tokens, index, "{"))
+    if (match(tokens, index, "{"))
     {
         // if so skip token
-        index ++;
-    } else
+        index++;
+    }
+    else
     {
         // if not throw error
         printErrorStatement(tokens[index], error);
     }
     // keep parseAlling until close bracket
-    while(!match(tokens, index, "}")){
+    while (!match(tokens, index, "}"))
+    {
         // each parseAll will return a node that will be pushed into while node's vector
         Node *node = parseAll(tokens, index, error);
-        if (node != nullptr) {
+        if (node != nullptr)
+        {
             WNode->statements.push_back(node);
         }
-        index ++;
-
+        index++;
     }
     // return the while node
     return WNode;
@@ -195,8 +206,8 @@ PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error)
     // make a new print node
     PrintNode *PNode = makePrintNode(tokens[index]); // for testing
     // skip token
-    index ++;
-    // if/esle node's condition = parse expression 
+    index++;
+    // if/else node's condition = parse expression
     PNode->expression = parseExpression(tokens, index, error);
     // return the print node
     return PNode;
@@ -213,18 +224,18 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
 
     bool braceCheck = false;
 
-    if(startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while")|| match(tokens, startOfExpression - 1, "if")))
+    if (startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while") || match(tokens, startOfExpression - 1, "if")))
     {
         braceCheck = true;
     }
-    for(size_t x = startOfExpression; x < tokens.size() - 1; x++)
+    for (size_t x = startOfExpression; x < tokens.size() - 1; x++)
     {
         Token currToken = tokens[x];
         Token nextToken = tokens[x + 1];
         tokensExpression.push_back(currToken);
-        if(braceCheck)
+        if (braceCheck)
         {
-            if(nextToken.type == LEFT_BRACE)
+            if (nextToken.type == LEFT_BRACE)
             {
                 index = x;
                 break;
@@ -232,7 +243,7 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
         }
         else
         {
-            if(nextToken.lineNumber != currToken.lineNumber || nextToken.type == END)
+            if (nextToken.lineNumber != currToken.lineNumber || nextToken.type == END)
             {
                 index = x;
                 break;
@@ -319,18 +330,18 @@ Node *parseLogicAnd(const vector<Token> &tokens, int &index, bool &error)
 }
 
 // Function to parse equality expressions
-Node* parseEquality(const vector<Token>& tokens, int& index, bool &error)
+Node *parseEquality(const vector<Token> &tokens, int &index, bool &error)
 {
     if (error)
     {
         return nullptr;
     }
-    Node* left = parseComparison(tokens, index, error);
+    Node *left = parseComparison(tokens, index, error);
     while (match(tokens, index, "==") || match(tokens, index, "!="))
     {
         Token opToken = tokens[index++];
-        Node* right = parseComparison(tokens, index, error);
-        Node* opNode = makeNode(opToken);
+        Node *right = parseComparison(tokens, index, error);
+        Node *opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
         left = opNode;
@@ -339,26 +350,25 @@ Node* parseEquality(const vector<Token>& tokens, int& index, bool &error)
 }
 
 // Function to parse comparison expressions
-Node* parseComparison(const vector<Token>& tokens, int& index, bool &error)
+Node *parseComparison(const vector<Token> &tokens, int &index, bool &error)
 {
     if (error)
     {
         return nullptr;
     }
-    Node* left = parseAddSub(tokens, index, error);
+    Node *left = parseAddSub(tokens, index, error);
     while (match(tokens, index, "<") || match(tokens, index, "<=") ||
            match(tokens, index, ">") || match(tokens, index, ">="))
     {
         Token opToken = tokens[index++];
-        Node* right = parseAddSub(tokens, index, error);
-        Node* opNode = makeNode(opToken);
+        Node *right = parseAddSub(tokens, index, error);
+        Node *opNode = makeNode(opToken);
         opNode->children.push_back(left);
         opNode->children.push_back(right);
         left = opNode;
     }
     return left;
 }
-
 
 // Function to parse addition and subtraction expressions
 Node *parseAddSub(const vector<Token> &tokens, int &index, bool &error)
@@ -523,58 +533,77 @@ bool checkVar(Node *root, bool &error)
 // check for parentheses errors
 bool checkParen(vector<Token> &tokens, bool &error)
 {
-    if (error) {
+    if (error)
+    {
         return false;
     }
     int count = 0;
     Token lastToken;
-    
-    for (const Token &token : tokens) {
-        if (token.text == "(") {
+
+    for (const Token &token : tokens)
+    {
+        if (token.text == "(")
+        {
             count++;
-        } else if (token.text == ")") {
+        }
+        else if (token.text == ")")
+        {
             count--;
-            
-            if (count < 0) {
+
+            if (count < 0)
+            {
                 // More right parentheses than left parentheses
                 printErrorStatement(token, error);
                 return false;
             }
         }
-        
+
         lastToken = token;
     }
-    
-    if (count > 0) {
+
+    if (count > 0)
+    {
         // More left parentheses than right parentheses
         printErrorStatement(lastToken, error);
         return false;
     }
-    
+
     return true;
 }
 // Deletes all nodes
-void deleteNodeAll(Node *node){
-    if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(node)) {
+void deleteNodeAll(Node *node)
+{
+    if (IfElseNode *iENode = dynamic_cast<IfElseNode *>(node))
+    {
         deleteNodeAll(iENode->condition);
-        for(Node* child : iENode->statementsTrue) {
+        for (Node *child : iENode->statementsTrue)
+        {
             deleteNodeAll(child);
         }
-        for(Node* child : iENode->statementsFalse) {
+        for (Node *child : iENode->statementsFalse)
+        {
             deleteNodeAll(child);
         }
         delete iENode;
-    } else if (WhileNode *wNode = dynamic_cast<WhileNode*>(node)) {
+    }
+    else if (WhileNode *wNode = dynamic_cast<WhileNode *>(node))
+    {
         deleteNodeAll(wNode->condition);
-        for(Node* child : wNode->statements) {
+        for (Node *child : wNode->statements)
+        {
             deleteNodeAll(child);
         }
         delete wNode;
-    } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
+    }
+    else if (PrintNode *pNode = dynamic_cast<PrintNode *>(node))
+    {
         deleteNodeAll(pNode->expression);
         delete pNode;
-    } else {
-        for(Node* child : node->children) {
+    }
+    else
+    {
+        for (Node *child : node->children)
+        {
             deleteNodeAll(child);
         }
         delete node;
