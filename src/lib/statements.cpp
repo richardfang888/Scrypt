@@ -49,6 +49,7 @@ Node *makeTree(const vector<Token> &tokens, int &index)
     return parseAll(tokens, index, error);
 }
 
+// Parse all tokens in the given vector and return a pointer to the parsed node
 Node *parseAll(const vector<Token> &tokens, int &index, bool &error)
 {
     if (error)
@@ -75,6 +76,7 @@ Node *parseAll(const vector<Token> &tokens, int &index, bool &error)
     }
 }
 
+// Parses an if statement from a vector of tokens
 IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
 {
     if (error)
@@ -158,6 +160,7 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
     return IENode;
 }
 
+// Parses a while loop from a vector of tokens starting at the given index.
 WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
 {
     if (error)
@@ -197,6 +200,7 @@ WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
     return WNode;
 }
 
+// Parses a print statement from the given tokens
 PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error)
 {
     if (error)
@@ -204,8 +208,7 @@ PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error)
         return nullptr;
     }
     // make a new print node
-    PrintNode *PNode = makePrintNode(tokens[index]); // for testing
-    // skip token
+    PrintNode *PNode = makePrintNode(tokens[index]);
     index++;
     // if/else node's condition = parse expression
     PNode->expression = parseExpression(tokens, index, error);
@@ -213,6 +216,7 @@ PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error)
     return PNode;
 }
 
+// Parses an expression from a vector of tokens
 Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
 {
     if (error)
@@ -222,12 +226,13 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
     int startOfExpression = index;
     vector<Token> tokensExpression;
 
+    // checks if the current expression is preceded by a "while" or "if" token
     bool braceCheck = false;
-
     if (startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while") || match(tokens, startOfExpression - 1, "if")))
     {
         braceCheck = true;
     }
+    // Iterate through the tokens to build the expression
     for (size_t x = startOfExpression; x < tokens.size() - 1; x++)
     {
         Token currToken = tokens[x];
@@ -291,6 +296,7 @@ Node *parseLogicOr(const vector<Token> &tokens, int &index, bool &error)
     return left;
 }
 
+// Parses the XOR logic expression from the given tokens
 Node *parseLogicXor(const vector<Token> &tokens, int &index, bool &error)
 {
     if (error)
@@ -310,6 +316,7 @@ Node *parseLogicXor(const vector<Token> &tokens, int &index, bool &error)
     return left;
 }
 
+// Parses the AND logic expression from the given tokens
 Node *parseLogicAnd(const vector<Token> &tokens, int &index, bool &error)
 {
     if (error)
@@ -573,6 +580,7 @@ bool checkParen(vector<Token> &tokens, bool &error)
 // Deletes all nodes
 void deleteNodeAll(Node *node)
 {
+    // for if/else node
     if (IfElseNode *iENode = dynamic_cast<IfElseNode *>(node))
     {
         deleteNodeAll(iENode->condition);
@@ -586,6 +594,7 @@ void deleteNodeAll(Node *node)
         }
         delete iENode;
     }
+    // for while node
     else if (WhileNode *wNode = dynamic_cast<WhileNode *>(node))
     {
         deleteNodeAll(wNode->condition);
@@ -595,6 +604,7 @@ void deleteNodeAll(Node *node)
         }
         delete wNode;
     }
+    // for print node
     else if (PrintNode *pNode = dynamic_cast<PrintNode *>(node))
     {
         deleteNodeAll(pNode->expression);

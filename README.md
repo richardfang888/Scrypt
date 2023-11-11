@@ -19,7 +19,7 @@ src/lib/token.hpp: This header file contains the struct that has the types of to
 
 MakeFile Usage: 
 
-1) make parse {input S expression}: Compiles and runs parse.cpp
-2) make calc {input infix expression}: Compiles and runs calc.cpp
-3) make format {input program}: Compiles and runs format.cpp
-4) make scrypt {input program}: Compiles and runs scrypt.cpp
+1) make parse {input S expression}: Compiles and runs parse.cpp. Takes an S expression as standard input, and if it is valid, outputs the expression in infix form as well as the result of it.
+2) make calc {input infix expression}: Compiles and runs calc.cpp. Takes an infix expression as standard input, and if it is valid, outputs the infix form (with parentheses) as well as the result of it.
+3) make format {input program}: Compiles and runs format.cpp. Takes a program as standard input, and if it is valid, outputs the program as a formatted version.
+4) make scrypt {input program}: Compiles and runs scrypt.cpp. Takes a program as standard input, and if it is valid, outputs what the program explicitly wants to print.
