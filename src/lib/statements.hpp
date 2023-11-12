@@ -44,7 +44,7 @@ Node *parseAll(const vector<Token> &tokens, int &index, bool &error);
 IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error);
 WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error);
 PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error);
-Node *parseExpression(const vector<Token> &tokens, int &index, bool &error);
+Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, bool &error);
 Node *parseAssignment(const std::vector<Token> &tokens, int &index, bool &error);
 Node *parseComparison(const std::vector<Token> &tokens, int &index, bool &error);
 Node *parseLogicAnd(const std::vector<Token> &tokens, int &index, bool &error);

@@ -195,8 +195,9 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
         {
             if (node->children[i]->token.type != IDENTIFIER)
             {
-                // cout << "invalid identifier" << endl;
-                printErrorStatement(node->token, error);
+                error = true;
+                cout << "Runtime error: invalid asignee." << endl;
+                exit(3);
 
                 return numeric_limits<double>::quiet_NaN();
             }
@@ -277,45 +278,59 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
         for (size_t i = 1; i < node->children.size(); i++)
         {
             variant<double, bool> childrenVal = evaluateExpression(node->children[i], variables, error);
-            if ((holds_alternative<double>(childrenVal) && !holds_alternative<double>(result)) || (!holds_alternative<double>(childrenVal) && holds_alternative<double>(result)))
-            {
-                error = true;
-                cout << "Runtime error: invalid operand type." << endl;
-                exit(3);
-                return numeric_limits<double>::quiet_NaN();
-            }
             Token opToken = node->token;
-            if (opToken.text == ">")
+            if (opToken.text == "==" || opToken.text == "!=")
             {
-                result = result > evaluateExpression(node->children[i], variables, error);
-            }
-            else if (opToken.text == "<")
-            {
-                result = result < evaluateExpression(node->children[i], variables, error);
-            }
-            else if (opToken.text == ">=")
-            {
-                result =  result >= evaluateExpression(node->children[i], variables, error);
-            }
-            else if (opToken.text == "<=")
-            {
-                // Check for division by zero.
-                result = result <= evaluateExpression(node->children[i], variables, error);
-            }
-            else if (opToken.text == "==")
-            {
-                result = result == evaluateExpression(node->children[i], variables, error);
-            }
-            else if (opToken.text == "!=")
-            {
-                result = result != evaluateExpression(node->children[i], variables, error);
-            }
-            else
-            {
-                // If the operation is unrecognized, print an error message.
-                // cout << "unknown operator " << endl;
-                printErrorStatement(opToken, error);
-                return numeric_limits<double>::quiet_NaN();
+                bool equality = true;
+                // If different type or if same type but unequal, equality is false
+                if ((holds_alternative<double>(childrenVal) && !holds_alternative<double>(result)) || 
+                    (!holds_alternative<double>(childrenVal) && holds_alternative<double>(result)) ||
+                    result != evaluateExpression(node->children[i], variables, error))
+                {
+                    equality = false;
+                }
+                if (opToken.text == "==")
+                {
+                    result = equality;
+                }
+                else if (opToken.text == "!=")
+                {
+                    result = !equality;
+                }
+            }        
+            else {
+                // if left and right side of logical operator not the same type, return runtime error
+                if ((holds_alternative<double>(childrenVal) && !holds_alternative<double>(result)) || (!holds_alternative<double>(childrenVal) && holds_alternative<double>(result)))
+                {
+                    error = true;
+                    cout << "Runtime error: invalid operand type." << endl;
+                    exit(3);
+                    return numeric_limits<double>::quiet_NaN();
+                }
+                if (opToken.text == ">")
+                {
+                    result = result > evaluateExpression(node->children[i], variables, error);
+                }
+                else if (opToken.text == "<")
+                {
+                    result = result < evaluateExpression(node->children[i], variables, error);
+                }
+                else if (opToken.text == ">=")
+                {
+                    result =  result >= evaluateExpression(node->children[i], variables, error);
+                }
+                else if (opToken.text == "<=")
+                {
+                    // Check for division by zero.
+                    result = result <= evaluateExpression(node->children[i], variables, error);
+                }
+                else
+                {
+                    // If the operation is unrecognized, print an error message.
+                    // cout << "unknown operator " << endl;
+                    printErrorStatement(opToken, error);
+                    return numeric_limits<double>::quiet_NaN();
+                }
             }
         }
         return result;
@@ -374,7 +389,7 @@ int main(int argc, const char **argv)
 
     //test cases:
     //text = "x \n 42";
-    //text = "x = 42";
+    // text = "x = 42 \n";
     //text = "x = 42 \n 5 + 7";
     //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n ";
     //text = "steps = 0 \n while steps < 3 { \n steps = steps + 1 \n print steps \n 5 / 9 \n } \n 4 - 7 ";
@@ -388,6 +403,7 @@ int main(int argc, const char **argv)
     //text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n print steps \n";
     //text = "print a = 49 \n print b = 21 \n while a != b {\n if a > b {\n a = a - b \n } \n else if b > a {\n b = b - a \n } \n } \n print a \n";
     // text = "a = 12 \n b = 14 \n c = true \n \n while c { \n print a \n if a < b { \n a = a + 7 \n } \n else if a > b { \n b = b + 5 \n } \n else { \n c = 0\n } \n }";
+    // text = "x = 42;\n c = true;\n if x != c {\n 1 + 2 = 4;\n print x; \n}\n";
 
     // lex
     tokens = readTokens(text);

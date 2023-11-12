@@ -56,23 +56,23 @@ Node *parseAll(const vector<Token> &tokens, int &index, bool &error)
     {
         return nullptr;
     }
-    // check first token
-    // for each respective token parse them and if not assume assignment
+    // check first token for keyword
+    // parse each statement type given by the keyword parse them, default to plain expression
     if(match(tokens, index, "if"))
-    {      
+    {
         return parseIf(tokens, index, error);
     }
-    else if(match(tokens, index, "while"))
+    else if (match(tokens, index, "while"))
     {
         return parseWhile(tokens, index, error);
     }
-    else if(match(tokens, index, "print"))
+    else if (match(tokens, index, "print"))
     {
         return parsePrint(tokens, index, error);
     }
     else
     {
-        return parseExpression(tokens, index, error);
+        return parseExpression(tokens, index, true, error);
     }
 }
 
@@ -87,12 +87,12 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
     // skip token
     index ++;
     // if/esle node's condition = parse expression 
-    IENode->condition = parseExpression(tokens, index, error);
+    IENode->condition = parseExpression(tokens, index, false, error);
     // check if the conditionn is a boolean
     index ++;
 
     // check if there is an open bracket
-    if(match(tokens, index, "{"))
+    if (match(tokens, index, "{"))
     {
         // if so skip token
         index ++;
@@ -102,7 +102,7 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
         printErrorStatement(tokens[index], error);
     }
     // keep parseAlling until close bracket
-    while(!match(tokens, index, "}")){
+    while (!match(tokens, index, "}")){
         // each parseAll will return a node that will be pushed into if/esle node's vector
         Node *node = parseAll(tokens, index, error);
         if (node != nullptr) {
@@ -112,16 +112,16 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
     }
     // if false
     index ++;
-    if(match(tokens, index, "else"))
+    if (match(tokens, index, "else"))
     {
         IENode->hasElse = true;
         index ++;
         // check if there is an open bracket
-        if(match(tokens, index, "{"))
+        if (match(tokens, index, "{"))
         {
             // if so skip token
             index ++;
-            while(!match(tokens, index, "}")){
+            while (!match(tokens, index, "}")){
             Node *node = parseAll(tokens, index, error);
                 if (node != nullptr) {
                     IENode->statementsFalse.push_back(node);
@@ -155,12 +155,12 @@ WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
     {
         return nullptr;
     }
-    // make a new if/esle node
+    // make a new while node
     WhileNode *WNode = makeWhileNode(tokens[index]);
     // skip token
     index ++;
     // make the vector
-    WNode->condition = parseExpression(tokens, index, error);
+    WNode->condition = parseExpression(tokens, index, false, error);
     index ++;
     // check if there is an open bracket
     if(match(tokens, index, "{"))
@@ -173,7 +173,7 @@ WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
         printErrorStatement(tokens[index], error);
     }
     // keep parseAlling until close bracket
-    while(!match(tokens, index, "}")){
+    while (!match(tokens, index, "}")){
         // each parseAll will return a node that will be pushed into while node's vector
         Node *node = parseAll(tokens, index, error);
         if (node != nullptr) {
@@ -196,13 +196,12 @@ PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error)
     PrintNode *PNode = makePrintNode(tokens[index]); // for testing
     // skip token
     index ++;
-    // if/esle node's condition = parse expression 
-    PNode->expression = parseExpression(tokens, index, error);
+    PNode->expression = parseExpression(tokens, index, true, error);
     // return the print node
     return PNode;
 }
 
-Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
+Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, bool &error)
 {
     if (error)
     {
@@ -213,7 +212,7 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
 
     bool braceCheck = false;
 
-    if(startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while")|| match(tokens, startOfExpression - 1, "if")))
+    if (startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while")|| match(tokens, startOfExpression - 1, "if")))
     {
         braceCheck = true;
     }
@@ -222,9 +221,9 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
         Token currToken = tokens[x];
         Token nextToken = tokens[x + 1];
         tokensExpression.push_back(currToken);
-        if(braceCheck)
+        if (braceCheck)
         {
-            if(nextToken.type == LEFT_BRACE)
+            if (nextToken.type == LEFT_BRACE)
             {
                 index = x;
                 break;
@@ -232,11 +231,30 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
         }
         else
         {
-            if(nextToken.lineNumber != currToken.lineNumber || nextToken.type == END)
+            if (nextToken.lineNumber != currToken.lineNumber || nextToken.type == END)
             {
                 index = x;
                 break;
             }
+        }
+    }
+    // check that expression ends with semicolon if a print/normal expression
+    if (!tokensExpression.empty() && checkSemi)
+    {
+        // cout << "checkSemi" << endl;
+        // for (auto token : tokensExpression)
+        // {
+        //     cout << token.text;
+        // }
+        // cout << endl;
+        if ((tokensExpression.back().type == END && tokensExpression.size() > 1 && 
+                tokensExpression[tokensExpression.size() - 2].text != ";" && 
+                tokensExpression[tokensExpression.size() - 2].text != "}") ||
+            (tokensExpression.back().type != END && tokensExpression.back().text != ";"))
+        {
+            // cout << "Error: Expression must end with semicolon" << endl;
+            error = true;
+            printErrorStatement(tokensExpression.back(), error);
         }
     }
     int assignIndex = 0;

@@ -20,6 +20,8 @@ enum TokenType {
     END,
     COMMA, // ,
     SEMICOLON, // ;
+    FUNCTION, // def
+    NULLVAL, // null
 
     // other unexpected tokens (syntax error)
     OTHER

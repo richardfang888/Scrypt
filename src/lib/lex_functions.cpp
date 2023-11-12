@@ -50,6 +50,8 @@ vector<Token> readTokens(string &input)
         case ')':
         case '{':
         case '}':
+        case ';':
+        case ',':
             finishToken(currToken, tokens);
             currToken.text += c;
             currToken.length++;
@@ -69,21 +71,14 @@ vector<Token> readTokens(string &input)
             {
                 currToken.type = RIGHT_BRACE;
             }
-            finishToken(currToken, tokens);
-            break;
-
-        case ';':
-            finishToken(currToken, tokens);
-            currToken.text += c;
-            currToken.length++;
-            currToken.type = SEMICOLON;
-            finishToken(currToken, tokens);
-            break;
-        case ',':
-            finishToken(currToken, tokens);
-            currToken.text += c;    
-            currToken.length++;
-            currToken.type = COMMA;
+            else if (c == ';')
+            {
+                currToken.type = SEMICOLON;
+            }
+            else if (c == ',')
+            {
+                currToken.type = COMMA;
+            }
             finishToken(currToken, tokens);
             break;
 
