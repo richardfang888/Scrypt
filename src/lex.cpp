@@ -20,6 +20,7 @@ int main(int argc, const char **argv)
         }
     }
 
+    // lex and then check for lex errors
     tokens = readTokens(text);
 
     if (tokens.empty() || tokens.back().text == "error")
@@ -30,17 +31,6 @@ int main(int argc, const char **argv)
     {
         printTokens(tokens);
     }
-
-    // try 
-    // {
-    //     tokens = readTokens(text);
-    //     printTokens(tokens);
-    // }
-    // catch(const lexer_error &e)
-    // {
-    //     cout << e.what() << endl;
-    //     exit(1);
-    // }
 
     return 0;
 }
