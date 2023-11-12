@@ -11,6 +11,7 @@
     "tuple": "cpp",
     "utility": "cpp",
     "ostream": "cpp",
-    "random": "cpp"
+    "random": "cpp",
+    "xlocale": "cpp"
   }
 }

@@ -56,9 +56,9 @@ Node *parseAll(const vector<Token> &tokens, int &index, bool &error)
     {
         return nullptr;
     }
-    // check first token
-    // for each respective token parse them and if not assume assignment
-    if (match(tokens, index, "if"))
+    // check first token for keyword
+    // parse each statement type given by the keyword parse them, default to plain expression
+    if(match(tokens, index, "if"))
     {
         return parseIf(tokens, index, error);
     }
@@ -72,7 +72,7 @@ Node *parseAll(const vector<Token> &tokens, int &index, bool &error)
     }
     else
     {
-        return parseExpression(tokens, index, error);
+        return parseExpression(tokens, index, true, error);
     }
 }
 
@@ -86,9 +86,10 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
     // make a new if/esle node
     IfElseNode *IENode = makeIfElseNode(tokens[index]); // for testing
     // skip token
-    index++;
-    // if/esle node's condition = parse expression
-    IENode->condition = parseExpression(tokens, index, error);
+
+    index ++;
+    // if/esle node's condition = parse expression 
+    IENode->condition = parseExpression(tokens, index, false, error);
     // check if the conditionn is a boolean
     index++;
 
@@ -104,6 +105,7 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
         printErrorStatement(tokens[index], error);
     }
     // keep parseAlling until close bracket
+
     while (!match(tokens, index, "}"))
     {
         // each parseAll will return a node that will be pushed into if/esle node's vector
@@ -115,7 +117,9 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
         index++;
     }
     // if false
-    index++;
+
+    index ++;
+
     if (match(tokens, index, "else"))
     {
         IENode->hasElse = true;
@@ -167,13 +171,14 @@ WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
     {
         return nullptr;
     }
-    // make a new if/esle node
+    // make a new while node
     WhileNode *WNode = makeWhileNode(tokens[index]);
     // skip token
     index++;
     // make the vector
-    WNode->condition = parseExpression(tokens, index, error);
+    WNode->condition = parseExpression(tokens, index, false, error);
     index++;
+
     // check if there is an open bracket
     if (match(tokens, index, "{"))
     {
@@ -217,7 +222,7 @@ PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error)
 }
 
 // Parses an expression from a vector of tokens
-Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
+Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, bool &error)
 {
     if (error)
     {
@@ -228,6 +233,7 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
 
     // checks if the current expression is preceded by a "while" or "if" token
     bool braceCheck = false;
+
     if (startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while") || match(tokens, startOfExpression - 1, "if")))
     {
         braceCheck = true;
@@ -253,6 +259,25 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool &error)
                 index = x;
                 break;
             }
+        }
+    }
+    // check that expression ends with semicolon if a print/normal expression
+    if (!tokensExpression.empty() && checkSemi)
+    {
+        // cout << "checkSemi" << endl;
+        // for (auto token : tokensExpression)
+        // {
+        //     cout << token.text;
+        // }
+        // cout << endl;
+        if ((tokensExpression.back().type == END && tokensExpression.size() > 1 && 
+                tokensExpression[tokensExpression.size() - 2].text != ";" && 
+                tokensExpression[tokensExpression.size() - 2].text != "}") ||
+            (tokensExpression.back().type != END && tokensExpression.back().text != ";"))
+        {
+            // cout << "Error: Expression must end with semicolon" << endl;
+            error = true;
+            printErrorStatement(tokensExpression.back(), error);
         }
     }
     int assignIndex = 0;

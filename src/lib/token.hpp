@@ -18,6 +18,10 @@ enum TokenType {
     RIGHT_BRACE,
     KEYWORD, // while, print, if, else
     END,
+    COMMA, // ,
+    SEMICOLON, // ;
+    FUNCTION, // def
+    NULLVAL, // null
 
     // other unexpected tokens (syntax error)
     OTHER

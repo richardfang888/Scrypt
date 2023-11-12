@@ -25,7 +25,7 @@ void printAll(Node *node, int &depth)
         printPrint(pNode, depth);
     } else {
         // Node is a normal Node
-        printInfix(node);
+        printInfix(node, true);
         cout << endl;
     }
 }
@@ -36,7 +36,7 @@ void printIfElse(const Node *node, int &depth)
         cout << "if ";
     const IfElseNode* ifElseNode = dynamic_cast<const IfElseNode*>(node);
     if (ifElseNode) {
-        printInfix(ifElseNode->condition);
+        printInfix(ifElseNode->condition, false);
         cout << " {" << endl;
         depth ++;
         for(size_t i = 0; i < ifElseNode->statementsTrue.size(); i++) {
@@ -74,7 +74,7 @@ void printWhile(const Node *node, int &depth)
         cout << "while ";
     const WhileNode* whileNode = dynamic_cast<const WhileNode*>(node);
     if (whileNode) {
-        printInfix(whileNode->condition);
+        printInfix(whileNode->condition, false);
         cout << " {" << endl;
         depth ++;
         for(size_t i = 0; i < whileNode->statements.size(); i++) {
@@ -96,19 +96,21 @@ void printPrint(const Node *node, int &depth)
         cout << "print ";
     const PrintNode* printNode = dynamic_cast<const PrintNode*>(node);
     if (printNode) {
-        printInfix(printNode->expression);
+        printInfix(printNode->expression, true);
         cout << endl;
     }
 }
 // Prints the infix notation of a given AST.
-void printInfix(const Node *node) 
+void printInfix(const Node *node, bool semi) 
 {
     if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
         cout << "(";
     printInfixHelper(node);
     if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
         cout << ")";
-
+    if (semi) {
+        cout << ";";
+    }
 }
 
 // Prints the infix notation of a given AST.
@@ -173,6 +175,9 @@ int main(int argc, const char **argv)
             text += '\n';
         }
     }
+
+    // text = "x=2;\n if x==1 \n{print 1;\n} else \n{print 0;\n}\n";
+    // text = "print a = 49; \n print b = 21; \n while a != b {\n if a > b {\n a = a - b; \n } \n else if b > a {\n b = b - a; \n } \n } \n print a; \n";
 
     tokens = readTokens(text);
 
