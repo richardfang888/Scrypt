@@ -14,8 +14,10 @@ enum TokenType {
     WHITESPACE,
     LEFT_PAREN,
     RIGHT_PAREN,
-    LEFT_BRACE,
-    RIGHT_BRACE,
+    LEFT_BRACE, // {
+    RIGHT_BRACE, // }
+    LEFT_BRACKET, // [
+    RIGHT_BRACKET, // ]
     KEYWORD, // while, print, if, else
     END,
     COMMA, // ,

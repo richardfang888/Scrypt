@@ -50,6 +50,8 @@ vector<Token> readTokens(string &input)
         case ')':
         case '{':
         case '}':
+        case '[':
+        case ']':
         case ';':
         case ',':
             finishToken(currToken, tokens);
@@ -70,6 +72,14 @@ vector<Token> readTokens(string &input)
             else if (c == '}')
             {
                 currToken.type = RIGHT_BRACE;
+            }
+            else if (c == '[')
+            {
+                currToken.type = LEFT_BRACKET;
+            }
+            else if (c == ']')
+            {
+                currToken.type = RIGHT_BRACKET;
             }
             else if (c == ';')
             {
