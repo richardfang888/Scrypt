@@ -16,7 +16,7 @@ enum TokenType {
     RIGHT_PAREN,
     LEFT_BRACE,
     RIGHT_BRACE,
-    KEYWORD, // while, print, if, else
+    KEYWORD, // while, print, if, else, return, def
     END,
     COMMA, // ,
     SEMICOLON, // ;

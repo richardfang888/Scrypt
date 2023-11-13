@@ -1,6 +1,7 @@
 #include "lex.hpp"
 #include <unordered_map>
 #include <variant>
+
 struct Node
 {
     Token token;
@@ -33,10 +34,37 @@ struct PrintNode : public Node
     virtual ~PrintNode() = default;
 };
 
+struct FunctDefNode : public Node
+{
+    Token token;
+    Token functname;
+    unordered_map<string, variant<double, bool>> vars;
+    vector<string> arguments;
+    vector<Node *> statements;
+    virtual ~FunctDefNode() = default;
+};
+
+struct FunctCallNode : public Node
+{
+    Token token;
+    vector<string> arguments;
+    virtual ~FunctCallNode() = default;
+};
+
+struct ReturnNode : public Node
+{
+    Token token;
+    Node* expression;
+    virtual ~ReturnNode() = default;
+};
+
 Node *makeNode(const Token &token);
 WhileNode *makeWhileNode(const Token &token);
 IfElseNode *makeIfElseNode(const Token &token);
 PrintNode *makePrintNode(const Token &token);
+ReturnNode *makeReturnNode(const Token &token);
+FunctDefNode *makeFunctDefNode(const Token &token);
+FunctCallNode *makeFunctCallNode(const Token &token);
 bool checkIden(Node *root, unordered_map<string, variant<double, bool>> &variables, bool &error);
 bool checkVar(Node *root, bool &error);
 bool checkParen(vector<Token> &tokens, bool &error);
@@ -44,6 +72,9 @@ Node *parseAll(const vector<Token> &tokens, int &index, bool &error);
 IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error);
 WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error);
 PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error);
+ReturnNode *parseReturn(const vector<Token> &tokens, int &index, bool &error);
+FunctDefNode *parseFunctDef(const vector<Token> &tokens, int &index, bool &error);
+FunctCallNode *parseFunctCall(const vector<Token> &tokens, int &index, bool &error);
 Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, bool &error);
 Node *parseAssignment(const std::vector<Token> &tokens, int &index, bool &error);
 Node *parseComparison(const std::vector<Token> &tokens, int &index, bool &error);

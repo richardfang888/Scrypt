@@ -238,7 +238,7 @@ vector<Token> readTokens(string &input)
             currToken.text += c;
             currToken.length++;
             if (currToken.text == "if" || currToken.text == "print" || currToken.text == "while" 
-                || currToken.text == "else")
+                || currToken.text == "else" || currToken.text == "return" || currToken.text == "def")
             {
                 currToken.type = KEYWORD;
             }

@@ -5,8 +5,11 @@
 #include <cmath>
 
 
-void printAll(Node *node, int &depth) ;
-void printInfix(const Node *node, bool semi) ;
-void printIfElse(const Node *node, int &depth) ;
-void printWhile(const Node *node, int &depth) ;
-void printPrint(const Node *node, int &depth) ;
+void printAll(Node *node, int &depth);
+void printInfix(const Node *node, bool semi);
+void printIfElse(const Node *node, int &depth);
+void printWhile(const Node *node, int &depth);
+void printPrint(const Node *node, int &depth);
+void printFunctDef(const Node *node, int &depth);
+void printReturn(const Node *node, int &depth);
+void printFunctCall(const Node *node, int &depth);

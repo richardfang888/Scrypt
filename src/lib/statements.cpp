@@ -42,6 +42,26 @@ PrintNode *makePrintNode(const Token &token)
     return pNode;
 }
 
+ReturnNode *makeReturnNode(const Token &token)
+{
+    ReturnNode *rNode = new ReturnNode();
+    rNode->token = token;
+    return rNode;
+}
+
+FunctDefNode *makeFunctDefNode(const Token &token)
+{
+    FunctDefNode *fdNode = new FunctDefNode();
+    fdNode->token = token;
+    return fdNode;
+}
+FunctCallNode *makeFunctCallNode(const Token &token)
+{
+    FunctCallNode *fcNode = new FunctCallNode();
+    fcNode->token = token;
+    return fcNode;
+}
+
 // Recursively creates an AST from a list of tokens and returns the root node
 Node *makeTree(const vector<Token> &tokens, int &index)
 {
@@ -69,6 +89,14 @@ Node *parseAll(const vector<Token> &tokens, int &index, bool &error)
     else if (match(tokens, index, "print"))
     {
         return parsePrint(tokens, index, error);
+    }
+    else if (match(tokens, index, "return"))
+    {
+        return parseReturn(tokens, index, error);
+    }
+    else if (match(tokens, index, "def"))
+    {
+        return parseFunctDef(tokens, index, error);
     }
     else
     {
@@ -216,9 +244,128 @@ PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error)
     PrintNode *PNode = makePrintNode(tokens[index]);
     index++;
     // if/else node's condition = parse expression
-    PNode->expression = parseExpression(tokens, index, error);
+    PNode->expression = parseExpression(tokens, index, true, error);
     // return the print node
     return PNode;
+}
+
+// Parses a return statement from the given tokens
+ReturnNode *parseReturn(const vector<Token> &tokens, int &index, bool &error)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    // make a new return node
+    ReturnNode *RNode = makeReturnNode(tokens[index]);
+    index++;
+    // if/else node's condition = parse expression
+    RNode->expression = parseExpression(tokens, index, true, error);
+    // return the return node
+    return RNode;
+}
+
+// Parses a function definition from the given tokens
+FunctDefNode *parseFunctDef(const vector<Token> &tokens, int &index, bool &error)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    // make a new function definition node
+    FunctDefNode *FNode = makeFunctDefNode(tokens[index]);
+    index++;
+    FNode->functname = tokens[index];
+    index++;
+    if (!match(tokens, index, "("))
+    {
+        // if not throw error
+        printErrorStatement(tokens[index], error);
+    }
+    index++;
+    while (!match(tokens, index, ")"))
+    {
+        if (tokens[index].type == IDENTIFIER)
+        {
+
+            FNode->vars[tokens[index].text] = numeric_limits<double>::quiet_NaN();
+            FNode->arguments.push_back(tokens[index].text);
+            index++;
+            if (match(tokens, index, ","))
+            {
+                index++;
+            }
+            else
+            {
+                printErrorStatement(tokens[index], error);
+            }
+        }
+        else
+        {
+            // if argument is not an identifier, throw error
+            printErrorStatement(tokens[index], error);
+        }
+    }
+    index++;
+    if (!match(tokens, index, "{"))
+    {
+        // if not throw error
+        printErrorStatement(tokens[index], error);
+    }
+    index++;
+    // keep parseAlling until close bracket
+    while (!match(tokens, index, "}"))
+    {
+        // each parseAll will return a node that will be pushed into while node's vector
+        Node *node = parseAll(tokens, index, error);
+        if (node != nullptr)
+        {
+            FNode->statements.push_back(node);
+        }
+        index++;
+    }
+    return FNode;
+}
+
+// Parses a function call from the given tokens
+FunctCallNode *parseFunctCall(const vector<Token> &tokens, int &index, bool &error)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    // make a new function call node
+    FunctCallNode *FNode = makeFunctCallNode(tokens[index]);
+    FNode->token = tokens[index];
+    index++;
+    if (!match(tokens, index, "("))
+    {
+        // if not throw error
+        printErrorStatement(tokens[index], error);
+    }
+    index++; // skips open parenthesis
+    while (!match(tokens, index, ")"))
+    {
+        if (tokens[index].type == IDENTIFIER)
+        {
+            FNode->arguments.push_back(tokens[index].text);
+            index++;
+            if (match(tokens, index, ","))
+            {
+                index++;
+            }
+            else
+            {
+                printErrorStatement(tokens[index], error);
+            }
+        }
+        else
+        {
+            // if argument is not an identifier, throw error
+            printErrorStatement(tokens[index], error);
+        }
+    }
+    return FNode;
 }
 
 // Parses an expression from a vector of tokens
@@ -234,7 +381,8 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
     // checks if the current expression is preceded by a "while" or "if" token
     bool braceCheck = false;
 
-    if (startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while") || match(tokens, startOfExpression - 1, "if")))
+    if (startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while") 
+        || match(tokens, startOfExpression - 1, "if") || match(tokens, startOfExpression - 1, "def")))
     {
         braceCheck = true;
     }
@@ -261,7 +409,7 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
             }
         }
     }
-    // check that expression ends with semicolon if a print/normal expression
+    // check that expression ends with semicolon if boolean flag is true
     if (!tokensExpression.empty() && checkSemi)
     {
         // cout << "checkSemi" << endl;
@@ -283,6 +431,7 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
     int assignIndex = 0;
     return parseAssignment(tokensExpression, assignIndex, error);
 }
+
 // Function to parse assignment expressions
 Node *parseAssignment(const vector<Token> &tokens, int &index, bool &error)
 {
@@ -301,6 +450,7 @@ Node *parseAssignment(const vector<Token> &tokens, int &index, bool &error)
     }
     return left;
 }
+
 // Function to parse logical expressions
 Node *parseLogicOr(const vector<Token> &tokens, int &index, bool &error)
 {
@@ -450,8 +600,16 @@ Node *parsePrimary(const vector<Token> &tokens, int &index, bool &error)
         return nullptr;
     }
     Token token = tokens[index++];
-    if (token.type == FLOAT || token.type == IDENTIFIER || token.type == BOOLEAN)
+    if (token.type == FLOAT || token.type == BOOLEAN)
     {
+        return makeNode(token);
+    }
+    else if (token.type == IDENTIFIER)
+    {
+        if (match(tokens, index + 1, "("))
+        {
+            return parseFunctCall(tokens, index, error);
+        }
         return makeNode(token);
     }
     else if (token.type == TokenType::LEFT_PAREN)
@@ -634,6 +792,26 @@ void deleteNodeAll(Node *node)
     {
         deleteNodeAll(pNode->expression);
         delete pNode;
+    }
+    // for return node
+    else if (ReturnNode *rNode = dynamic_cast<ReturnNode *>(node))
+    {
+        deleteNodeAll(rNode->expression);
+        delete rNode;
+    }
+    // for function definition
+    else if (FunctDefNode *fNode = dynamic_cast<FunctDefNode *>(node))
+    {
+        for (Node *child : fNode->statements)
+        {
+            deleteNodeAll(child);
+        }
+        delete fNode;
+    }
+    // for function call
+    else if (FunctCallNode *fNode = dynamic_cast<FunctCallNode *>(node))
+    {
+        delete fNode;
     }
     else
     {
