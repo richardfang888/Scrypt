@@ -39,14 +39,14 @@ struct FunctDefNode : public Node
     Token token;
     Token functname;
     unordered_map<string, variant<double, bool>> vars;
-    vector<string> arguments;
+    vector<string> params;
     vector<Node *> statements;
     virtual ~FunctDefNode() = default;
 };
 
 struct FunctCallNode : public Node
 {
-    Token token;
+    Token functname;
     vector<string> arguments;
     virtual ~FunctCallNode() = default;
 };

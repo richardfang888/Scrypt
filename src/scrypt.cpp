@@ -24,6 +24,21 @@ void evaluateAll(Node *node, unordered_map<string, variant<double, bool>> &varia
         // Node is a PrintNode
         evaluatePrint(pNode, variables, error);
     }
+    else if (FunctDefNode *fdNode = dynamic_cast<FunctDefNode *>(node))
+    {
+        // Node is a FunctDefNode
+        evaluateFunctDef(fdNode, variables, error);
+    }
+    else if (ReturnNode *rNode = dynamic_cast<ReturnNode *>(node))
+    {
+        // Node is a ReturnNode
+        evaluateReturn(rNode, variables, error);
+    }
+    else if (FunctCallNode *fcNode = dynamic_cast<FunctCallNode *>(node))
+    {
+        // Node is a FunctCallNode
+        evaluateFunctCall(fcNode, variables, error);
+    }
     else
     {
         // Node is a normal Node
@@ -131,6 +146,41 @@ variant<double, bool> evaluatePrint(PrintNode *node, unordered_map<string, varia
         cout << get<bool>(result) << endl;
     }
     // dummy return -> can make it void if needed
+    return numeric_limits<double>::quiet_NaN();
+}
+
+// Evaluates a return statement.
+variant<double, bool> evaluateReturn(ReturnNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
+{
+    if (!node || error)
+    {
+        return numeric_limits<double>::quiet_NaN();
+    }
+    variant<double, bool> result = evaluateExpression(node->expression, variables, error);
+
+    // set the value of the function call to return
+    return result;
+}
+
+// Evaluates a function definition.
+variant<double, bool> evaluateFunctDef(FunctDefNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
+{
+    if (!node || error)
+    {
+        return numeric_limits<double>::quiet_NaN();
+    }
+    // dummy return
+    return numeric_limits<double>::quiet_NaN();
+}
+
+// Evaluates a function call.
+variant<double, bool> evaluateFunctCall(FunctCallNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
+{
+    if (!node || error)
+    {
+        return numeric_limits<double>::quiet_NaN();
+    }
+    // dummy return
     return numeric_limits<double>::quiet_NaN();
 }
 

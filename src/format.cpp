@@ -17,18 +17,34 @@ void printAll(Node *node, int &depth)
     if (IfElseNode *iENode = dynamic_cast<IfElseNode*>(node)) {
         // Node is a WhileNode
         printIfElse(iENode, depth);
-    } else if (WhileNode *wNode = dynamic_cast<WhileNode*>(node)) {
+    }
+    else if (WhileNode *wNode = dynamic_cast<WhileNode*>(node)) {
         // Node is an IfElseNode
         printWhile(wNode, depth);
-    } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
+    } 
+    else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
         // Node is a PrintNode
         printPrint(pNode, depth);
-    } else {
+    } 
+    else if (FunctDefNode *fdNode = dynamic_cast<FunctDefNode*>(node)) {
+        // Node is a FunctDefNode
+        printFunctDef(fdNode, depth);
+    } 
+    else if (ReturnNode *rNode = dynamic_cast<ReturnNode*>(node)) {
+        // Node is a ReturnNode
+        printReturn(rNode, depth);
+    } 
+    else if (FunctCallNode *fcNode = dynamic_cast<FunctCallNode*>(node)) {
+        // Node is a FunctCallNode
+        printFunctCall(fcNode, depth);
+    }
+    else {
         // Node is a normal Node
         printInfix(node, true);
         cout << endl;
     }
 }
+
 // prints the if/else node
 void printIfElse(const Node *node, int &depth) 
 {
@@ -39,34 +55,32 @@ void printIfElse(const Node *node, int &depth)
         printInfix(ifElseNode->condition, false);
         cout << " {" << endl;
         depth ++;
-        for(size_t i = 0; i < ifElseNode->statementsTrue.size(); i++) {
+        for (size_t i = 0; i < ifElseNode->statementsTrue.size(); i++) {
             printAll(ifElseNode->statementsTrue[i], depth);
         }
         depth --;
-        for(int j = 0; j < depth; j++)
-        {
+        for (int j = 0; j < depth; j++) {
             cout << "    ";
         }
         cout << "}" << endl;
-        if(ifElseNode->hasElse) {
-            for(int j = 0; j < depth; j++)
-            {
+        if (ifElseNode->hasElse) {
+            for(int j = 0; j < depth; j++) {
                 cout << "    ";
             }
             cout << "else {" << endl;
             depth ++;
-            for(size_t i = 0; i < ifElseNode->statementsFalse.size(); i++) {
+            for (size_t i = 0; i < ifElseNode->statementsFalse.size(); i++) {
                 printAll(ifElseNode->statementsFalse[i], depth);
             }
             depth --;
-            for(int j = 0; j < depth; j++)
-            {
+            for (int j = 0; j < depth; j++) {
                 cout << "    ";
             }
             cout << "}" << endl;
         }
     }
 }
+
 // prints the while node
 void printWhile(const Node *node, int &depth) 
 {
@@ -77,11 +91,11 @@ void printWhile(const Node *node, int &depth)
         printInfix(whileNode->condition, false);
         cout << " {" << endl;
         depth ++;
-        for(size_t i = 0; i < whileNode->statements.size(); i++) {
+        for (size_t i = 0; i < whileNode->statements.size(); i++) {
             printAll(whileNode->statements[i], depth);
         }
         depth --;
-        for(int j = 0; j < depth; j++)
+        for (int j = 0; j < depth; j++)
         {
             cout << "    ";
         }
@@ -100,6 +114,61 @@ void printPrint(const Node *node, int &depth)
         cout << endl;
     }
 }
+
+void printFunctDef(const Node *node, int &depth)
+{
+    if (node)
+        cout << "def ";
+    const FunctDefNode* functDefNode = dynamic_cast<const FunctDefNode*>(node);
+    if (functDefNode) {
+        cout << functDefNode->functname.text << "(";
+        for (size_t i = 0; i < functDefNode->params.size(); i++) {
+            cout << functDefNode->params[i];
+            if (i != functDefNode->params.size() - 1) {
+                cout << ", ";
+            }
+        }
+        cout << ") ";
+        cout << " {" << endl;
+        depth ++;
+        for (size_t i = 0; i < functDefNode->statements.size(); i++) {
+            printAll(functDefNode->statements[i], depth);
+        }
+        depth --;
+        for (int j = 0; j < depth; j++)
+        {
+            cout << "    ";
+        }
+        cout << "}" << endl;
+    }
+}
+
+void printReturn(const Node *node, int &depth)
+{
+    if (node)
+        cout << "return ";
+    const ReturnNode* returnNode = dynamic_cast<const ReturnNode*>(node);
+    if (returnNode) {
+        printInfix(returnNode->expression, true);
+        cout << endl;
+    }
+}
+
+void printFunctCall(const Node *node, int &depth)
+{
+    const FunctCallNode* functCallNode = dynamic_cast<const FunctCallNode*>(node);
+    if (functCallNode) {
+        cout << functCallNode->functname.text << "(";
+        for (size_t i = 0; i < functCallNode->arguments.size(); i++) {
+            cout << functCallNode->arguments[i];
+            if (i != functCallNode->arguments.size() - 1) {
+                cout << ", ";
+            }
+        }
+        cout << ")" << endl;
+    }
+}
+
 // Prints the infix notation of a given AST.
 void printInfix(const Node *node, bool semi) 
 {

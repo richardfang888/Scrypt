@@ -6,5 +6,6 @@ variant<double, bool> evaluateExpression(Node* root, unordered_map<string, varia
 variant<double, bool> evaluateIfElse(IfElseNode* root, unordered_map<string, variant<double, bool>> &variables, bool &error);
 variant<double, bool> evaluateWhile(WhileNode* root, unordered_map<string, variant<double, bool>> &variables, bool &error);
 variant<double, bool> evaluatePrint(PrintNode* root, unordered_map<string, variant<double, bool>> &variables, bool &error);
-variant<double, bool> evaluateFunctCall(FunctDefNode* root, unordered_map<string, variant<double, bool>> &variables, bool &error);
+variant<double, bool> evaluateFunctDef(FunctDefNode* root, unordered_map<string, variant<double, bool>> &variables, bool &error);
+variant<double, bool> evaluateFunctCall(FunctCallNode* root, unordered_map<string, variant<double, bool>> &variables, bool &error);
 variant<double, bool> evaluateReturn(ReturnNode* root, unordered_map<string, variant<double, bool>> &variables, bool &error);

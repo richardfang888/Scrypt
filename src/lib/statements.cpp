@@ -58,7 +58,7 @@ FunctDefNode *makeFunctDefNode(const Token &token)
 FunctCallNode *makeFunctCallNode(const Token &token)
 {
     FunctCallNode *fcNode = new FunctCallNode();
-    fcNode->token = token;
+    fcNode->functname = token;
     return fcNode;
 }
 
@@ -289,7 +289,7 @@ FunctDefNode *parseFunctDef(const vector<Token> &tokens, int &index, bool &error
         {
 
             FNode->vars[tokens[index].text] = numeric_limits<double>::quiet_NaN();
-            FNode->arguments.push_back(tokens[index].text);
+            FNode->params.push_back(tokens[index].text);
             index++;
             if (match(tokens, index, ","))
             {
@@ -336,7 +336,7 @@ FunctCallNode *parseFunctCall(const vector<Token> &tokens, int &index, bool &err
     }
     // make a new function call node
     FunctCallNode *FNode = makeFunctCallNode(tokens[index]);
-    FNode->token = tokens[index];
+    FNode->functname = tokens[index];
     index++;
     if (!match(tokens, index, "("))
     {
