@@ -216,7 +216,7 @@ PrintNode *parsePrint(const vector<Token> &tokens, int &index, bool &error)
     PrintNode *PNode = makePrintNode(tokens[index]);
     index++;
     // if/else node's condition = parse expression
-    PNode->expression = parseExpression(tokens, index, error);
+    PNode->expression = parseExpression(tokens, index, true, error);
     // return the print node
     return PNode;
 }
