@@ -41,6 +41,24 @@ PrintNode *makePrintNode(const Token &token)
     pNode->token = token;
     return pNode;
 }
+ArrayLiteralNode *makeArrayLiteralNode(const Token &token)
+{
+    ArrayLiteralNode *aLNode = new ArrayLiteralNode();
+    aLNode->token = token;
+    return aLNode;
+}
+// ArrayLookupNode *makeArrayLookupNode(const Token &token)
+// {
+//     ArrayLookupNode *aLNode = new ArrayLookupNode();
+//     aLNode->token = token;
+//     return aLNode;
+// }
+ArrayAssignNode *makeArrayAssignNode(const Token &token)
+{
+    ArrayAssignNode *aANode = new ArrayAssignNode();
+    aANode->token = token;
+    return aANode;
+}
 
 // Recursively creates an AST from a list of tokens and returns the root node
 Node *makeTree(const vector<Token> &tokens, int &index)
@@ -234,9 +252,21 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
     // checks if the current expression is preceded by a "while" or "if" token
     bool braceCheck = false;
 
+    bool bracketCheck = false;
+
+    bool commaCheck = false;
+
     if (startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while") || match(tokens, startOfExpression - 1, "if")))
     {
         braceCheck = true;
+    }
+    if(startOfExpression > 0 && match(tokens, startOfExpression - 1, "["))
+    {
+        bracketCheck = true;
+    }
+    if(startOfExpression > 0 && match(tokens, startOfExpression - 1, ","))
+    {
+        commaCheck = true;
     }
     // Iterate through the tokens to build the expression
     for (size_t x = startOfExpression; x < tokens.size() - 1; x++)
@@ -252,6 +282,14 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
                 break;
             }
         }
+        else if (bracketCheck || commaCheck)
+        {
+            if (nextToken.type == RIGHT_BRACKET || nextToken.type == COMMA)
+            {
+                index = x;
+                break;
+            }
+        }
         else
         {
             if (nextToken.lineNumber != currToken.lineNumber || nextToken.type == END)
@@ -260,7 +298,8 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
                 break;
             }
         }
-    }
+    }   
+    
     // check that expression ends with semicolon if a print/normal expression
     if (!tokensExpression.empty() && checkSemi)
     {
@@ -281,6 +320,12 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
         }
     }
     int assignIndex = 0;
+    cout << "tokensExpression size is: " << tokensExpression.size() << endl;
+    for(size_t i = 0; i < tokensExpression.size(); i++)
+    {
+        cout << "Value in index " << i << " is: " << tokensExpression[i].text << " ";
+    }
+    cout << endl << "Index is: "  << index << endl;
     return parseAssignment(tokensExpression, assignIndex, error);
 }
 // Function to parse assignment expressions
@@ -450,9 +495,24 @@ Node *parsePrimary(const vector<Token> &tokens, int &index, bool &error)
         return nullptr;
     }
     Token token = tokens[index++];
-    if (token.type == FLOAT || token.type == IDENTIFIER || token.type == BOOLEAN)
+    if (token.type == FLOAT || token.type == BOOLEAN)
     {
         return makeNode(token);
+    }
+    else if (token.type == LEFT_BRACKET)
+    {
+        return parseArrayLiteral(tokens, index, error);
+    }
+    else if (token.type == IDENTIFIER)
+    {
+        if(match(tokens, index, "["))
+        {
+            return parseArrayAssign(tokens, index, error);
+        }
+        else
+        {
+            return makeNode(token);
+        }
     }
     else if (token.type == TokenType::LEFT_PAREN)
     {
@@ -477,6 +537,51 @@ Node *parsePrimary(const vector<Token> &tokens, int &index, bool &error)
         return nullptr;
     }
 }
+ArrayLiteralNode *parseArrayLiteral(const vector<Token> &tokens, int &index, bool &error)
+{
+    cout << "parsing array literal" << endl;
+    if (error)
+    {
+        return nullptr;
+    }
+    ArrayLiteralNode *aLNode = makeArrayLiteralNode(tokens[index - 1]);
+
+    cout << "Text of token: " << tokens[index].text << endl;
+    // keep parseAlling until close bracket
+    while (!match(tokens, index, "]"))
+    {
+        // each parseAll will return a node that will be pushed into while node's vector
+        Node *node = parseExpression(tokens, index, false, error);
+        cout << "Text of token made it past parse: " << tokens[index].text << endl;
+        if (node != nullptr)
+        {
+            aLNode->array.push_back(node);
+        }
+        index ++;
+        if(match(tokens, index, "]")){
+            break;
+        }
+        index ++;
+    }
+    // return the while node
+    return aLNode;
+}
+ArrayAssignNode *parseArrayAssign(const vector<Token> &tokens, int &index, bool &error)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    // set array asign node to the variable before the [
+    ArrayAssignNode *aANode = makeArrayAssignNode(tokens[index - 1]);
+    //move index to the statement in []
+    index++;
+    aANode->arrayIndex = parseExpression(tokens, index, false, error);
+    // skip the ending ]
+    index++;
+    return aANode;
+}
+
 // Utility function to check if the current token matches the expected token type
 bool match(const vector<Token> &tokens, int index, string expectedType)
 {

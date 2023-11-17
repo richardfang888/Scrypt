@@ -101,24 +101,45 @@ void printPrint(const Node *node, int &depth)
     }
 }
 // Prints the infix notation of a given AST.
-void printInfix(const Node *node, bool semi) 
+void printInfix(Node *node, bool semi) 
 {
-    if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
-        cout << "(";
     printInfixHelper(node);
-    if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
-        cout << ")";
     if (semi) {
         cout << ";";
     }
 }
 
 // Prints the infix notation of a given AST.
-void printInfixHelper(const Node *node)
+void printInfixHelper(Node *node)
 {
+    //cout << " |" << node->token.text << "| ";
+    if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
+        cout << "(";
+
     if (!node)
     {
         return;
+    }
+    else if (ArrayLiteralNode *aLNode = dynamic_cast<ArrayLiteralNode*>(node))
+    {
+        //cout << "SADFSADFlength: " << aLNode->array.size() << endl;
+        //cout << " HERE|" << node->token.text << "|HERE ";
+        cout << "[";
+        for (size_t i = 0; i < aLNode->array.size(); i++)
+        {
+            printInfixHelper(aLNode->array[i]);
+            if (i != aLNode->array.size() - 1)
+            {
+                cout << ", ";
+            }
+        }
+        cout << "]";
+    }
+    else if (ArrayAssignNode *aANode = dynamic_cast<ArrayAssignNode*>(node))
+    {
+        cout << aANode->token.text << "[";
+        printInfixHelper(aANode->arrayIndex);
+        cout << "]";
     }
     else if (node->token.type == FLOAT)
     {
@@ -148,17 +169,24 @@ void printInfixHelper(const Node *node)
             {
                 isFirst = false;
             }
-            if (child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
+            bool isArrayLit = false;
+            if(ArrayLiteralNode *aLNode = dynamic_cast<ArrayLiteralNode*>(child))
+            {
+                isArrayLit = true;
+            }
+            if (!isArrayLit && child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
             {
                 cout << "(";
             }
             printInfixHelper(child);
-            if (child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
+            if (!isArrayLit && child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
             {
                 cout << ")";
             }
         }
     }
+    if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
+        cout << ")";
 }
 
 int main(int argc, const char **argv)
@@ -167,17 +195,21 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
-    // text = "x=2;\n if x==1 \n{print 1;\n} else \n{print 0;\n}\n";
-    // text = "print a = 49; \n print b = 21; \n while a != b {\n if a > b {\n a = a - b; \n } \n else if b > a {\n b = b - a; \n } \n } \n print a; \n";
+    text = "x = 42 \n steps = 0 \n while x > 1 { \n steps = steps + 1 \n if x % 2 == 0 { \n x = x / 2 \n } \n else { \n x = 3 * x + 1 \n } \n } \n ";
+    //text = "x=2;\n if x==1 \n{print 1;\n} else \n{print 0;\n}\n";
+    //text = "print a = 49; \n print b = 21; \n while a != b {\n if a > b {\n a = a - b; \n } \n else if b > a {\n b = b - a; \n } \n } \n print a; \n";
+    //text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array;";
+    //text = "array = [true, 2, 1+1+1, 4];";
+    //text = "print array[2];";
 
     tokens = readTokens(text);
 
@@ -198,7 +230,7 @@ int main(int argc, const char **argv)
         trees.push_back(root);
         index ++;
     } 
-
+    cout << "MADE IT PAST PARSING" << endl;
     //print and evaluate trees
     for (size_t i = 0; i < trees.size(); i++)
     {
