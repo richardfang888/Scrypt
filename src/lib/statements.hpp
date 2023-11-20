@@ -47,7 +47,7 @@ struct FunctDefNode : public Node
 struct FunctCallNode : public Node
 {
     Token functname;
-    vector<string> arguments;
+    vector<Node *> arguments;
     virtual ~FunctCallNode() = default;
 };
 

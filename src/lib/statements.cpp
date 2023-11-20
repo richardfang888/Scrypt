@@ -338,25 +338,24 @@ FunctCallNode *parseFunctCall(const vector<Token> &tokens, int &index, bool &err
     FunctCallNode *FNode = makeFunctCallNode(tokens[index]);
     FNode->functname = tokens[index];
     index++;
-    if (!match(tokens, index, "("))
-    {
-        // if not throw error
-        printErrorStatement(tokens[index], error);
-    }
     index++; // skips open parenthesis
     while (!match(tokens, index, ")"))
     {
         if (tokens[index].type == IDENTIFIER)
         {
-            FNode->arguments.push_back(tokens[index].text);
-            index++;
-            if (match(tokens, index, ","))
+            // create new vector of tokens for each argument to be parsed
+            vector<Token> argtokens;
+            // TODO: condition may fail for error cases where function call has no comma
+            while (!match(tokens, index, ",") && !match(tokens, index, ")"))
             {
+                argtokens.push_back(tokens[index]);
                 index++;
             }
-            else
+            int newIndex = 0;
+            FNode->arguments.push_back(parseExpression(argtokens, newIndex, false, error));
+            if (!match(tokens, index, ","))
             {
-                printErrorStatement(tokens[index], error);
+                index++;
             }
         }
         else

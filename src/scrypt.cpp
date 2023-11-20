@@ -7,53 +7,54 @@
 
 using namespace std;
 
-void evaluateAll(Node *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
+variant<double, bool> evaluateAll(Node *node, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error)
 {
     if (IfElseNode *iENode = dynamic_cast<IfElseNode *>(node))
     {
         // Node is a WhileNode
-        evaluateIfElse(iENode, variables, error);
+        evaluateIfElse(iENode, variables, functions, error);
     }
     else if (WhileNode *wNode = dynamic_cast<WhileNode *>(node))
     {
         // Node is an IfElseNode
-        evaluateWhile(wNode, variables, error);
+        evaluateWhile(wNode, variables, functions, error);
     }
     else if (PrintNode *pNode = dynamic_cast<PrintNode *>(node))
     {
         // Node is a PrintNode
-        evaluatePrint(pNode, variables, error);
-    }
-    else if (FunctDefNode *fdNode = dynamic_cast<FunctDefNode *>(node))
-    {
-        // Node is a FunctDefNode
-        evaluateFunctDef(fdNode, variables, error);
+        evaluatePrint(pNode, variables, functions, error);
     }
     else if (ReturnNode *rNode = dynamic_cast<ReturnNode *>(node))
     {
         // Node is a ReturnNode
-        evaluateReturn(rNode, variables, error);
+        return evaluateReturn(rNode, variables, error);
+    }
+    else if (FunctDefNode *fdNode = dynamic_cast<FunctDefNode *>(node))
+    {
+        // Node is a FunctDefNode
+        evaluateFunctDef(fdNode, variables, functions, error);
     }
     else if (FunctCallNode *fcNode = dynamic_cast<FunctCallNode *>(node))
     {
         // Node is a FunctCallNode
-        evaluateFunctCall(fcNode, variables, error);
+        evaluateFunctCall(fcNode, variables, functions, error);
     }
     else
     {
         // Node is a normal Node
-        evaluateExpression(node, variables, error);
+        evaluateExpression(node, variables, functions, error);
     }
+    return numeric_limits<double>::quiet_NaN();
 }
 
 // Evaluates an if else block.
-variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
+variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error)
 {
     if (!node || error)
     {
         return numeric_limits<double>::quiet_NaN();
     }
-    variant<double, bool> condResult = evaluateExpression(node->condition, variables, error);
+    variant<double, bool> condResult = evaluateExpression(node->condition, variables, functions, error);
     if (holds_alternative<double>(condResult))
     {
         // runtime error
@@ -66,23 +67,21 @@ variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, var
     {
         if (get<bool>(condResult))
         {
+            // change to evaluateStatements
             for (Node *statement : node->statementsTrue)
             {
-                evaluateAll(statement, variables, error);
+                evaluateAll(statement, variables, functions, error);
             }
         }
         else
         {
             if (node->hasElse)
             {
+                // change to evaluateStatements
                 for (Node *statement : node->statementsFalse)
                 {
-                    evaluateAll(statement, variables, error);
+                    evaluateAll(statement, variables, functions, error);
                 }
-            }
-            else
-            {
-                return numeric_limits<double>::quiet_NaN();
             }
         }
     }
@@ -91,13 +90,13 @@ variant<double, bool> evaluateIfElse(IfElseNode *node, unordered_map<string, var
 }
 
 // Evaluates a while loop.
-variant<double, bool> evaluateWhile(WhileNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
+variant<double, bool> evaluateWhile(WhileNode *node, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error)
 {
     if (!node || error)
     {
         return numeric_limits<double>::quiet_NaN();
     }
-    variant<double, bool> condResult = evaluateExpression(node->condition, variables, error);
+    variant<double, bool> condResult = evaluateExpression(node->condition, variables, functions, error);
     if (holds_alternative<double>(condResult))
     {
         // runtime error
@@ -110,11 +109,12 @@ variant<double, bool> evaluateWhile(WhileNode *node, unordered_map<string, varia
     {
         while (get<bool>(condResult))
         {
+            // change to evaluateStatements (set to var, check if return is nan again, return if not)
             for (Node *statement : node->statements)
             {
-                evaluateAll(statement, variables, error);
+                evaluateAll(statement, variables, functions, error);
             }
-            condResult = evaluateExpression(node->condition, variables, error);
+            condResult = evaluateExpression(node->condition, variables, functions, error);
             if (holds_alternative<double>(condResult))
             {
                 // runtime error
@@ -130,13 +130,13 @@ variant<double, bool> evaluateWhile(WhileNode *node, unordered_map<string, varia
 }
 
 // Evaluates a print statement.
-variant<double, bool> evaluatePrint(PrintNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
+variant<double, bool> evaluatePrint(PrintNode *node, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error)
 {
     if (!node || error)
     {
         return numeric_limits<double>::quiet_NaN();
     }
-    variant<double, bool> result = evaluateExpression(node->expression, variables, error);
+    variant<double, bool> result = evaluateExpression(node->expression, variables, functions, error);
     if (holds_alternative<double>(result))
     {
         cout << get<double>(result) << endl;
@@ -150,42 +150,90 @@ variant<double, bool> evaluatePrint(PrintNode *node, unordered_map<string, varia
 }
 
 // Evaluates a return statement.
-variant<double, bool> evaluateReturn(ReturnNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
+variant<double, bool> evaluateReturn(ReturnNode *node, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error)
 {
     if (!node || error)
     {
         return numeric_limits<double>::quiet_NaN();
     }
-    variant<double, bool> result = evaluateExpression(node->expression, variables, error);
+    variant<double, bool> result = evaluateExpression(node->expression, variables, functions, error);
 
     // set the value of the function call to return
     return result;
 }
 
 // Evaluates a function definition.
-variant<double, bool> evaluateFunctDef(FunctDefNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
+variant<double, bool> evaluateFunctDef(FunctDefNode *node, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error)
 {
     if (!node || error)
     {
         return numeric_limits<double>::quiet_NaN();
     }
+    // TODO: check if function already defined
+    // add function to defined functions
+    functions.push_back(node);
+
     // dummy return
     return numeric_limits<double>::quiet_NaN();
 }
 
 // Evaluates a function call.
-variant<double, bool> evaluateFunctCall(FunctCallNode *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
+variant<double, bool> evaluateFunctCall(FunctCallNode *node, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error)
 {
     if (!node || error)
     {
         return numeric_limits<double>::quiet_NaN();
     }
-    // dummy return
+    
+    // check if function exists in defined functions
+    int functIndex = -1;
+    for (size_t i = 0; i < functions.size(); i++)
+    {
+        FunctDefNode *function = functions[i];
+        if (function->functname.text == node->token.text)
+        {
+            functIndex = i;
+            break;
+        }
+    }
+
+    if (functIndex == -1) 
+    {
+        error = true;
+        // function undefined
+        // cout << "Runtime error: function " << node->token.text << " not defined." << endl;
+        // exit(3);
+        // return numeric_limits<double>::quiet_NaN();
+    }
+
+    // evaluate function with given arguments
+    unordered_map<string, variant<double, bool>> functionVariables;
+    for (size_t i = 0; i < node->arguments.size(); i++) 
+    {
+        functionVariables[functions[functIndex]->params[i]] = evaluateExpression(node->arguments[i], variables, functions, error);
+    }
+    return evaluateStatements(functions[functIndex]->statements, functionVariables, functions, error);
+}
+
+// Evaluates a bunch of statements
+variant<double, bool> evaluateStatements(vector<Node *> &statements, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error) 
+{
+    for (Node *statement : statements)
+    {
+        variant<double, bool> result = evaluateAll(statement, variables, functions, error);
+        if (holds_alternative<double>(result))
+        {
+            if (get<double>(result) != numeric_limits<double>::quiet_NaN())
+            {
+                return get<double>(result);
+            }
+        }
+    }
     return numeric_limits<double>::quiet_NaN();
 }
 
 // Evaluates an expression given the root of the expression's AST.
-variant<double, bool> evaluateExpression(Node *node, unordered_map<string, variant<double, bool>> &variables, bool &error)
+variant<double, bool> evaluateExpression(Node *node, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error)
 {
     if (!node || error)
     {
@@ -195,6 +243,11 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
     if (node->token.type == FLOAT)
     {
         return stod(node->token.text);
+    }
+    if (FunctCallNode *fcNode = dynamic_cast<FunctCallNode *>(node))
+    {
+        // Node is a FunctCallNode
+        return evaluateFunctCall(fcNode, variables, functions, error);
     }
     // If the node holds a BOOLEAN token, simply return its value.
     if (node->token.type == BOOLEAN)
@@ -240,7 +293,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
     // Node is assignment operator
     else if (node->token.text == "=")
     {
-        variant<double, bool> result = evaluateExpression(node->children[node->children.size() - 1], variables, error);
+        variant<double, bool> result = evaluateExpression(node->children[node->children.size() - 1], variables, functions, error);
         for (int i = int(node->children.size() - 2); i >= 0; i--)
         {
             if (node->children[i]->token.type != IDENTIFIER)
@@ -258,7 +311,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
     // Node is a non-assignment operator
     else if (node->token.type == OPERATOR)
     {
-        variant<double, bool> result = evaluateExpression(node->children[0], variables, error);
+        variant<double, bool> result = evaluateExpression(node->children[0], variables, functions, error);
         if (holds_alternative<bool>(result))
         {
             // runtime error
@@ -270,7 +323,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
         // Iterate over the rest of the children to apply the operation.
         for (size_t i = 1; i < node->children.size(); i++)
         {
-            if (holds_alternative<bool>(evaluateExpression(node->children[i], variables, error)))
+            if (holds_alternative<bool>(evaluateExpression(node->children[i], variables, functions, error)))
             {
                 error = true;
                 cout << "Runtime error: invalid operand type." << endl;
@@ -281,20 +334,20 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             double resultDouble = get<double>(result);
             if (opToken.text == "+")
             {
-                resultDouble += get<double>(evaluateExpression(node->children[i], variables, error));
+                resultDouble += get<double>(evaluateExpression(node->children[i], variables, functions, error));
             }
             else if (opToken.text == "-")
             {
-                resultDouble -= get<double>(evaluateExpression(node->children[i], variables, error));
+                resultDouble -= get<double>(evaluateExpression(node->children[i], variables, functions, error));
             }
             else if (opToken.text == "*")
             {
-                resultDouble *= get<double>(evaluateExpression(node->children[i], variables, error));
+                resultDouble *= get<double>(evaluateExpression(node->children[i], variables, functions, error));
             }
             else if (opToken.text == "/")
             {
                 // Check for division by zero.
-                variant<double, bool> denominator = evaluateExpression(node->children[i], variables, error);
+                variant<double, bool> denominator = evaluateExpression(node->children[i], variables, functions, error);
                 if (get<double>(denominator) != 0)
                 {
                     resultDouble /= get<double>(denominator);
@@ -309,7 +362,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             }
             else if (opToken.text == "%")
             {
-                resultDouble = fmod(resultDouble, get<double>(evaluateExpression(node->children[i], variables, error)));
+                resultDouble = fmod(resultDouble, get<double>(evaluateExpression(node->children[i], variables, functions, error)));
             }
             else
             {
@@ -324,10 +377,10 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
     else if (node->token.type == COMPARATOR)
     {
         // Iterate over the rest of the children to apply the operation.
-        variant<double, bool> result = evaluateExpression(node->children[0], variables, error);
+        variant<double, bool> result = evaluateExpression(node->children[0], variables, functions, error);
         for (size_t i = 1; i < node->children.size(); i++)
         {
-            variant<double, bool> childrenVal = evaluateExpression(node->children[i], variables, error);
+            variant<double, bool> childrenVal = evaluateExpression(node->children[i], variables, functions, error);
             Token opToken = node->token;
             if (opToken.text == "==" || opToken.text == "!=")
             {
@@ -335,7 +388,7 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
                 // If different type or if same type but unequal, equality is false
                 if ((holds_alternative<double>(childrenVal) && !holds_alternative<double>(result)) || 
                     (!holds_alternative<double>(childrenVal) && holds_alternative<double>(result)) ||
-                    result != evaluateExpression(node->children[i], variables, error))
+                    result != evaluateExpression(node->children[i], variables, functions, error))
                 {
                     equality = false;
                 }
@@ -359,20 +412,20 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
                 }
                 if (opToken.text == ">")
                 {
-                    result = result > evaluateExpression(node->children[i], variables, error);
+                    result = result > evaluateExpression(node->children[i], variables, functions, error);
                 }
                 else if (opToken.text == "<")
                 {
-                    result = result < evaluateExpression(node->children[i], variables, error);
+                    result = result < evaluateExpression(node->children[i], variables, functions, error);
                 }
                 else if (opToken.text == ">=")
                 {
-                    result =  result >= evaluateExpression(node->children[i], variables, error);
+                    result =  result >= evaluateExpression(node->children[i], variables, functions, error);
                 }
                 else if (opToken.text == "<=")
                 {
                     // Check for division by zero.
-                    result = result <= evaluateExpression(node->children[i], variables, error);
+                    result = result <= evaluateExpression(node->children[i], variables, functions, error);
                 }
                 else
                 {
@@ -388,10 +441,10 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
     else if (node->token.type == LOGICAL)
     {
         // Iterate over the rest of the children to apply the operation.
-        variant<double, bool> result = evaluateExpression(node->children[0], variables, error);
+        variant<double, bool> result = evaluateExpression(node->children[0], variables, functions, error);
         for (size_t i = 1; i < node->children.size(); i++)
         {
-            variant<double, bool> childrenVal = evaluateExpression(node->children[i], variables, error);
+            variant<double, bool> childrenVal = evaluateExpression(node->children[i], variables, functions, error);
             if (holds_alternative<double>(childrenVal) || holds_alternative<double>(result))
             {
                 error = true;
@@ -403,15 +456,15 @@ variant<double, bool> evaluateExpression(Node *node, unordered_map<string, varia
             bool resultBool = get<bool>(result);
             if (opToken.text == "&")
             {
-                resultBool = get<bool>(result) && get<bool>(evaluateExpression(node->children[i], variables, error));
+                resultBool = get<bool>(result) && get<bool>(evaluateExpression(node->children[i], variables, functions, error));
             }
             else if (opToken.text == "|")
             {
-                resultBool = get<bool>(result) || get<bool>(evaluateExpression(node->children[i], variables, error));
+                resultBool = get<bool>(result) || get<bool>(evaluateExpression(node->children[i], variables, functions, error));
             }
             else
             {
-                resultBool = get<bool>(result) != get<bool>(evaluateExpression(node->children[i], variables, error));
+                resultBool = get<bool>(result) != get<bool>(evaluateExpression(node->children[i], variables, functions, error));
             }
             result = resultBool;
         }
@@ -442,7 +495,8 @@ int main(int argc, const char **argv)
 
     int index = 0;
     vector<Node *> trees;
-    std::unordered_map<string, variant<double, bool>> variables;
+    unordered_map<string, variant<double, bool>> variables;
+    vector<FunctDefNode *> functions;
     if (tokens.empty() || tokens.back().text == "error") //
     {
         exit(1);
@@ -461,7 +515,7 @@ int main(int argc, const char **argv)
     for (size_t i = 0; i < trees.size(); i++)
     {
         bool error = false;
-        evaluateAll(trees[i], variables, error);
+        evaluateAll(trees[i], variables, functions, error);
     }
     for (size_t i = 0; i < trees.size(); i++)
     {
