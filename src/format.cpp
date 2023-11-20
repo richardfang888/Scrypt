@@ -22,7 +22,7 @@ void printAll(Node *node, int &depth)
         printWhile(wNode, depth);
     } else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
         // Node is a PrintNode
-        printPrint(pNode, depth);
+        printPrint(pNode);
     } else {
         // Node is a normal Node
         printInfix(node, true);
@@ -90,7 +90,7 @@ void printWhile(const Node *node, int &depth)
 }
 
 // prints the print node
-void printPrint(const Node *node, int &depth) 
+void printPrint(const Node *node) 
 {
     if (node)
         cout << "print ";
@@ -104,11 +104,11 @@ void printPrint(const Node *node, int &depth)
 void printInfix(Node *node, bool semi) 
 {
     bool isArrayAssignOrArrayLiteral = false;
-    if(ArrayLiteralNode *aLNode = dynamic_cast<ArrayLiteralNode*>(node))
+    if(dynamic_cast<ArrayLiteralNode*>(node))
     {
         isArrayAssignOrArrayLiteral = true;
     }
-    else if(ArrayAssignNode *aANode = dynamic_cast<ArrayAssignNode*>(node))
+    else if(dynamic_cast<ArrayAssignNode*>(node))
     {
         isArrayAssignOrArrayLiteral = true;
     }
@@ -140,11 +140,11 @@ void printInfixHelper(Node *node)
         for (size_t i = 0; i < aLNode->array.size(); i++)
         {
             Node *currNode = aLNode->array[i];
-            if(ArrayLiteralNode *aLNode = dynamic_cast<ArrayLiteralNode*>(currNode))
+            if(dynamic_cast<ArrayLiteralNode*>(currNode))
             {
                 isArrayAssignOrArrayLiteral = true;
             }   
-            else if(ArrayAssignNode *aANode = dynamic_cast<ArrayAssignNode*>(node))
+            else if(dynamic_cast<ArrayAssignNode*>(node))
             {
                 isArrayAssignOrArrayLiteral = true;
             }
@@ -195,7 +195,7 @@ void printInfixHelper(Node *node)
                 isFirst = false;
             }
             bool isArrayLit = false;
-            if(ArrayLiteralNode *aLNode = dynamic_cast<ArrayLiteralNode*>(child))
+            if(dynamic_cast<ArrayLiteralNode*>(child))
             {
                 isArrayLit = true;
             }
