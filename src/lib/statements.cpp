@@ -291,7 +291,7 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
             {
                 array2D = true;
             }
-            if (!array2D && nextToken.type == RIGHT_BRACKET || nextToken.type == COMMA)
+            if (!array2D && (nextToken.type == RIGHT_BRACKET || nextToken.type == COMMA))
             {
                 index = x;
                 break;
