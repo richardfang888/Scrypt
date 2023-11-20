@@ -182,6 +182,7 @@ void printInfixHelper(Node *node)
     else
     {
         bool isFirst = true;
+        //cout << "node text: " << node->token.text << endl;
         for (const auto &child : node->children)
         {
             if (!child)
@@ -194,17 +195,21 @@ void printInfixHelper(Node *node)
             {
                 isFirst = false;
             }
-            bool isArrayLit = false;
+            bool isArrayLitOrAssign = false;
             if(dynamic_cast<ArrayLiteralNode*>(child))
             {
-                isArrayLit = true;
+                isArrayLitOrAssign = true;
             }
-            if (!isArrayLit && child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
+            if(dynamic_cast<ArrayAssignNode*>(child))
+            {
+                isArrayLitOrAssign = true;
+            }
+            if (!isArrayLitOrAssign && child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
             {
                 cout << "(";
             }
             printInfixHelper(child);
-            if (!isArrayLit && child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
+            if (!isArrayLitOrAssign && child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
             {
                 cout << ")";
             }
@@ -227,14 +232,15 @@ int main(int argc, const char **argv)
         }
     }
 
-    //text = "x = 42; \n steps = 0; \n while x > 1 { \n steps = steps + 1; \n if x % 2 == 0 { \n x = x / 2; \n } \n else { \n x = 3 * x + 1; \n } \n } \n ";
-    //text = "x=2;\n if x==1 \n{print 1;\n} else \n{print 0;\n}\n";
-    //text = "print a = 49; \n print b = 21; \n while a != b {\n if a > b {\n a = a - b; \n } \n else if b > a {\n b = b - a; \n } \n } \n print a; \n";
     //text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array;";
     //text = "array = [true, 2, 1+1+1, 4];";
     //text = "print array[2];";
     //text = "array = [true, 2, 1+1+1, 4]; \n print array[2]; \n print array;";
     //text = "array = [true, 2 + 1, [5]];";
+    //text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array; \n \n arref = array; \n temp  = arref[1]; \n arref[1] = 0 - arref[3]; \n arref[3] = 0 - temp; \n print array;";
+    //text = "arref[1] = 0 - arref[3];";
+    //text = "value = 6; \n arret[1] = 5;";
+
 
     tokens = readTokens(text);
 

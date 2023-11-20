@@ -349,6 +349,7 @@ Node *parseAssignment(const vector<Token> &tokens, int &index, bool &error)
     Node *left = parseLogicOr(tokens, index, error);
     if (match(tokens, index, "="))
     {
+        //cout << "go to equals match" << endl;
         Node *assignNode = makeNode(tokens[index]);
         Node *right = parseAssignment(tokens, ++index, error);
         assignNode->children.push_back(left);
@@ -589,7 +590,7 @@ ArrayAssignNode *parseArrayAssign(const vector<Token> &tokens, int &index, bool 
     index++;
     aANode->arrayIndex = parseExpression(tokens, index, false, error);
     // skip the ending ]
-    index++;
+    index+= 2;
     return aANode;
 }
 
