@@ -143,7 +143,7 @@ void printInfixHelper(Node *node)
             if(ArrayLiteralNode *aLNode = dynamic_cast<ArrayLiteralNode*>(currNode))
             {
                 isArrayAssignOrArrayLiteral = true;
-            }
+            }   
             else if(ArrayAssignNode *aANode = dynamic_cast<ArrayAssignNode*>(node))
             {
                 isArrayAssignOrArrayLiteral = true;
@@ -218,19 +218,19 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    // while (getline(cin, input))
-    // {
-    //     text += input;
-    //     if (!cin.eof())
-    //     {
-    //         text += '\n';
-    //     }
-    // }
+    while (getline(cin, input))
+    {
+        text += input;
+        if (!cin.eof())
+        {
+            text += '\n';
+        }
+    }
 
     //text = "x = 42; \n steps = 0; \n while x > 1 { \n steps = steps + 1; \n if x % 2 == 0 { \n x = x / 2; \n } \n else { \n x = 3 * x + 1; \n } \n } \n ";
     //text = "x=2;\n if x==1 \n{print 1;\n} else \n{print 0;\n}\n";
     //text = "print a = 49; \n print b = 21; \n while a != b {\n if a > b {\n a = a - b; \n } \n else if b > a {\n b = b - a; \n } \n } \n print a; \n";
-    text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array;";
+    //text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array;";
     //text = "array = [true, 2, 1+1+1, 4];";
     //text = "print array[2];";
     //text = "array = [true, 2, 1+1+1, 4]; \n print array[2]; \n print array;";
