@@ -271,6 +271,7 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
     // Iterate through the tokens to build the expression
     for (size_t x = startOfExpression; x < tokens.size() - 1; x++)
     {
+        
         Token currToken = tokens[x];
         Token nextToken = tokens[x + 1];
         tokensExpression.push_back(currToken);
