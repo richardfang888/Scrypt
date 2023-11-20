@@ -255,7 +255,7 @@ int main(int argc, const char **argv)
         trees.push_back(root);
         index ++;
     } 
-    cout << "MADE IT PAST PARSING" << endl;
+    //cout << "MADE IT PAST PARSING" << endl;
     //print and evaluate trees
     for (size_t i = 0; i < trees.size(); i++)
     {

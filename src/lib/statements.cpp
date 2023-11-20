@@ -331,12 +331,12 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
         }
     }
     int assignIndex = 0;
-    cout << "tokensExpression size is: " << tokensExpression.size() << endl;
-    for(size_t i = 0; i < tokensExpression.size(); i++)
-    {
-        cout << "Value in index " << i << " is: " << tokensExpression[i].text << " ";
-    }
-    cout << endl << "Index is: "  << index << endl;
+    // cout << "tokensExpression size is: " << tokensExpression.size() << endl;
+    // for(size_t i = 0; i < tokensExpression.size(); i++)
+    // {
+    //     cout << "Value in index " << i << " is: " << tokensExpression[i].text << " ";
+    // }
+    // cout << endl << "Index is: "  << index << endl;
     return parseAssignment(tokensExpression, assignIndex, error);
 }
 // Function to parse assignment expressions
@@ -550,20 +550,20 @@ Node *parsePrimary(const vector<Token> &tokens, int &index, bool &error)
 }
 ArrayLiteralNode *parseArrayLiteral(const vector<Token> &tokens, int &index, bool &error)
 {
-    cout << "parsing array literal" << endl;
+    //cout << "parsing array literal" << endl;
     if (error)
     {
         return nullptr;
     }
     ArrayLiteralNode *aLNode = makeArrayLiteralNode(tokens[index - 1]);
 
-    cout << "Text of token: " << tokens[index].text << endl;
+    //cout << "Text of token: " << tokens[index].text << endl;
     // keep parseAlling until close bracket
     while (!match(tokens, index, "]"))
     {
         // each parseAll will return a node that will be pushed into while node's vector
         Node *node = parseExpression(tokens, index, false, error);
-        cout << "Text of token made it past parse: " << tokens[index].text << endl;
+        //cout << "Text of token made it past parse: " << tokens[index].text << endl;
         if (node != nullptr)
         {
             aLNode->array.push_back(node);
