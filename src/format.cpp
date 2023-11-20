@@ -136,13 +136,22 @@ void printInfixHelper(Node *node)
         //cout << "SADFSADFlength: " << aLNode->array.size() << endl;
         //cout << " HERE|" << node->token.text << "|HERE ";
         cout << "[";
+        bool isArrayAssignOrArrayLiteral = false;
         for (size_t i = 0; i < aLNode->array.size(); i++)
         {
             Node *currNode = aLNode->array[i];
-            if (currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN))
+            if(ArrayLiteralNode *aLNode = dynamic_cast<ArrayLiteralNode*>(currNode))
+            {
+                isArrayAssignOrArrayLiteral = true;
+            }
+            else if(ArrayAssignNode *aANode = dynamic_cast<ArrayAssignNode*>(node))
+            {
+                isArrayAssignOrArrayLiteral = true;
+            }
+            if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN))
                 cout << "(";
             printInfixHelper(currNode);
-            if (currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN))
+            if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN))
                 cout << ")";
             if (i != aLNode->array.size() - 1)
             {
@@ -221,11 +230,11 @@ int main(int argc, const char **argv)
     //text = "x = 42; \n steps = 0; \n while x > 1 { \n steps = steps + 1; \n if x % 2 == 0 { \n x = x / 2; \n } \n else { \n x = 3 * x + 1; \n } \n } \n ";
     //text = "x=2;\n if x==1 \n{print 1;\n} else \n{print 0;\n}\n";
     //text = "print a = 49; \n print b = 21; \n while a != b {\n if a > b {\n a = a - b; \n } \n else if b > a {\n b = b - a; \n } \n } \n print a; \n";
-    //text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array;";
+    text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array;";
     //text = "array = [true, 2, 1+1+1, 4];";
     //text = "print array[2];";
     //text = "array = [true, 2, 1+1+1, 4]; \n print array[2]; \n print array;";
-    text = "array = [true, [5]];";
+    //text = "array = [true, 2 + 1, [5]];";
 
     tokens = readTokens(text);
 

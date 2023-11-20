@@ -268,6 +268,8 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
     {
         commaCheck = true;
     }
+    // check if it is a 2d array
+    bool array2D = false;
     // Iterate through the tokens to build the expression
     for (size_t x = startOfExpression; x < tokens.size() - 1; x++)
     {
@@ -285,10 +287,18 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
         }
         else if (bracketCheck || commaCheck)
         {
-            if (nextToken.type == RIGHT_BRACKET || nextToken.type == COMMA)
+            if (currToken.type == LEFT_BRACKET)
+            {
+                array2D = true;
+            }
+            if (!array2D && nextToken.type == RIGHT_BRACKET || nextToken.type == COMMA)
             {
                 index = x;
                 break;
+            }
+            if (nextToken.type == RIGHT_BRACKET)
+            {
+                array2D = false;
             }
         }
         else
