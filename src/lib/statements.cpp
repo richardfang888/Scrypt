@@ -752,6 +752,21 @@ void deleteNodeAll(Node *node)
         deleteNodeAll(pNode->expression);
         delete pNode;
     }
+    // for array literal node
+    else if(ArrayLiteralNode *aLNode = dynamic_cast<ArrayLiteralNode*>(node))
+    {
+        for (Node *child : aLNode->array)
+        {
+            deleteNodeAll(child);
+        }
+        delete aLNode;
+    }
+    // for array assign node
+    else if(ArrayAssignNode *aANode = dynamic_cast<ArrayAssignNode*>(node))
+    {
+        deleteNodeAll(aANode->arrayIndex);
+        delete aANode;
+    }
     else
     {
         for (Node *child : node->children)
