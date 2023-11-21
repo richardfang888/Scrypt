@@ -238,14 +238,14 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    // while (getline(cin, input))
-    // {
-    //     text += input;
-    //     if (!cin.eof())
-    //     {
-    //         text += '\n';
-    //     }
-    // }
+    while (getline(cin, input))
+    {
+        text += input;
+        if (!cin.eof())
+        {
+            text += '\n';
+        }
+    }
 
     // text = "x=2;\n if x==1 \n{print 1;\n} else \n{print 0;\n}\n";
     // text = "print a = 49; \n print b = 21; \n while a != b {\n if a > b {\n a = a - b; \n } \n else if b > a {\n b = b - a; \n } \n } \n print a; \n";
