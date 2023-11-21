@@ -823,7 +823,10 @@ void deleteNodeAll(Node *node)
     // for return node
     else if (ReturnNode *rNode = dynamic_cast<ReturnNode *>(node))
     {
-        deleteNodeAll(rNode->expression);
+        if (rNode->expression)
+        {
+            deleteNodeAll(rNode->expression);
+        }
         delete rNode;
     }
     // for function definition
@@ -838,6 +841,10 @@ void deleteNodeAll(Node *node)
     // for function call
     else if (FunctCallNode *fNode = dynamic_cast<FunctCallNode *>(node))
     {
+        for (Node *child : fNode->arguments)
+        {
+            deleteNodeAll(child);
+        }
         delete fNode;
     }
     else

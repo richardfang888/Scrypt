@@ -125,7 +125,7 @@ void printFunctDef(const Node *node, int &depth)
             }
         }
         cout << ") ";
-        cout << " {" << endl;
+        cout << "{" << endl;
         depth ++;
         for (size_t i = 0; i < functDefNode->statements.size(); i++) {
             printAll(functDefNode->statements[i], depth);
@@ -145,10 +145,13 @@ void printReturn(const Node *node)
         cout << "return";
     const ReturnNode* returnNode = dynamic_cast<const ReturnNode*>(node);
     if (returnNode) {
-        if (returnNode->expression->token.text != "") {
+        if (returnNode->expression) {
             cout << " ";
+            printInfix(returnNode->expression, true);
         }
-        printInfix(returnNode->expression, true);
+        else {
+            cout << " null";
+        }
         cout << endl;
     }
 }
