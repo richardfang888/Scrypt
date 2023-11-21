@@ -150,7 +150,7 @@ void printReturn(const Node *node)
             printInfix(returnNode->expression, true);
         }
         else {
-            cout << " null";
+            cout << ";";
         }
         cout << endl;
     }

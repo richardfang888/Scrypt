@@ -261,7 +261,7 @@ ReturnNode *parseReturn(const vector<Token> &tokens, int &index, bool &error)
     index++;
     if (match(tokens, index, ";"))
     {
-        RNode->expression = makeNode(Token{NULLVAL, "", -1, -1, -1});
+        RNode->expression = nullptr;
     }
     else 
     {
