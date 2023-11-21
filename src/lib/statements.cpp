@@ -259,9 +259,14 @@ ReturnNode *parseReturn(const vector<Token> &tokens, int &index, bool &error)
     // make a new return node
     ReturnNode *RNode = makeReturnNode(tokens[index]);
     index++;
-    // if/else node's condition = parse expression
-    RNode->expression = parseExpression(tokens, index, true, error);
-    // return the return node
+    if (match(tokens, index, ";"))
+    {
+        RNode->expression = makeNode(Token{NULLVAL, "", -1, -1, -1});
+    }
+    else 
+    {
+        RNode->expression = parseExpression(tokens, index, true, error);
+    }
     return RNode;
 }
 
@@ -287,7 +292,6 @@ FunctDefNode *parseFunctDef(const vector<Token> &tokens, int &index, bool &error
     {
         if (tokens[index].type == IDENTIFIER)
         {
-
             FNode->vars[tokens[index].text] = numeric_limits<double>::quiet_NaN();
             FNode->params.push_back(tokens[index].text);
             index++;
@@ -295,7 +299,7 @@ FunctDefNode *parseFunctDef(const vector<Token> &tokens, int &index, bool &error
             {
                 index++;
             }
-            else
+            else if (!match(tokens, index, ")"))
             {
                 printErrorStatement(tokens[index], error);
             }
@@ -335,34 +339,21 @@ FunctCallNode *parseFunctCall(const vector<Token> &tokens, int &index, bool &err
         return nullptr;
     }
     // make a new function call node
-    FunctCallNode *FNode = makeFunctCallNode(tokens[index]);
-    FNode->functname = tokens[index];
+    FunctCallNode *FNode = makeFunctCallNode(tokens[index - 1]);
+    FNode->functname = tokens[index - 1];
     index++;
-    index++; // skips open parenthesis
     while (!match(tokens, index, ")"))
     {
-        if (tokens[index].type == IDENTIFIER)
+        Node *node = parseExpression(tokens, index, false, error);
+        if (node != nullptr)
         {
-            // create new vector of tokens for each argument to be parsed
-            vector<Token> argtokens;
-            // TODO: condition may fail for error cases where function call has no comma
-            while (!match(tokens, index, ",") && !match(tokens, index, ")"))
-            {
-                argtokens.push_back(tokens[index]);
-                index++;
-            }
-            int newIndex = 0;
-            FNode->arguments.push_back(parseExpression(argtokens, newIndex, false, error));
-            if (!match(tokens, index, ","))
-            {
-                index++;
-            }
+            FNode->arguments.push_back(node);
         }
-        else
-        {
-            // if argument is not an identifier, throw error
-            printErrorStatement(tokens[index], error);
+        index++;
+        if(match(tokens, index, ")")){
+            break;
         }
+        index++;
     }
     return FNode;
 }
@@ -376,15 +367,31 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
     }
     int startOfExpression = index;
     vector<Token> tokensExpression;
-
     // checks if the current expression is preceded by a "while" or "if" token
     bool braceCheck = false;
+    bool bracketCheck = false;
+    bool commaCheck = false;
+    bool parenCheck = false;
 
     if (startOfExpression > 0 && (match(tokens, startOfExpression - 1, "while") 
         || match(tokens, startOfExpression - 1, "if") || match(tokens, startOfExpression - 1, "def")))
     {
         braceCheck = true;
     }
+    if (startOfExpression > 0 && match(tokens, startOfExpression - 1, "["))
+    {
+        bracketCheck = true;
+    }
+    if (startOfExpression > 0 && match(tokens, startOfExpression - 1, ","))
+    {
+        commaCheck = true;
+    }
+    if (startOfExpression > 1 && match(tokens, startOfExpression - 1, "(") && tokens[startOfExpression - 2].type == IDENTIFIER) 
+    {
+        parenCheck = true;
+    }
+
+    int nested = 0;
     // Iterate through the tokens to build the expression
     for (size_t x = startOfExpression; x < tokens.size() - 1; x++)
     {
@@ -399,6 +406,22 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
                 break;
             }
         }
+        else if (bracketCheck || commaCheck || parenCheck)
+        {
+            if (currToken.type == LEFT_PAREN)
+            {
+                nested++;
+            }
+            if (nested == 0 && (nextToken.type == COMMA || nextToken.type == RIGHT_PAREN))
+            {
+                index = x;
+                break;
+            }
+            if (nextToken.type == RIGHT_PAREN)
+            {
+                nested--;
+            }
+        }
         else
         {
             if (nextToken.lineNumber != currToken.lineNumber || nextToken.type == END)
@@ -411,22 +434,26 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
     // check that expression ends with semicolon if boolean flag is true
     if (!tokensExpression.empty() && checkSemi)
     {
-        // cout << "checkSemi" << endl;
-        // for (auto token : tokensExpression)
-        // {
-        //     cout << token.text;
-        // }
-        // cout << endl;
-        if ((tokensExpression.back().type == END && tokensExpression.size() > 1 && 
-                tokensExpression[tokensExpression.size() - 2].text != ";" && 
-                tokensExpression[tokensExpression.size() - 2].text != "}") ||
-            (tokensExpression.back().type != END && tokensExpression.back().text != ";"))
+        int checkIndex = tokensExpression.size() - 1;
+        while ((tokensExpression[checkIndex].type == END || tokensExpression[checkIndex].text == "}") && checkIndex > 0)
+        {
+            checkIndex--;
+        }
+        // cout << checkIndex << endl;
+        // cout << tokensExpression[checkIndex].text << endl;
+        if (tokensExpression[checkIndex].text != ";")
         {
             // cout << "Error: Expression must end with semicolon" << endl;
             error = true;
             printErrorStatement(tokensExpression.back(), error);
         }
     }
+    // cout << "tokensExpression size is: " << tokensExpression.size() << endl;
+    // for(size_t i = 0; i < tokensExpression.size(); i++)
+    // {
+    //     cout << "Value in index " << i << " is: " << tokensExpression[i].text << " ";
+    // }
+    // cout << endl << "Index is: "  << index << endl;
     int assignIndex = 0;
     return parseAssignment(tokensExpression, assignIndex, error);
 }
@@ -599,19 +626,20 @@ Node *parsePrimary(const vector<Token> &tokens, int &index, bool &error)
         return nullptr;
     }
     Token token = tokens[index++];
-    if (token.type == FLOAT || token.type == BOOLEAN)
+    if (token.type == FLOAT || token.type == BOOLEAN || token.type == NULLVAL)
     {
         return makeNode(token);
     }
     else if (token.type == IDENTIFIER)
     {
-        if (match(tokens, index + 1, "("))
+        if (match(tokens, index, "("))
         {
+            // cout << "Parsing function call: " << token.text << endl;
             return parseFunctCall(tokens, index, error);
         }
         return makeNode(token);
     }
-    else if (token.type == TokenType::LEFT_PAREN)
+    else if (token.type == LEFT_PAREN)
     {
         Node *expression = parseAssignment(tokens, index, error);
         if (!match(tokens, index, ")"))

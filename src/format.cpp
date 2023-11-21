@@ -24,7 +24,7 @@ void printAll(Node *node, int &depth)
     } 
     else if (PrintNode *pNode = dynamic_cast<PrintNode*>(node)) {
         // Node is a PrintNode
-        printPrint(pNode, depth);
+        printPrint(pNode);
     } 
     else if (FunctDefNode *fdNode = dynamic_cast<FunctDefNode*>(node)) {
         // Node is a FunctDefNode
@@ -32,12 +32,8 @@ void printAll(Node *node, int &depth)
     } 
     else if (ReturnNode *rNode = dynamic_cast<ReturnNode*>(node)) {
         // Node is a ReturnNode
-        printReturn(rNode, depth);
+        printReturn(rNode);
     } 
-    else if (FunctCallNode *fcNode = dynamic_cast<FunctCallNode*>(node)) {
-        // Node is a FunctCallNode
-        printFunctCall(fcNode, depth);
-    }
     else {
         // Node is a normal Node
         printInfix(node, true);
@@ -104,7 +100,7 @@ void printWhile(const Node *node, int &depth)
 }
 
 // prints the print node
-void printPrint(const Node *node, int &depth) 
+void printPrint(const Node *node) 
 {
     if (node)
         cout << "print ";
@@ -143,40 +139,51 @@ void printFunctDef(const Node *node, int &depth)
     }
 }
 
-void printReturn(const Node *node, int &depth)
+void printReturn(const Node *node)
 {
     if (node)
-        cout << "return ";
+        cout << "return";
     const ReturnNode* returnNode = dynamic_cast<const ReturnNode*>(node);
     if (returnNode) {
+        if (returnNode->expression->token.text != "") {
+            cout << " ";
+        }
         printInfix(returnNode->expression, true);
         cout << endl;
     }
 }
 
-void printFunctCall(const Node *node, int &depth)
+void printFunctCall(const Node *node)
 {
     const FunctCallNode* functCallNode = dynamic_cast<const FunctCallNode*>(node);
     if (functCallNode) {
         cout << functCallNode->functname.text << "(";
         for (size_t i = 0; i < functCallNode->arguments.size(); i++) {
-            cout << functCallNode->arguments[i];
+            printInfixHelper(functCallNode->arguments[i]);
             if (i != functCallNode->arguments.size() - 1) {
                 cout << ", ";
             }
         }
-        cout << ")" << endl;
+        cout << ")";
     }
 }
 
 // Prints the infix notation of a given AST.
-void printInfix(const Node *node, bool semi) 
+void printInfix(Node *node, bool semi) 
 {
-    if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
+    bool isFunctCall = false;
+    if (dynamic_cast<const FunctCallNode*>(node)) {
+        isFunctCall = true;
+    }
+    if (!isFunctCall && node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN && node->token.type != NULLVAL)) 
+    {
         cout << "(";
+    }
     printInfixHelper(node);
-    if (node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
+    if (!isFunctCall && node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN && node->token.type != NULLVAL)) 
+    {
         cout << ")";
+    }
     if (semi) {
         cout << ";";
     }
@@ -189,6 +196,10 @@ void printInfixHelper(const Node *node)
     {
         return;
     }
+    else if (const FunctCallNode *fcNode = dynamic_cast<const FunctCallNode*>(node))
+    {
+        printFunctCall(fcNode);
+    }
     else if (node->token.type == FLOAT)
     {
         double val = stod(node->token.text);
@@ -197,9 +208,8 @@ void printInfixHelper(const Node *node)
         else
             cout << node->token.text;
     }
-    else if (node->token.type == IDENTIFIER || node->token.type == BOOLEAN)
+    else if (node->token.type == IDENTIFIER || node->token.type == BOOLEAN || node->token.type == NULLVAL)
     {
-
         cout << node->token.text;
     }
     else
@@ -217,15 +227,7 @@ void printInfixHelper(const Node *node)
             {
                 isFirst = false;
             }
-            if (child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
-            {
-                cout << "(";
-            }
-            printInfixHelper(child);
-            if (child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
-            {
-                cout << ")";
-            }
+            printInfix(child, false);
         }
     }
 }
@@ -236,17 +238,33 @@ int main(int argc, const char **argv)
     string text;
     vector<Token> tokens;
 
-    while (getline(cin, input))
-    {
-        text += input;
-        if (!cin.eof())
-        {
-            text += '\n';
-        }
-    }
+    // while (getline(cin, input))
+    // {
+    //     text += input;
+    //     if (!cin.eof())
+    //     {
+    //         text += '\n';
+    //     }
+    // }
 
     // text = "x=2;\n if x==1 \n{print 1;\n} else \n{print 0;\n}\n";
     // text = "print a = 49; \n print b = 21; \n while a != b {\n if a > b {\n a = a - b; \n } \n else if b > a {\n b = b - a; \n } \n } \n print a; \n";
+    
+    // function def tests
+    // text = "def noop1(){\n}\n";
+    // text = "def noop2(){\nreturn;\n}\n";
+    // text = "def noop3(){\nreturn null;\n}";
+    // text = "def print_if_bool(val) {\nif val == true | val == false {\nprint val;\n}\n}\n";
+    // text = "def make_mac(factor, scalar){def multiply_and_accumulate(value){return factor * value + scalar;\n}\nreturn multiply_and_accumulate;\n}\n";
+
+    // function call tests
+    // text = "doit();";
+    // text = "twelve = 3 * four();";
+    // text = "forty1 = forty(1);";
+    // text = "print max(1, 2, 3, four());";
+
+    // function example test
+    // text = "z = 42;\n\n def foo(x, y) {\n def square(value) {\nreturn value * value;\n}\nprint square(x + y + z);\n\n}\nz = 108;\nf = foo;\nresult = f(1, 2);\nif result != null {\nprint result;\n}\n";
 
     tokens = readTokens(text);
 
