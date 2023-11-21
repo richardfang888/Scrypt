@@ -424,7 +424,7 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
         }
         else
         {
-            if (nextToken.lineNumber != currToken.lineNumber || nextToken.type == END)
+            if (nextToken.lineNumber != currToken.lineNumber || nextToken.type == END || currToken.text == ";")
             {
                 index = x;
                 break;
@@ -443,17 +443,17 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
         // cout << tokensExpression[checkIndex].text << endl;
         if (tokensExpression[checkIndex].text != ";")
         {
-            // cout << "Error: Expression must end with semicolon" << endl;
+            cout << "Error: Expression must end with semicolon" << endl;
             error = true;
             printErrorStatement(tokensExpression.back(), error);
         }
     }
-    // cout << "tokensExpression size is: " << tokensExpression.size() << endl;
-    // for(size_t i = 0; i < tokensExpression.size(); i++)
-    // {
-    //     cout << "Value in index " << i << " is: " << tokensExpression[i].text << " ";
-    // }
-    // cout << endl << "Index is: "  << index << endl;
+    cout << "tokensExpression size is: " << tokensExpression.size() << endl;
+    for(size_t i = 0; i < tokensExpression.size(); i++)
+    {
+        cout << "Value in index " << i << " is: " << tokensExpression[i].text << " ";
+    }
+    cout << endl << "Index is: "  << index << endl;
     int assignIndex = 0;
     return parseAssignment(tokensExpression, assignIndex, error);
 }

@@ -162,7 +162,7 @@ void printFunctCall(const Node *node)
     if (functCallNode) {
         cout << functCallNode->functname.text << "(";
         for (size_t i = 0; i < functCallNode->arguments.size(); i++) {
-            printInfixHelper(functCallNode->arguments[i]);
+            printInfix(functCallNode->arguments[i], false);
             if (i != functCallNode->arguments.size() - 1) {
                 cout << ", ";
             }
@@ -254,9 +254,10 @@ int main(int argc, const char **argv)
     // text = "print a = 49; \n print b = 21; \n while a != b {\n if a > b {\n a = a - b; \n } \n else if b > a {\n b = b - a; \n } \n } \n print a; \n";
     
     // function def tests
-    // text = "def noop1(){\n}\n";
-    // text = "def noop2(){\nreturn;\n}\n";
-    // text = "def noop3(){\nreturn null;\n}";
+    // text = "def noop1(){}";
+    // text = "def noop2(){return;}";
+    // text = "if x == 1 {print 2;}";
+    // text = "def noop3(){return null;}";
     // text = "def print_if_bool(val) {\nif val == true | val == false {\nprint val;\n}\n}\n";
     // text = "def make_mac(factor, scalar){def multiply_and_accumulate(value){return factor * value + scalar;\n}\nreturn multiply_and_accumulate;\n}\n";
 
