@@ -12,6 +12,7 @@
     "utility": "cpp",
     "ostream": "cpp",
     "random": "cpp",
-    "xlocale": "cpp"
+    "xlocale": "cpp",
+    "functional": "cpp"
   }
 }

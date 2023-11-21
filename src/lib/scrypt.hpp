@@ -1,13 +1,30 @@
 #include "statements.hpp"
+#include <memory>
 #include <iostream>
 
-variant<double, bool> evaluateAll(Node *node, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error);
-variant<double, bool> evaluateExpression(Node* root, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error);
-variant<double, bool> evaluateIfElse(IfElseNode* root, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error);
-variant<double, bool> evaluateWhile(WhileNode* root, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error);
-variant<double, bool> evaluatePrint(PrintNode* root, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error);
-variant<double, bool> evaluateFunctDef(FunctDefNode* root, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error);
-variant<double, bool> evaluateFunctCall(FunctCallNode* root, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error);
-variant<double, bool> evaluateReturn(ReturnNode* root, unordered_map<string, variant<double, bool>> &variables, bool &error);
-variant<double, bool> evaluateStatements(vector<Node*> &statements, unordered_map<string, variant<double, bool>> &variables, vector<FunctDefNode *> &functions, bool &error);
-FunctCallNode * getFunction(vector<FunctDefNode *> &functions, FunctCallNode *node, unordered_map<string, variant<double, bool>> &variables);
+class Function;
+
+struct Value: public variant <
+    double,
+    bool,
+    nullptr_t,
+    shared_ptr<vector<Value>>,
+    shared_ptr<Function>
+> {
+    using variant<double, bool, nullptr_t, shared_ptr<vector<Value>>, shared_ptr<Function>>::variant;
+};
+
+class Function {
+    public:
+        FunctDefNode *function;
+        unordered_map<string, Value> functVariables;
+};
+
+Value evaluateAll(Node *node, unordered_map<string, Value> &variables, bool &error);
+Value evaluateExpression(Node* root, unordered_map<string, Value> &variables, bool &error);
+Value evaluateIfElse(IfElseNode* root, unordered_map<string, Value> &variables, bool &error);
+Value evaluateWhile(WhileNode* root, unordered_map<string, Value> &variables, bool &error);
+Value evaluatePrint(PrintNode* root, unordered_map<string, Value> &variables, bool &error);
+Value evaluateFunctDef(FunctDefNode* root, unordered_map<string, Value> &variables, bool &error);
+Value evaluateFunctCall(FunctCallNode* root, unordered_map<string, Value> &variables, bool &error);
+Value evaluateReturn(ReturnNode* root, unordered_map<string, Value> &variables, bool &error);
