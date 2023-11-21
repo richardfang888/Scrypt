@@ -162,7 +162,8 @@ void printInfixHelper(Node *node)
     }
     else if (ArrayAssignNode *aANode = dynamic_cast<ArrayAssignNode*>(node))
     {
-        cout << aANode->token.text << "[";
+        printInfixHelper(aANode->expression);
+        cout << "[";
         printInfixHelper(aANode->arrayIndex);
         cout << "]";
     }
@@ -234,12 +235,23 @@ int main(int argc, const char **argv)
 
     //text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array;";
     //text = "array = [true, 2, 1+1+1, 4];";
-    //text = "print array[2];";
+    //text = "print array[2];"lo;
     //text = "array = [true, 2, 1+1+1, 4]; \n print array[2]; \n print array;";
     //text = "array = [true, 2 + 1, [5]];";
+
     //text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array; \n \n arref = array; \n temp  = arref[1]; \n arref[1] = 0 - arref[3]; \n arref[3] = 0 - temp; \n print array;";
     //text = "arref[1] = 0 - arref[3];";
     //text = "value = 6; \n arret[1] = 5;";
+
+    //text = "[1, 2, 3][ 2 ]; \n sum = x[1] + y[2] + z[3]; \n print [ \n true, \n false \n ][fake_bool];";
+    //text = "[1, 2, 3][ 2 ];";
+    //text = "print [1, 2, 3][ 2 ];";
+    //text = "print [ \n true, \n false \n ][fake_bool];";
+    //text = "print [ true, false ][fake_bool];";
+
+    //text = "[]; \n [1]; \n [true,false]; \n x = [1, [2], [[3]]]; \n print     [4, 5, 6];";
+    //text = "x = [1, [2], [[3]]]; ";
+    //text = "x = [1, [2], [3]]; "; 
 
 
     tokens = readTokens(text);
@@ -261,7 +273,7 @@ int main(int argc, const char **argv)
         trees.push_back(root);
         index ++;
     } 
-    //cout << "MADE IT PAST PARSING" << endl;
+    //out << "MADE IT PAST PARSING" << endl;
     //print and evaluate trees
     for (size_t i = 0; i < trees.size(); i++)
     {

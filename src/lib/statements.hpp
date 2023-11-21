@@ -52,8 +52,8 @@ struct ArrayLookupNode : public Node
 struct ArrayAssignNode : public Node
 {
     Token token;
+    Node* expression;
     Node* arrayIndex;
-    //ArrayLiteralNode* refArray; // needed idk
     virtual ~ArrayAssignNode() = default;
 };
 
