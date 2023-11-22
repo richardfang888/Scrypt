@@ -185,21 +185,15 @@ void printInfix(Node *node, bool semi)
     {
         isArrayAssignOrArrayLiteral = true;
     }
-    if (!isArrayAssignOrArrayLiteral && node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
-        cout << "(";
-    printInfixHelper(node);
-    if (!isArrayAssignOrArrayLiteral && node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
-        cout << ")";
-    }
     if (dynamic_cast<const FunctCallNode*>(node)) {
         isFunctCall = true;
     }
-    if (!isFunctCall && node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN && node->token.type != NULLVAL)) 
+    if (!isArrayAssignOrArrayLiteral && !isFunctCall && node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN && node->token.type != NULLVAL)) 
     {
         cout << "(";
     }
     printInfixHelper(node);
-    if (!isFunctCall && node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN && node->token.type != NULLVAL)) 
+    if (!isArrayAssignOrArrayLiteral &&!isFunctCall && node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN && node->token.type != NULLVAL)) 
     {
         cout << ")";
     }
@@ -226,23 +220,10 @@ void printInfixHelper(Node *node)
         //cout << "SADFSADFlength: " << aLNode->array.size() << endl;
         //cout << " HERE|" << node->token.text << "|HERE ";
         cout << "[";
-        bool isArrayAssignOrArrayLiteral = false;
         for (size_t i = 0; i < aLNode->array.size(); i++)
         {
             Node *currNode = aLNode->array[i];
-            if(dynamic_cast<ArrayLiteralNode*>(currNode))
-            {
-                isArrayAssignOrArrayLiteral = true;
-            }   
-            else if(dynamic_cast<ArrayAssignNode*>(node))
-            {
-                isArrayAssignOrArrayLiteral = true;
-            }
-            if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN))
-                cout << "(";
-            printInfixHelper(currNode);
-            if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN))
-                cout << ")";
+            printInfix(currNode, false);
             if (i != aLNode->array.size() - 1)
             {
                 cout << ", ";
@@ -285,24 +266,7 @@ void printInfixHelper(Node *node)
             {
                 isFirst = false;
             }
-            bool isArrayLitOrAssign = false;
-            if(dynamic_cast<ArrayLiteralNode*>(child))
-            {
-                isArrayLitOrAssign = true;
-            }
-            if(dynamic_cast<ArrayAssignNode*>(child))
-            {
-                isArrayLitOrAssign = true;
-            }
-            if (!isArrayLitOrAssign && child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
-            {
-                cout << "(";
-            }
             printInfix(child, false);
-            if (!isArrayLitOrAssign && child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
-            {
-                cout << ")";
-            }
         }
     }
 }

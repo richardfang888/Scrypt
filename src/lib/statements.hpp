@@ -57,6 +57,8 @@ struct ReturnNode : public Node
     Token token;
     Node* expression;
     virtual ~ReturnNode() = default;
+};
+
 struct ArrayLiteralNode : public Node
 {
     Token token;

@@ -129,12 +129,12 @@ IfElseNode *parseIf(const vector<Token> &tokens, int &index, bool &error)
     {
         return nullptr;
     }
-    // make a new if/esle node
+    // make a new if/else node
     IfElseNode *IENode = makeIfElseNode(tokens[index]); // for testing
     // skip token
 
     index ++;
-    // if/esle node's condition = parse expression 
+    // if/else node's condition = parse expression 
     IENode->condition = parseExpression(tokens, index, false, error);
     // check if the conditionn is a boolean
     index++;
@@ -982,6 +982,7 @@ void deleteNodeAll(Node *node)
             deleteNodeAll(child);
         }
         delete fNode;
+    }
     // for array literal node
     else if(ArrayLiteralNode *aLNode = dynamic_cast<ArrayLiteralNode*>(node))
     {
