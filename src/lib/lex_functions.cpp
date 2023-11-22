@@ -10,6 +10,22 @@ void finishToken(Token &currToken, vector<Token> &tokens) {
     if (currToken.length == 0) {
         return;
     }
+    if (currToken.type == IDENTIFIER)
+    {
+        if (currToken.text == "if" || currToken.text == "print" || currToken.text == "while" 
+                || currToken.text == "else" || currToken.text == "return" || currToken.text == "def")
+        {
+            currToken.type = KEYWORD;
+        }
+        if (currToken.text == "true" || currToken.text == "false")
+        {
+            currToken.type = BOOLEAN;
+        }
+        if (currToken.text == "null")
+        {
+            currToken.type = NULLVAL;
+        }
+    }
     if (currToken.type != WHITESPACE)
     {
         tokens.push_back(currToken);
@@ -50,6 +66,8 @@ vector<Token> readTokens(string &input)
         case ')':
         case '{':
         case '}':
+        case '[':
+        case ']':
         case ';':
         case ',':
             finishToken(currToken, tokens);
@@ -70,6 +88,14 @@ vector<Token> readTokens(string &input)
             else if (c == '}')
             {
                 currToken.type = RIGHT_BRACE;
+            }
+            else if (c == '[')
+            {
+                currToken.type = LEFT_BRACKET;
+            }
+            else if (c == ']')
+            {
+                currToken.type = RIGHT_BRACKET;
             }
             else if (c == ';')
             {
@@ -237,15 +263,6 @@ vector<Token> readTokens(string &input)
             }
             currToken.text += c;
             currToken.length++;
-            if (currToken.text == "if" || currToken.text == "print" || currToken.text == "while" 
-                || currToken.text == "else")
-            {
-                currToken.type = KEYWORD;
-            }
-            if (currToken.text == "true" || currToken.text == "false")
-            {
-                currToken.type = BOOLEAN;
-            }
             break;
 
         // handle unknown tokens (syntax error)

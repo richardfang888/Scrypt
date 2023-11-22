@@ -1,8 +1,30 @@
 #include "statements.hpp"
+#include <memory>
 #include <iostream>
 
-void evaluateAll(Node *node, unordered_map<string, variant<double, bool>> &variables, bool &error);
-variant<double, bool> evaluateExpression(Node* root, unordered_map<string, variant<double, bool>> &variables, bool &error);
-variant<double, bool> evaluateIfElse(IfElseNode* root, unordered_map<string, variant<double, bool>> &variables, bool &error);
-variant<double, bool> evaluateWhile(WhileNode* root, unordered_map<string, variant<double, bool>> &variables, bool &error);
-variant<double, bool> evaluatePrint(PrintNode* root, unordered_map<string, variant<double, bool>> &variables, bool &error);
+class Function;
+
+struct Value: public variant <
+    double,
+    bool,
+    nullptr_t,
+    shared_ptr<vector<Value>>,
+    shared_ptr<Function>
+> {};
+
+// using Value = variant<double, bool, nullptr_t, shared_ptr<vector<Value>>, shared_ptr<Function>>;
+
+class Function {
+    public:
+        FunctDefNode *function;
+        unordered_map<string, Value> functVariables;
+};
+
+Value evaluateAll(Node *node, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
+Value evaluateExpression(Node* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
+Value evaluateIfElse(IfElseNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
+Value evaluateWhile(WhileNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
+Value evaluatePrint(PrintNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
+Value evaluateFunctDef(FunctDefNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
+Value evaluateFunctCall(FunctCallNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
+Value evaluateReturn(ReturnNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
