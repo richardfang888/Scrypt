@@ -341,6 +341,7 @@ FunctCallNode *parseFunctCall(const vector<Token> &tokens, int &index, bool &err
     // make a new function call node
     FunctCallNode *FNode = makeFunctCallNode(tokens[index - 1]);
     FNode->functname = tokens[index - 1];
+    // cout << "make funct call node for " << FNode->functname.text << endl;
     index++;
     while (!match(tokens, index, ")"))
     {
@@ -390,6 +391,22 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
     {
         parenCheck = true;
     }
+    // if (braceCheck)
+    // {
+    //     cout << "braceCheck" << endl;
+    // }
+    // if (bracketCheck)
+    // {
+    //     cout << "bracketCheck" << endl;
+    // }
+    // if (commaCheck)
+    // {
+    //     cout << "commaCheck" << endl;
+    // }
+    // if (parenCheck)
+    // {
+    //     cout << "parenCheck" << endl;
+    // }
 
     int nested = 0;
     // Iterate through the tokens to build the expression
@@ -424,7 +441,7 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
         }
         else
         {
-            if (nextToken.lineNumber != currToken.lineNumber || nextToken.type == END || currToken.text == ";")
+            if (nextToken.type == END || currToken.text == ";")
             {
                 index = x;
                 break;
