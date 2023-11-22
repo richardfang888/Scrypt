@@ -448,26 +448,18 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
         }
         else if (bracketCheck || commaCheck || parenCheck)
         {
-            if (currToken.type == LEFT_PAREN)
+            if (currToken.type == LEFT_PAREN || currToken.type == LEFT_BRACKET)
             {
                 nested++;
-            }
-            if (currToken.type == LEFT_BRACKET)
-            {
-                nested ++;
             }
             if (nested == 0 && (nextToken.type == RIGHT_BRACKET || nextToken.type == COMMA || nextToken.type == RIGHT_PAREN))
             {
                 index = x;
                 break;
             }
-            if (nextToken.type == RIGHT_PAREN)
+            if (nextToken.type == RIGHT_PAREN || nextToken.type == RIGHT_BRACKET)
             {
                 nested--;
-            }
-            if (nextToken.type == RIGHT_BRACKET)
-            {
-                nested --;
             }
         }
         else if (match(tokens, startOfExpression, "["))
@@ -995,6 +987,7 @@ void deleteNodeAll(Node *node)
     // for array assign node
     else if(ArrayAssignNode *aANode = dynamic_cast<ArrayAssignNode*>(node))
     {
+        deleteNodeAll(aANode->expression);
         deleteNodeAll(aANode->arrayIndex);
         delete aANode;
     }
