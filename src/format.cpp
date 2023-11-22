@@ -167,6 +167,7 @@ void printFunctCall(const Node *node)
                 cout << ", ";
             }
         }
+        cout << ")";
     }
 }
 
@@ -219,6 +220,7 @@ void printInfixHelper(Node *node)
     {
         //cout << "length: " << aLNode->array.size() << endl;
         //cout << " HERE|" << node->token.text << "|HERE ";
+        cout << "[";
         bool isArrayAssignOrArrayLiteral = false;
         for (size_t i = 0; i < aLNode->array.size(); i++)
         {
