@@ -343,6 +343,11 @@ FunctCallNode *parseFunctCall(const vector<Token> &tokens, int &index, bool &err
     FNode->functname = tokens[index - 1];
     // cout << "make funct call node for " << FNode->functname.text << endl;
     index++;
+    if (match(tokens, index, ","))
+    {
+        error = true;
+        printErrorStatement(tokens[index], error);
+    }
     while (!match(tokens, index, ")"))
     {
         Node *node = parseExpression(tokens, index, false, error);
@@ -449,6 +454,15 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
         }
     }
     // check that expression ends with semicolon if boolean flag is true
+    
+    // cout << "tokensExpression size is: " << tokensExpression.size() << endl;
+    // for(size_t i = 0; i < tokensExpression.size(); i++)
+    // {
+    //     cout << "Value in index " << i << " is: " << tokensExpression[i].text << " ";
+    // }
+    // cout << endl << "Index is: "  << index << endl;
+    int assignIndex = 0;
+    Node* result = parseAssignment(tokensExpression, assignIndex, error);
     if (!tokensExpression.empty() && checkSemi)
     {
         int checkIndex = tokensExpression.size() - 1;
@@ -460,19 +474,12 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
         // cout << tokensExpression[checkIndex].text << endl;
         if (tokensExpression[checkIndex].text != ";")
         {
-            cout << "Error: Expression must end with semicolon" << endl;
+            // cout << "Error: Expression must end with semicolon" << endl;
             error = true;
             printErrorStatement(tokensExpression.back(), error);
         }
     }
-    // cout << "tokensExpression size is: " << tokensExpression.size() << endl;
-    // for(size_t i = 0; i < tokensExpression.size(); i++)
-    // {
-    //     cout << "Value in index " << i << " is: " << tokensExpression[i].text << " ";
-    // }
-    // cout << endl << "Index is: "  << index << endl;
-    int assignIndex = 0;
-    return parseAssignment(tokensExpression, assignIndex, error);
+    return result;
 }
 
 // Function to parse assignment expressions

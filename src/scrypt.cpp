@@ -216,7 +216,7 @@ Value evaluateFunctCall(FunctCallNode *node, unordered_map<string, Value> &varia
     {
         error = true;
         // function undefined
-        cout << "Runtime error: function" << node->functname.text << " not defined." << endl;
+        cout << "Runtime error: not a function." << endl;
         exit(3);
         return Value{numeric_limits<double>::quiet_NaN()};
     }
@@ -226,7 +226,7 @@ Value evaluateFunctCall(FunctCallNode *node, unordered_map<string, Value> &varia
     {
         error = true;
         // function undefined
-        cout << "Runtime error: function " << node->token.text << " not defined." << endl;
+        cout << "Runtime error: not a function." << endl;
         exit(3);
         return Value{numeric_limits<double>::quiet_NaN()};
     }
@@ -555,6 +555,7 @@ int main(int argc, const char **argv)
     // text = "def foo(){}\ndef bar(){return;}\ndef\nbaz\n(\n)\n{\nreturn\nnull\n;\n}\n\nprint foo();\nprint bar();\nprint baz();";
     // text = "def bar(x, y, z) {\n  print x*y + z;\n}\n\nbar(10, 11);\n";
     // text = "def baz(arg) {\n  print arg;\n}\n\nreturn baz(42);";
+    // text = "def foo(x) {\n  print x == x;\n}\n\nfoo = 1492;\nprint foo(99);";
 
     // lex
     tokens = readTokens(text);

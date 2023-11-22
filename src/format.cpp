@@ -253,22 +253,21 @@ int main(int argc, const char **argv)
     // text = "x=2;\n if x==1 \n{print 1;\n} else \n{print 0;\n}\n";
     // text = "print a = 49; \n print b = 21; \n while a != b {\n if a > b {\n a = a - b; \n } \n else if b > a {\n b = b - a; \n } \n } \n print a; \n";
     
-    // function def tests
+    // function tests
     // text = "def noop1(){}";
     // text = "def noop2(){return;}";
     // text = "if x == 1 {print 2;}";
     // text = "def noop3(){return null;}";
     // text = "def print_if_bool(val) {\nif val == true | val == false {\nprint val;\n}\n}\n";
     // text = "def make_mac(factor, scalar){def multiply_and_accumulate(value){return factor * value + scalar;\n}\nreturn multiply_and_accumulate;\n}\n";
-
-    // function call tests
     // text = "doit();";
     // text = "twelve = 3 * four();";
     // text = "forty1 = forty(1);";
     // text = "print max(1, 2, 3, four());";
-
-    // function example test
     // text = "z = 42;\n\n def foo(x, y) {\n def square(value) {\nreturn value * value;\n}\nprint square(x + y + z);\n\n}\nz = 108;\nf = foo;\nresult = f(1, 2);\nif result != null {\nprint result;\n}\n";
+
+    // error tests
+    // text = "x = foo(,)";
 
     tokens = readTokens(text);
 
