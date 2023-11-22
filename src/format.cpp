@@ -167,14 +167,30 @@ void printFunctCall(const Node *node)
                 cout << ", ";
             }
         }
-        cout << ")";
     }
 }
+
 
 // Prints the infix notation of a given AST.
 void printInfix(Node *node, bool semi) 
 {
     bool isFunctCall = false;
+    bool isArrayAssignOrArrayLiteral = false;
+
+    if(dynamic_cast<ArrayLiteralNode*>(node))
+    {
+        isArrayAssignOrArrayLiteral = true;
+    }
+    else if(dynamic_cast<ArrayAssignNode*>(node))
+    {
+        isArrayAssignOrArrayLiteral = true;
+    }
+    if (!isArrayAssignOrArrayLiteral && node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
+        cout << "(";
+    printInfixHelper(node);
+    if (!isArrayAssignOrArrayLiteral && node && (node->token.type != FLOAT && node->token.type != IDENTIFIER && node->token.type != BOOLEAN))
+        cout << ")";
+    }
     if (dynamic_cast<const FunctCallNode*>(node)) {
         isFunctCall = true;
     }
@@ -193,8 +209,10 @@ void printInfix(Node *node, bool semi)
 }
 
 // Prints the infix notation of a given AST.
-void printInfixHelper(const Node *node)
+void printInfixHelper(Node *node)
 {
+    //cout << " |" << node->token.text << "| ";
+
     if (!node)
     {
         return;
@@ -202,6 +220,42 @@ void printInfixHelper(const Node *node)
     else if (const FunctCallNode *fcNode = dynamic_cast<const FunctCallNode*>(node))
     {
         printFunctCall(fcNode);
+    }
+    else if (ArrayLiteralNode *aLNode = dynamic_cast<ArrayLiteralNode*>(node))
+    {
+        //cout << "SADFSADFlength: " << aLNode->array.size() << endl;
+        //cout << " HERE|" << node->token.text << "|HERE ";
+        cout << "[";
+        bool isArrayAssignOrArrayLiteral = false;
+        for (size_t i = 0; i < aLNode->array.size(); i++)
+        {
+            Node *currNode = aLNode->array[i];
+            if(dynamic_cast<ArrayLiteralNode*>(currNode))
+            {
+                isArrayAssignOrArrayLiteral = true;
+            }   
+            else if(dynamic_cast<ArrayAssignNode*>(node))
+            {
+                isArrayAssignOrArrayLiteral = true;
+            }
+            if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN))
+                cout << "(";
+            printInfixHelper(currNode);
+            if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN))
+                cout << ")";
+            if (i != aLNode->array.size() - 1)
+            {
+                cout << ", ";
+            }
+        }
+        cout << "]";
+    }
+    else if (ArrayAssignNode *aANode = dynamic_cast<ArrayAssignNode*>(node))
+    {
+        printInfixHelper(aANode->expression);
+        cout << "[";
+        printInfixHelper(aANode->arrayIndex);
+        cout << "]";
     }
     else if (node->token.type == FLOAT)
     {
@@ -218,6 +272,7 @@ void printInfixHelper(const Node *node)
     else
     {
         bool isFirst = true;
+        //cout << "node text: " << node->token.text << endl;
         for (const auto &child : node->children)
         {
             if (!child)
@@ -230,7 +285,24 @@ void printInfixHelper(const Node *node)
             {
                 isFirst = false;
             }
+            bool isArrayLitOrAssign = false;
+            if(dynamic_cast<ArrayLiteralNode*>(child))
+            {
+                isArrayLitOrAssign = true;
+            }
+            if(dynamic_cast<ArrayAssignNode*>(child))
+            {
+                isArrayLitOrAssign = true;
+            }
+            if (!isArrayLitOrAssign && child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
+            {
+                cout << "(";
+            }
             printInfix(child, false);
+            if (!isArrayLitOrAssign && child->token.type != FLOAT && child->token.type != IDENTIFIER && child->token.type != BOOLEAN)
+            {
+                cout << ")";
+            }
         }
     }
 }
@@ -269,6 +341,26 @@ int main(int argc, const char **argv)
     // error tests
     // text = "x = foo(,)";
 
+    //text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array;";
+    //text = "array = [true, 2, 1+1+1, 4];";
+    //text = "print array[2];"lo;
+    //text = "array = [true, 2, 1+1+1, 4]; \n print array[2]; \n print array;";
+    //text = "array = [true, 2 + 1, [5]];";
+
+    //text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array; \n \n arref = array; \n temp  = arref[1]; \n arref[1] = 0 - arref[3]; \n arref[3] = 0 - temp; \n print array;";
+    //text = "arref[1] = 0 - arref[3];";
+    //text = "value = 6; \n arret[1] = 5;";
+
+    //text = "[1, 2, 3][ 2 ]; \n sum = x[1] + y[2] + z[3]; \n print [ \n true, \n false \n ][fake_bool];";
+    //text = "[1, 2, 3][ 2 ];";
+    //text = "print [1, 2, 3][ 2 ];";
+    //text = "print [ \n true, \n false \n ][fake_bool];";
+    //text = "print [ true, false ][fake_bool];";
+
+    //text = "[]; \n [1]; \n [true,false]; \n x = [1, [2], [[3]]]; \n print     [4, 5, 6];";
+    //text = "x = [1, [2], [[3]]]; ";
+    //text = "x = [1, [2], [3]]; "; 
+
     tokens = readTokens(text);
 
     // set up variables for muti expression parsing
@@ -288,7 +380,7 @@ int main(int argc, const char **argv)
         trees.push_back(root);
         index ++;
     } 
-
+    //out << "MADE IT PAST PARSING" << endl;
     //print and evaluate trees
     for (size_t i = 0; i < trees.size(); i++)
     {
