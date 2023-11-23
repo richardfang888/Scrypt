@@ -792,25 +792,6 @@ int main(int argc, const char **argv)
         }
     }
 
-    // Old statements tests
-    // text = "print a = 132;\nprint b = 72;\n\nwhile a != 0 {\n  if a > b {\n    a = a % b;\n  }\n  else if b > a {\n    c = a;\n    a = b % a;\n    b = c;\n  }\n  else {}\n}\n\nprint b;"; // 132 72 12
-    // text = "x = 57.5;\n\nif x > 90 {\n  print 4.0;\n}\nelse if x > 80 {\n  print 3.0;\n}\nelse if x > 70 {\n  print 2.0;\n}\nelse if x {\n  print 1.0;\n}\nelse {\n  print 0.0;\n}"; // not a bool
-
-    // Functions tests
-    // text = "def say_no() {\nprint false;\n}\ndef say_even(x) {\nprint x % 2 == 0;\n}\ndef say_equal(x, y, z) {\nprint x == y & y == z;\n}\nsay_even(14);\nsay_even(1 + 2);\nsay_no();\nsay_equal(4.0, 4, 4.00000);\nsay_equal(3, 3.00, 3.00001);"; // T F F T F
-    // text = "z = 42;\n\n def foo(x, y) {\n def square(value) {\nreturn value * value;\n}\nprint square(x + y + z);\n\n}\nz = 108;\nf = foo;\nresult = f(1, 2);\nif result != null {\nprint result;\n}\n"; // 2025
-    // text = "def foo(){}\ndef bar(){return;}\ndef\nbaz\n(\n)\n{\nreturn\nnull\n;\n}\n\nprint foo();\nprint bar();\nprint baz();"; // null null null
-    // text = "def bar(x, y, z) {\n  print x*y + z;\n}\n\nbar(10, 11);\n"; // incorrect argument count
-    // text = "def baz(arg) {\n  print [arg];\n}\n\nbaz(42);\nreturn;"; // unexpected return
-    // text = "def foo(x) {\n  print x == x;\n}\n\nfoo = 1492;\nprint foo(99);"; // not a function
-
-    // Array tests
-    // text = "values = [null, null, null, null, null];\n\ndef set_index(index, value) {\n  values[index] = value;\n  values = [];\n}\n\nset_index(3, 1.3);\nset_index(1, true);\nset_index(2, [1, [2], 3]);\n\nprint values;"; // [null, true, [1, [2], 3], 1.3, null]
-    // text = "def reverse(array) {\n  result = [];\n  while len(array) > 0 {\n    push(result, pop(array));\n  }\n\n  return result;\n}\n\nx = [1, 1, 2, 3, 5, 8, 13];\ny = reverse(x);\nprint x;\nprint y;"; // [13, 8, 5, 3, 2, 1, 1]
-    // text = "S = [];\nK = [9, 3, 1, 1, 7];\nN = 14;\n\ndef swap(i, j) {\n\n   temp = S[i];\n    S[i] = S[j];\n    S[j] = temp;\n}\n\ndef init() {\n    i = 0;\n    while i < N {\n        push(S, i);\n        i = i + 1;\n    }\n}\n\ninit();\n\ni = 0;\nj = 0;\nwhile i < N {\n    j = (j + S[i] + K[i % len(K)]) % N;\n    swap(i, j);\n    i = i + 1;\n}\n\nprint(S);"; // [9, 13, 2, 7, 6, 4, 11, 5, 8, 12, 1, 10, 3, 0]
-    // text = "def fib(n) {\n  if n <= 1 {\n    return 1;\n  }\n  else {\n    return fib(n - 1) + fib(n - 2);\n  }\n}\n\ndef fibvec(n) {\n  vec = [1, 1];\n\n  while len(vec) > n {\n    pop(vec);\n  }\n\n  while len(vec) < n {\n    push(vec, fib(len(vec)));\n  }\n\n\n return vec;\n}\n\nprint fibvec(0);\nprint fibvec(3);\n\ntop10 = fibvec(10);\nprint top10;"; // []  [1, 1, 2]  [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
-    // text = "x = [1, 2];\nprint [1, 2] == x;";
-
     // lex
     tokens = readTokens(text);
 

@@ -64,85 +64,6 @@ void deleteNodeCalc(Node *node)
     }
 }
 
-// using ValueBase = variant<
-//     double,
-//     bool,
-//     nullptr_t,
-//     shared_ptr<vector<Value>>,
-//     shared_ptr<Function>
-// >;
-
-// bool Value::operator==(const Value &other) const
-// {
-//     const Array *a1 = std::get_if<Array>(this);
-//     const Array *a2 = std::get_if<Array>(&other);
-//     if (a1 != nullptr && a2 != nullptr)
-//     {
-//         return (**a1 == **a2);
-//     }
-//     else
-//     {
-//         return ((const ValueBase &)*this == (const ValueBase &)other);
-//     }
-// }
-// bool Value::operator!=(const Value &other) const
-// {
-//     return !(*this == other);
-// }
-
-// bool Value::operator>(const Value &other) const
-// {
-//     const double *a1 = std::get_if<double>(this);
-//     const double *a2 = std::get_if<double>(&other);
-//     if (a1 != nullptr && a2 != nullptr)
-//     {
-//         return (*a1 > *a2);
-//     }
-//     else
-//     {
-//         throw "Incorrect operand type.";
-//     }
-// }
-// bool Value::operator<(const Value &other) const
-// {
-//     const double *a1 = std::get_if<double>(this);
-//     const double *a2 = std::get_if<double>(&other);
-//     if (a1 != nullptr && a2 != nullptr)
-//     {
-//         return (*a1 < *a2);
-//     }
-//     else
-//     {
-//         throw "Incorrect operand type.";
-//     }
-// }
-// bool Value::operator>=(const Value &other) const
-// {
-//     const double *a1 = std::get_if<double>(this);
-//     const double *a2 = std::get_if<double>(&other);
-//     if (a1 != nullptr && a2 != nullptr)
-//     {
-//         return (*a1 >= *a2);
-//     }
-//     else
-//     {
-//         throw "Incorrect operand type.";
-//     }
-// }
-// bool Value::operator<=(const Value &other) const
-// {
-//     const double *a1 = std::get_if<double>(this);
-//     const double *a2 = std::get_if<double>(&other);
-//     if (a1 != nullptr && a2 != nullptr)
-//     {
-//         return (*a1 <= *a2);
-//     }
-//     else
-//     {
-//         throw "Incorrect operand type.";
-//     }
-// }
-
 Node *makeNodeCalc(const Token &token)
 {
     Node *node = new Node();
@@ -253,9 +174,6 @@ Node *parseExpressionCalc(const vector<Token> &tokens, int &index, bool &error)
     {
         parenCheck = true;
     }
-    // cout << "state of each check: " << braceCheck << ", " << bracketCheck << ", " << commaCheck << endl;
-    // cout << "index: " << index << endl;
-    // check if it is a 2d array
     int nested = 0;
     // Iterate through the tokens to build the expression
     for (size_t x = startOfExpression; x < tokens.size() - 1; x++)
@@ -305,12 +223,6 @@ Node *parseExpressionCalc(const vector<Token> &tokens, int &index, bool &error)
         }
     }
     int assignIndex = 0;
-    // cout << "tokensExpression size is: " << tokensExpression.size() << endl;
-    // for(size_t i = 0; i < tokensExpression.size(); i++)
-    // {
-    //     cout << "Value in index " << i << " is: " << tokensExpression[i].text << " ";
-    // }
-    // cout << endl << "Index is: "  << index << endl;
     return parseAssignmentCalc(tokensExpression, assignIndex, error);
 }
 
@@ -483,44 +395,6 @@ Node *parseMultDivModCalc(const vector<Token> &tokens, int &index, bool &error)
     }
     return left;
 }
-
-// Node *parsePrimaryCalc(const vector<Token> &tokens, int &index, bool &error)
-// {
-//     //cout << "primary" << endl;
-//     if (error)
-//     {
-//         return nullptr;
-//     }
-//     Token token = tokens[index++];
-//     if (token.type == FLOAT || token.type == IDENTIFIER || token.type == BOOLEAN)
-//     {
-//         return makeNodeCalc(token);
-//     }
-//     else if (token.type == TokenType::LEFT_PAREN)
-//     {
-//         Node *expression = parseAssignmentCalc(tokens, index, error);
-//         if (!matchCalc(tokens, index, ")"))
-//         {
-//             // Handle missing closing parenthesis error
-//             if (index < int(tokens.size()) && !error)
-//             {
-//                 // cout << "parenthesis" << endl;
-//                 printErrorCalc(tokens[index], error);
-//             }
-//             deleteNodeCalc(expression);
-//             return nullptr;
-//         }
-//         ++index; // Increment index to skip the closing parenthesis
-//         return expression;
-//     }
-//     else
-//     {
-//         // Handle unexpected token error
-//         // cout << "primary" << endl;
-//         printErrorCalc(token, error);
-//         return nullptr;
-//     }
-// }
 
 // Function to parse primary expressions
 Node *parsePrimaryCalc(const vector<Token> &tokens, int &index, bool &error)
@@ -703,43 +577,6 @@ bool checkIdenCalc(Node *root, unordered_map<string, Value> &variables, bool &er
     return true;
 }
 
-// Throws error for invalid assignment
-// bool checkVarCalc(Node *root, bool &error)
-// {
-//     if (!root)
-//     {
-//         return true;
-//     }
-//     if (root->token.text == "=")
-//     {
-//         for (int i = int(root->children.size() - 2); i >= 0; i--)
-//         {
-//             if (error)
-//             {
-//                 break;
-//             }
-//             if (root->children[i]->token.type != IDENTIFIER)
-//             {
-//                 // invalid assignment error
-//                 printErrorCalc(root->token, error);
-//                 return false;
-//             }
-//         }
-//     }
-//     // Recursively check the children nodes
-//     for (Node *child : root->children)
-//     {
-//         if (error)
-//         {
-//             break;
-//         }
-//         if (!checkVarCalc(child, error))
-//         {
-//             return false;
-//         }
-//     }
-//     return true;
-// }
 
 // check for parentheses errors
 bool checkParenCalc(vector<Token> &tokens, bool &error)
@@ -924,14 +761,6 @@ Value evaluateFunctCallCalc(FunctCallNode *node, unordered_map<string, Value> &v
         return Value{numeric_limits<double>::quiet_NaN()};
     }
 
-    // debugging scope
-    // cout << "variables scope: " << endl;
-    // for (auto const& x : variables) {
-    //     cout << x.first << ": ";
-    //     printValue(x.second);
-    //     cout << endl;
-    // }
-
     if (node->functname.text == "len" || node->functname.text == "push" || node->functname.text == "pop")
     {
         return evaluateUtilityFunctCalc(node, variables, error, inFunct);
@@ -968,9 +797,6 @@ Value evaluateFunctCallCalc(FunctCallNode *node, unordered_map<string, Value> &v
     for (Node *argument : node->arguments)
     {
         Value result = evaluateAllCalc(argument, variables, error, inFunct);
-        // cout << "argument: ";
-        // printValue(result);
-        // cout << endl;
         evaluatedArguments.push_back(result);
         inFunct = true;
     }
@@ -987,14 +813,6 @@ Value evaluateFunctCallCalc(FunctCallNode *node, unordered_map<string, Value> &v
             newVariables[entry.first] = entry.second;
         }
     }
-    
-    // debugging scope
-    // cout << "function scope: " << endl;
-    // for (auto const& x : function->functVariables) {
-    //     cout << x.first << ": ";
-    //     printValue(x.second);
-    //     cout << endl;
-    // }
 
     inFunct = true;
     // Evaluate the statements within the function scope
@@ -1007,9 +825,6 @@ Value evaluateFunctCallCalc(FunctCallNode *node, unordered_map<string, Value> &v
         }
         if (returnVal.index() != 0 || !isnan(get<double>(returnVal))) {
             Value functReturn = returnVal;
-            // cout << "actual return ";
-            // printValue(functReturn);
-            // cout << endl;
             returnVal = Value{numeric_limits<double>::quiet_NaN()};
             return functReturn;
         }
@@ -1536,10 +1351,10 @@ void printInfixHelperCalc(Node *node)
             {
                 isArrayAssignOrArrayLiteral = true;
             }   
-            // else if(dynamic_cast<ArrayAssignNode*>(node))
-            // {
-            //     isArrayAssignOrArrayLiteral = true;
-            // }
+            else if(dynamic_cast<ArrayAssignNode*>(currNode))
+            {
+                isArrayAssignOrArrayLiteral = true;
+            }
             if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN && currNode->token.type != NULLVAL))
                 cout << "(";
             printInfixHelperCalc(currNode);

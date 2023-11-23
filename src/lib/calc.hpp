@@ -58,17 +58,8 @@ struct Value : public variant<
     shared_ptr<vector<Value>>,
     shared_ptr<Function>
 >{
-    // using variant<double, bool, nullptr_t, shared_ptr<vector<Value>>>::variant;
-    // bool operator==(const Value &other) const;
-    // bool operator!=(const Value &other) const;
-
-    // bool operator<(const Value &other) const;
-    // bool operator>(const Value &other) const;
-    // bool operator<=(const Value &other) const;
-    // bool operator>=(const Value &other) const;
 };
 
-// using Array = shared_ptr<vector<Value>>;
 
 class Function {
     public:

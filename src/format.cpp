@@ -300,45 +300,6 @@ int main(int argc, const char **argv)
         }
     }
 
-    // text = "x=2;\n if x==1 \n{print 1;\n} else \n{print 0;\n}\n";
-    // text = "print a = 49; \n print b = 21; \n while a != b {\n if a > b {\n a = a - b; \n } \n else if b > a {\n b = b - a; \n } \n } \n print a; \n";
-    
-    // function tests
-    // text = "def noop1(){}";
-    // text = "def noop2(){return;}";
-    // text = "if x == 1 {print 2;}";
-    // text = "def noop3(){return null;}";
-    // text = "def print_if_bool(val) {\nif val == true | val == false {\nprint val;\n}\n}\n";
-    // text = "def make_mac(factor, scalar){def multiply_and_accumulate(value){return factor * value + scalar;\n}\nreturn multiply_and_accumulate;\n}\n";
-    // text = "doit();";
-    // text = "twelve = 3 * four();";
-    // text = "forty1 = forty(1);";
-    // text = "print max(1, 2, 3, four());";
-    // text = "z = 42;\n\n def foo(x, y) {\n def square(value) {\nreturn value * value;\n}\nprint square(x + y + z);\n\n}\nz = 108;\nf = foo;\nresult = f(1, 2);\nif result != null {\nprint result;\n}\n";
-
-    // error tests
-    // text = "x = foo(,)";
-
-    //text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array;";
-    //text = "array = [true, 2, 1+1+1, 4];";
-    //text = "print array[2];"lo;
-    //text = "array = [true, 2, 1+1+1, 4]; \n print array[2]; \n print array;";
-    //text = "array = [true, 2 + 1, [5]];";
-
-    //text = "array = [true, 2, 1+1+1, 4, [5]]; \n print array[2]; \n print array; \n \n arref = array; \n temp  = arref[1]; \n arref[1] = 0 - arref[3]; \n arref[3] = 0 - temp; \n print array;";
-    //text = "arref[1] = 0 - arref[3];";
-    //text = "value = 6; \n arret[1] = 5;";
-
-    //text = "[1, 2, 3][ 2 ]; \n sum = x[1] + y[2] + z[3]; \n print [ \n true, \n false \n ][fake_bool];";
-    //text = "[1, 2, 3][ 2 ];";
-    //text = "print [1, 2, 3][ 2 ];";
-    //text = "print [ \n true, \n false \n ][fake_bool];";
-    //text = "print [ true, false ][fake_bool];";
-
-    //text = "[]; \n [1]; \n [true,false]; \n x = [1, [2], [[3]]]; \n print     [4, 5, 6];";
-    //text = "x = [1, [2], [[3]]]; ";
-    //text = "x = [1, [2], [3]]; "; 
-
     tokens = readTokens(text);
 
     // set up variables for muti expression parsing
