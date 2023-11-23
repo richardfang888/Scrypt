@@ -122,6 +122,6 @@ Value evaluateArrayAssignCalc(ArrayAssignNode* root, unordered_map<string, Value
 Value evaluateUtilityFunctCalc(FunctCallNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
 
 void printValueCalc(Value value);
-Value lenCalc(Value array);
-Value pushCalc(Value array, Value value);
-Value popCalc(Value array);
+Value lenCalc(Value array, bool &error);
+Value pushCalc(Value array, Value value, bool &error);
+Value popCalc(Value array, bool &error);

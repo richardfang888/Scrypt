@@ -196,17 +196,27 @@ FunctCallNode *parseFunctCallCalc(const vector<Token> &tokens, int &index, bool 
     while (!matchCalc(tokens, index, ")"))
     {
         Node *node = parseExpressionCalc(tokens, index, error);
+        // cout << "node: " << node->token.text << endl;
         if (node != nullptr)
         {
             FNode->arguments.push_back(node);
         }
-        index++;
         if(matchCalc(tokens, index, ")")){
             break;
         }
         index++;
+        // if(matchCalc(tokens, index - 1, ",")){
+        //     continue;
+        // }
+        // cout << "here " << tokens[index].text << endl;
+        if(matchCalc(tokens, index, ")")){
+            break;
+        }
+        index++;
+        // cout << "here 2" << tokens[index].text << endl;
     }
     index++;
+    // cout << "finished parsing function call" << endl;
     return FNode;
 }
 
@@ -221,10 +231,16 @@ Node *parseExpressionCalc(const vector<Token> &tokens, int &index, bool &error)
     vector<Token> tokensExpression;
     // checks if the current expression is preceded by a "while" or "if" token
 
+     bool braceCheck = false;
     bool bracketCheck = false;
-
     bool commaCheck = false;
+    bool parenCheck = false;
 
+    if (startOfExpression > 0 && (matchCalc(tokens, startOfExpression - 1, "while") 
+        || matchCalc(tokens, startOfExpression - 1, "if") || matchCalc(tokens, startOfExpression - 1, "def")))
+    {
+        braceCheck = true;
+    }
     if (startOfExpression > 0 && matchCalc(tokens, startOfExpression - 1, "["))
     {
         bracketCheck = true;
@@ -232,6 +248,10 @@ Node *parseExpressionCalc(const vector<Token> &tokens, int &index, bool &error)
     if (startOfExpression > 0 && matchCalc(tokens, startOfExpression - 1, ","))
     {
         commaCheck = true;
+    }
+    if (startOfExpression > 1 && matchCalc(tokens, startOfExpression - 1, "(") && tokens[startOfExpression - 2].type == IDENTIFIER) 
+    {
+        parenCheck = true;
     }
     // cout << "state of each check: " << braceCheck << ", " << bracketCheck << ", " << commaCheck << endl;
     // cout << "index: " << index << endl;
@@ -243,25 +263,41 @@ Node *parseExpressionCalc(const vector<Token> &tokens, int &index, bool &error)
         Token currToken = tokens[x];
         Token nextToken = tokens[x + 1];
         tokensExpression.push_back(currToken);
-        if (bracketCheck || commaCheck)
+        if (braceCheck)
         {
-            if (currToken.type == LEFT_BRACKET)
-            {
-                nested++;
-            }
-            if ((nested == 0) && (nextToken.type == RIGHT_BRACKET || nextToken.type == COMMA))
+            if (nextToken.type == LEFT_BRACE)
             {
                 index = x;
                 break;
             }
-            if (nextToken.type == RIGHT_BRACKET)
+        }
+        else if (bracketCheck || commaCheck || parenCheck)
+        {
+            if (currToken.type == LEFT_PAREN || currToken.type == LEFT_BRACKET)
+            {
+                nested++;
+            }
+            if (nested == 0 && (nextToken.type == RIGHT_BRACKET || nextToken.type == COMMA || nextToken.type == RIGHT_PAREN))
+            {
+                index = x;
+                break;
+            }
+            if (nextToken.type == RIGHT_PAREN || nextToken.type == RIGHT_BRACKET)
             {
                 nested--;
             }
         }
+        else if (matchCalc(tokens, startOfExpression, "["))
+        {
+            if (currToken.type == SEMICOLON)
+            {
+                index = x;
+                break;
+            }
+        }
         else
         {
-            if (nextToken.lineNumber != currToken.lineNumber || nextToken.type == END)
+            if (currToken.length != nextToken.lineNumber  || nextToken.type == END || currToken.text == ";")
             {
                 index = x;
                 break;
@@ -985,7 +1021,7 @@ Value evaluateUtilityFunctCalc(FunctCallNode *node, unordered_map<string, Value>
         else
         {
             Value array = evaluateAllCalc(node->arguments[0], variables, error, inFunct);
-            return lenCalc(array);
+            return lenCalc(array, error);
         }
     }
     else if (node->functname.text == "push")
@@ -999,7 +1035,7 @@ Value evaluateUtilityFunctCalc(FunctCallNode *node, unordered_map<string, Value>
         {
             Value array = evaluateAllCalc(node->arguments[0], variables, error, inFunct);
             Value value = evaluateAllCalc(node->arguments[1], variables, error, inFunct);
-            return pushCalc(array, value);
+            return pushCalc(array, value, error);
         }
     }
     else
@@ -1012,7 +1048,7 @@ Value evaluateUtilityFunctCalc(FunctCallNode *node, unordered_map<string, Value>
         else
         {
             Value array = evaluateAllCalc(node->arguments[0], variables, error, inFunct);
-            return popCalc(array);
+            return popCalc(array, error);
         }
     }
 
@@ -1367,28 +1403,36 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
     return  Value{numeric_limits<double>::quiet_NaN()};
 }
 
-Value lenCalc(Value array) {
+Value lenCalc(Value array, bool& error) {
     if (array.index() != 3) {
+        error = true;
         cout << "Runtime error: not an array." << endl;
+        return Value{numeric_limits<double>::quiet_NaN()};
     }
     shared_ptr<vector<Value>> arrayPtr = get<shared_ptr<vector<Value>>>(array);
     // printValue(Value{double((*arrayPtr).size())});
     return Value{double((*arrayPtr).size())};
 }
-Value pushCalc(Value array, Value value) {
+Value pushCalc(Value array, Value value, bool& error) {
     if (array.index() != 3) {
+        error = true;
         cout << "Runtime error: not an array." << endl;
+        return Value{numeric_limits<double>::quiet_NaN()};
     }
     shared_ptr<vector<Value>> arrayPtr = get<shared_ptr<vector<Value>>>(array);
     (*arrayPtr).push_back(value);
     return Value{nullptr};
 }
-Value popCalc(Value array) {
+Value popCalc(Value array, bool& error) {
     if (array.index() != 3) {
+        error = true;
         cout << "Runtime error: not an array." << endl;
+        return Value{numeric_limits<double>::quiet_NaN()};
     }
-    if (int(get<double>(lenCalc(array))) == 0) {
+    if (int(get<double>(lenCalc(array, error))) == 0) {
+        error = true;
         cout << "Runtime error: underflow." << endl;
+        return Value{numeric_limits<double>::quiet_NaN()};
     }
     shared_ptr<vector<Value>> arrayPtr = get<shared_ptr<vector<Value>>>(array);
     Value back = (*arrayPtr).back();
