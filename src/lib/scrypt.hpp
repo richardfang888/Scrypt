@@ -28,3 +28,12 @@ Value evaluatePrint(PrintNode* root, unordered_map<string, Value> &variables, bo
 Value evaluateFunctDef(FunctDefNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
 Value evaluateFunctCall(FunctCallNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
 Value evaluateReturn(ReturnNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
+Value evaluateArrayLiteral(ArrayLiteralNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
+Value evaluateArrayAssign(ArrayAssignNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct, bool setValue);
+Value evaluateUtilityFunct(FunctCallNode* root, unordered_map<string, Value> &variables, bool &error, bool &inFunct);
+
+void printValue(Value value);
+Value len(Value array);
+Value push(Value array, Value value);
+Value pop(Value array);
+

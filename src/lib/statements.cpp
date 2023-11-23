@@ -222,6 +222,7 @@ WhileNode *parseWhile(const vector<Token> &tokens, int &index, bool &error)
     index++;
     // make the vector
     WNode->condition = parseExpression(tokens, index, false, error);
+    // cout << "WNode condition: " << WNode->condition->token.text << endl;
     index++;
 
     // check if there is an open bracket
@@ -378,6 +379,7 @@ FunctCallNode *parseFunctCall(const vector<Token> &tokens, int &index, bool &err
         }
         index++;
     }
+    index++;
     return FNode;
 }
 
@@ -479,7 +481,6 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
             }
         }
     }
-    // check that expression ends with semicolon if boolean flag is true
     
     // cout << "tokensExpression size is: " << tokensExpression.size() << endl;
     // for(size_t i = 0; i < tokensExpression.size(); i++)
@@ -487,6 +488,7 @@ Node *parseExpression(const vector<Token> &tokens, int &index, bool checkSemi, b
     //     cout << "Value in index " << i << " is: " << tokensExpression[i].text << " ";
     // }
     // cout << endl << "Index is: "  << index << endl;
+
     int assignIndex = 0;
     Node* result = parseAssignment(tokensExpression, assignIndex, error);
 
@@ -680,19 +682,21 @@ Node *parsePrimary(const vector<Token> &tokens, int &index, bool &error)
         return nullptr;
     }
     Token token = tokens[index++];
+    // cout << "current token text: " << token.text << endl;
     if (token.type == FLOAT || token.type == BOOLEAN || token.type == NULLVAL)
     {
         return makeNode(token);
     }
     else if (token.type == LEFT_BRACKET)
     {
-       // cout << "no shot we are making lit nodes"   << endl;
+        // cout << "array literal in primary" << endl;
+        // cout << "current token text: " << tokens[index].text << endl;
         ArrayLiteralNode *array = parseArrayLiteral(tokens, index, error);
         //cout << "current token text: " << tokens[index].text << endl;
         if(match(tokens, index + 1, "["))
         {
             index ++;
-            //cout << "parsing lit going into assign" << endl;
+            // cout << "parsing lit going into assign" << endl;
             ArrayAssignNode *arrayAssign = parseArrayAssign(tokens, index, error);
             arrayAssign->expression = array;
             return arrayAssign;
