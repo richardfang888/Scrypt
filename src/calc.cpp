@@ -3,6 +3,7 @@
 #include <limits>
 #include <cmath>
 #include <stack>
+#include <iomanip>
 
 using namespace std;
 
@@ -25,6 +26,32 @@ void deleteNodeCalc(Node *node)
             deleteNodeCalc(aANode->arrayIndex);
             delete aANode;
         }
+        else if (ReturnNode *rNode = dynamic_cast<ReturnNode *>(node))
+        {
+            if (rNode->expression)
+            {
+                deleteNodeCalc(rNode->expression);
+            }
+            delete rNode;
+        }
+        // for function definition
+        else if (FunctDefNode *fNode = dynamic_cast<FunctDefNode *>(node))
+        {
+            for (Node *child : fNode->statements)
+            {
+                deleteNodeCalc(child);
+            }
+            delete fNode;
+        }
+        // for function call
+        else if (FunctCallNode *fNode = dynamic_cast<FunctCallNode *>(node))
+        {
+            for (Node *child : fNode->arguments)
+            {
+                deleteNodeCalc(child);
+            }
+            delete fNode;
+        }
         else
         {
             for (Node *child : node->children)
@@ -33,6 +60,7 @@ void deleteNodeCalc(Node *node)
             }
             delete node;
         }
+        
     }
 }
 
@@ -741,7 +769,6 @@ Value evaluateReturnCalc(ReturnNode *node, unordered_map<string, Value> &variabl
     {
         error = true;
         cout << "Runtime error: unexpected return." << endl;
-        exit(3);
         return Value{numeric_limits<double>::quiet_NaN()};
     }
     if (!node->expression)
@@ -811,7 +838,6 @@ Value evaluateFunctCallCalc(FunctCallNode *node, unordered_map<string, Value> &v
         // cout << "can't find: " << node->functname.text << endl;
         error = true;
         cout << "Runtime error: not a function." << endl;
-        exit(3);
         return Value{numeric_limits<double>::quiet_NaN()};
     }
     Value functionValue = iter->second;
@@ -820,7 +846,6 @@ Value evaluateFunctCallCalc(FunctCallNode *node, unordered_map<string, Value> &v
     {
         error = true;
         cout << "Runtime error: not a function." << endl;
-        exit(3);
         return Value{numeric_limits<double>::quiet_NaN()};
     }
     shared_ptr<Function> function = get<shared_ptr<Function>>(functionValue);
@@ -830,7 +855,6 @@ Value evaluateFunctCallCalc(FunctCallNode *node, unordered_map<string, Value> &v
     {
         error = true;
         cout << "Runtime error: incorrect argument count." << endl;
-        exit(3);
         return Value{numeric_limits<double>::quiet_NaN()};
     }
     // evaluate arguments
@@ -936,7 +960,6 @@ Value evaluateUtilityFunctCalc(FunctCallNode *node, unordered_map<string, Value>
     {
         error = true;
         cout << "Runtime error: incorrect argument count." << endl;
-        exit(3);
         return Value{numeric_limits<double>::quiet_NaN()};
     }
     return Value{nullptr};
@@ -968,11 +991,16 @@ Value evaluateArrayAssignCalc(ArrayAssignNode *node, unordered_map<string, Value
     }
     Value arrayIndexValue = evaluateAllCalc(node->arrayIndex, variables, error, inFunct);
     double intPart;
-    if (arrayIndexValue.index() != 0 || modf(get<double>(arrayIndexValue), &intPart) != 0)
+    if (arrayIndexValue.index() != 0)
+    {
+        error = true;
+        cout << "Runtime error: index is not a number." << endl;
+        return Value{numeric_limits<double>::quiet_NaN()};
+    }
+    else if (modf(get<double>(arrayIndexValue), &intPart) != 0)
     {
         error = true;
         cout << "Runtime error: index is not an integer." << endl;
-        exit(3);
         return Value{numeric_limits<double>::quiet_NaN()};
     }
     Value arrayExpression = evaluateAllCalc(node->expression, variables, error, inFunct);
@@ -980,7 +1008,6 @@ Value evaluateArrayAssignCalc(ArrayAssignNode *node, unordered_map<string, Value
     {
         error = true;
         cout << "Runtime error: not an array." << endl;
-        exit(3);
         return Value{numeric_limits<double>::quiet_NaN()};
     }
     auto array = *get<shared_ptr<vector<Value>>>(arrayExpression);
@@ -988,7 +1015,6 @@ Value evaluateArrayAssignCalc(ArrayAssignNode *node, unordered_map<string, Value
     {
         error = true;
         cout << "Runtime error: index out of bounds." << endl;
-        exit(3);
         return Value{numeric_limits<double>::quiet_NaN()};
     }
     if (setValue) 
@@ -1063,7 +1089,6 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
             // Handle error: Unknown identifier
             error = true;
             cout << "Runtime error: unknown identifier " + identifierText << endl;
-            exit(3);
             return Value{numeric_limits<double>::quiet_NaN()};
         }
     }
@@ -1094,7 +1119,6 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
             {
                 error = true;
                 cout << "Runtime error: invalid assignee." << endl;
-                exit(3);
 
                 return Value{numeric_limits<double>::quiet_NaN()};
             }
@@ -1115,7 +1139,6 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
             // runtime error
             error = true;
             cout << "Runtime error: invalid operand type." << endl;
-            exit(3);
             return  Value{numeric_limits<double>::quiet_NaN()};
         }
         // Iterate over the rest of the children to apply the operation.
@@ -1125,7 +1148,6 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
             {
                 error = true;
                 cout << "Runtime error: invalid operand type." << endl;
-                exit(3);
                 return Value{numeric_limits<double>::quiet_NaN()};
             }
             Token opToken = node->token;
@@ -1154,7 +1176,6 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
                 {
                     error = true;
                     cout << "Runtime error: division by zero." << endl;
-                    exit(3);
                     return Value{numeric_limits<double>::quiet_NaN()};
                 }
             }
@@ -1204,7 +1225,6 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
                 {
                     error = true;
                     cout << "Runtime error: invalid operand type." << endl;
-                    exit(3);
                     return Value{numeric_limits<double>::quiet_NaN()};
                 }
                 if (opToken.text == ">")
@@ -1246,7 +1266,6 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
             {
                 error = true;
                 cout << "Runtime error: invalid operand type." << endl;
-                exit(3);
                 return  Value{numeric_limits<double>::quiet_NaN()};
             }
             Token opToken = node->token;
@@ -1273,7 +1292,6 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
 Value lenCalc(Value array) {
     if (array.index() != 3) {
         cout << "Runtime error: not an array." << endl;
-        exit(3);
     }
     shared_ptr<vector<Value>> arrayPtr = get<shared_ptr<vector<Value>>>(array);
     // printValue(Value{double((*arrayPtr).size())});
@@ -1282,7 +1300,6 @@ Value lenCalc(Value array) {
 Value pushCalc(Value array, Value value) {
     if (array.index() != 3) {
         cout << "Runtime error: not an array." << endl;
-        exit(3);
     }
     shared_ptr<vector<Value>> arrayPtr = get<shared_ptr<vector<Value>>>(array);
     (*arrayPtr).push_back(value);
@@ -1291,11 +1308,9 @@ Value pushCalc(Value array, Value value) {
 Value popCalc(Value array) {
     if (array.index() != 3) {
         cout << "Runtime error: not an array." << endl;
-        exit(3);
     }
     if (int(get<double>(lenCalc(array))) == 0) {
         cout << "Runtime error: underflow." << endl;
-        exit(3);
     }
     shared_ptr<vector<Value>> arrayPtr = get<shared_ptr<vector<Value>>>(array);
     Value back = (*arrayPtr).back();
@@ -1376,10 +1391,10 @@ void printInfixHelperCalc(Node *node)
             {
                 isArrayAssignOrArrayLiteral = true;
             }
-            if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN))
+            if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN && currNode->token.type != NULLVAL))
                 cout << "(";
             printInfixHelperCalc(currNode);
-            if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN))
+            if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN && currNode->token.type != NULLVAL))
                 cout << ")";
             if (i != aLNode->array.size() - 1)
             {
@@ -1398,10 +1413,12 @@ void printInfixHelperCalc(Node *node)
     else if (node->token.type == FLOAT)
     {
         double val = stod(node->token.text);
+        // if (val < 0.00001)
+        //     cout << scientific << setprecision(0) <<stod(node->token.text);
         if (val == static_cast<int>(val))
             cout << static_cast<int>(val);
         else
-            cout << node->token.text;
+            cout << val;
     }
     else if (node->token.type == IDENTIFIER || node->token.type == BOOLEAN || node->token.type == NULLVAL)
     {

@@ -809,7 +809,8 @@ int main(int argc, const char **argv)
     // text = "def reverse(array) {\n  result = [];\n  while len(array) > 0 {\n    push(result, pop(array));\n  }\n\n  return result;\n}\n\nx = [1, 1, 2, 3, 5, 8, 13];\ny = reverse(x);\nprint x;\nprint y;"; // [13, 8, 5, 3, 2, 1, 1]
     // text = "S = [];\nK = [9, 3, 1, 1, 7];\nN = 14;\n\ndef swap(i, j) {\n\n   temp = S[i];\n    S[i] = S[j];\n    S[j] = temp;\n}\n\ndef init() {\n    i = 0;\n    while i < N {\n        push(S, i);\n        i = i + 1;\n    }\n}\n\ninit();\n\ni = 0;\nj = 0;\nwhile i < N {\n    j = (j + S[i] + K[i % len(K)]) % N;\n    swap(i, j);\n    i = i + 1;\n}\n\nprint(S);"; // [9, 13, 2, 7, 6, 4, 11, 5, 8, 12, 1, 10, 3, 0]
     // text = "def fib(n) {\n  if n <= 1 {\n    return 1;\n  }\n  else {\n    return fib(n - 1) + fib(n - 2);\n  }\n}\n\ndef fibvec(n) {\n  vec = [1, 1];\n\n  while len(vec) > n {\n    pop(vec);\n  }\n\n  while len(vec) < n {\n    push(vec, fib(len(vec)));\n  }\n\n\n return vec;\n}\n\nprint fibvec(0);\nprint fibvec(3);\n\ntop10 = fibvec(10);\nprint top10;"; // []  [1, 1, 2]  [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
-    
+    // text = "x = [1, 2];\nprint [1, 2] == x;";
+
     // lex
     tokens = readTokens(text);
 
