@@ -1011,7 +1011,7 @@ Value evaluateArrayAssignCalc(ArrayAssignNode *node, unordered_map<string, Value
         return Value{numeric_limits<double>::quiet_NaN()};
     }
     auto array = *get<shared_ptr<vector<Value>>>(arrayExpression);
-    if (int(get<double>(arrayIndexValue)) >= int(array.size()))
+    if (int(get<double>(arrayIndexValue)) >= int(array.size()) || int(get<double>(arrayIndexValue)) < 0)
     {
         error = true;
         cout << "Runtime error: index out of bounds." << endl;
@@ -1109,6 +1109,9 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
             {
                 // cout << "array assign found" << endl;
                 Value array = evaluateArrayAssignCalc(aANode, variables, error, inFunct, true);
+                if (error) {
+                    return Value{numeric_limits<double>::quiet_NaN()};
+                }
                 Value index = evaluateAllCalc(aANode->arrayIndex, variables, error, inFunct);
                 // printValue(array);
                 // printValue(index);
@@ -1144,6 +1147,10 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
         // Iterate over the rest of the children to apply the operation.
         for (size_t i = 1; i < node->children.size(); i++)
         {
+            if (error)
+            {
+                return Value{numeric_limits<double>::quiet_NaN()};
+            }
             if (holds_alternative<bool>(evaluateExpressionCalc(node->children[i], variables, error, inFunct)))
             {
                 error = true;
@@ -1199,6 +1206,10 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
         Value result = evaluateExpressionCalc(node->children[0], variables, error, inFunct);
         for (size_t i = 1; i < node->children.size(); i++)
         {
+            if (error)
+            {
+                return Value{numeric_limits<double>::quiet_NaN()};
+            }
             Value childrenVal = evaluateExpressionCalc(node->children[i], variables, error, inFunct);
             Token opToken = node->token;
             if (opToken.text == "==" || opToken.text == "!=")
@@ -1261,12 +1272,19 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
         Value result = evaluateExpressionCalc(node->children[0], variables, error, inFunct);
         for (size_t i = 1; i < node->children.size(); i++)
         {
-            Value childrenVal = evaluateExpressionCalc(node->children[i], variables, error, inFunct);
-            if (holds_alternative<double>(childrenVal) || holds_alternative<double>(result))
+            if (error)
             {
-                error = true;
-                cout << "Runtime error: invalid operand type." << endl;
-                return  Value{numeric_limits<double>::quiet_NaN()};
+                return Value{numeric_limits<double>::quiet_NaN()};
+            }
+            Value childrenVal = evaluateExpressionCalc(node->children[i], variables, error, inFunct);
+            if (childrenVal.index() != 1 || result.index() != 1)
+            {
+                if (!error)
+                {
+                    error = true;
+                    cout << "Runtime error: invalid operand type." << endl;
+                    return Value{numeric_limits<double>::quiet_NaN()};
+                }
             }
             Token opToken = node->token;
             bool resultBool = get<bool>(result);
@@ -1413,8 +1431,6 @@ void printInfixHelperCalc(Node *node)
     else if (node->token.type == FLOAT)
     {
         double val = stod(node->token.text);
-        // if (val < 0.00001)
-        //     cout << scientific << setprecision(0) <<stod(node->token.text);
         if (val == static_cast<int>(val))
             cout << static_cast<int>(val);
         else
