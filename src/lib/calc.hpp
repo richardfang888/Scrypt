@@ -81,6 +81,7 @@ Node *makeNodeCalc(const Token &token);
 
 ArrayLiteralNode *makeArrayLiteralNodeCalc(const Token &token);
 ArrayAssignNode *makeArrayAssignNodeCalc(const Token &token);
+FunctCallNode *makeFunctCallNodeCalc(const Token &token);
 
 bool checkIdenCalc(Node *root, unordered_map<string, Value> &variables, bool &error);
 bool checkVarCalc(Node *root, bool &error);

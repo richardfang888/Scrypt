@@ -162,10 +162,52 @@ ArrayAssignNode *makeArrayAssignNodeCalc(const Token &token)
     aANode->token = token;
     return aANode;
 }
+
+FunctCallNode *makeFunctCallNodeCalc(const Token &token)
+{
+    FunctCallNode *fcNode = new FunctCallNode();
+    fcNode->functname = token;
+    return fcNode;
+}
+
 // Recursively creates an AST from a list of tokens
 Node *makeTreeCalc(const vector<Token> &tokens, int &index, bool &error)
 {
     return parseAssignmentCalc(tokens, index, error);
+}
+
+// Parses a function call from the given tokens
+FunctCallNode *parseFunctCallCalc(const vector<Token> &tokens, int &index, bool &error)
+{
+    if (error)
+    {
+        return nullptr;
+    }
+    // make a new function call node
+    FunctCallNode *FNode = makeFunctCallNodeCalc(tokens[index - 1]);
+    FNode->functname = tokens[index - 1];
+    // cout << "make funct call node for " << FNode->functname.text << endl;
+    index++;
+    if (matchCalc(tokens, index, ","))
+    {
+        error = true;
+        printErrorCalc(tokens[index], error);
+    }
+    while (!matchCalc(tokens, index, ")"))
+    {
+        Node *node = parseExpressionCalc(tokens, index, error);
+        if (node != nullptr)
+        {
+            FNode->arguments.push_back(node);
+        }
+        index++;
+        if(matchCalc(tokens, index, ")")){
+            break;
+        }
+        index++;
+    }
+    index++;
+    return FNode;
 }
 
 Node *parseExpressionCalc(const vector<Token> &tokens, int &index, bool &error)
@@ -442,9 +484,22 @@ Node *parsePrimaryCalc(const vector<Token> &tokens, int &index, bool &error)
         return nullptr;
     }
     Token token = tokens[index++];
-    if (token.type == FLOAT || token.type == BOOLEAN || token.type == NULLVAL)
+    if (token.type == FLOAT || token.type == NULLVAL)
     {
         return makeNodeCalc(token);
+    }
+    else if (token.type == BOOLEAN) {
+        // cout << "normal identifier" << endl;
+        if (matchCalc(tokens, index, "["))
+        {
+            Node *identifier = makeNodeCalc(token);
+            ArrayAssignNode *arrayAssign = parseArrayAssignCalc(tokens, index, error);
+            arrayAssign->expression = identifier;
+            return arrayAssign;
+        }
+        else {
+            return makeNodeCalc(token);
+        }
     }
     else if (token.type == LEFT_BRACKET)
     {
@@ -473,6 +528,11 @@ Node *parsePrimaryCalc(const vector<Token> &tokens, int &index, bool &error)
             ArrayAssignNode *arrayAssign = parseArrayAssignCalc(tokens, index, error);
             arrayAssign->expression = identifier;
             return arrayAssign;
+        }
+        else if (matchCalc(tokens, index, "("))
+        {
+            // cout << "Parsing function call: " << token.text << endl;
+            return parseFunctCallCalc(tokens, index, error);
         }
         else
         {
@@ -1425,7 +1485,7 @@ void printInfixHelperCalc(Node *node)
     {
         printInfixHelperCalc(aANode->expression);
         cout << "[";
-        printInfixHelperCalc(aANode->arrayIndex);
+        printInfixCalc(aANode->arrayIndex);
         cout << "]";
     }
     else if (node->token.type == FLOAT)
