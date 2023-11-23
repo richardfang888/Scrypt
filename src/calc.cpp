@@ -231,7 +231,7 @@ Node *parseExpressionCalc(const vector<Token> &tokens, int &index, bool &error)
     vector<Token> tokensExpression;
     // checks if the current expression is preceded by a "while" or "if" token
 
-     bool braceCheck = false;
+    bool braceCheck = false;
     bool bracketCheck = false;
     bool commaCheck = false;
     bool parenCheck = false;
@@ -401,6 +401,13 @@ Node *parseEqualityCalc(const vector<Token> &tokens, int &index, bool &error)
         return nullptr;
     }
     Node *left = parseComparisonCalc(tokens, index, error);
+    bool isArray = false;
+    if (matchCalc(tokens, index, "]")) {
+        isArray = true;
+    }
+    if (isArray) {
+        index ++;
+    }
     while (matchCalc(tokens, index, "==") || matchCalc(tokens, index, "!="))
     {
         Token opToken = tokens[index++];
@@ -409,6 +416,9 @@ Node *parseEqualityCalc(const vector<Token> &tokens, int &index, bool &error)
         opNode->children.push_back(left);
         opNode->children.push_back(right);
         left = opNode;
+    }
+    if (isArray) {
+        index --;
     }
     return left;
 }
@@ -1317,6 +1327,23 @@ Value evaluateExpressionCalc(Node *node, unordered_map<string, Value> &variables
                 {
                     equality = false;
                 }
+                if (result.index() == 3 && childrenVal.index() == 3)
+                {
+                    equality = true;
+                    if (get<shared_ptr<vector<Value>>>(result)->size() != get<shared_ptr<vector<Value>>>(childrenVal)->size())
+                    {
+                        equality = false;
+                    }
+                    else {
+                        for (size_t j = 0; j < get<shared_ptr<vector<Value>>>(result)->size(); j++)
+                        {
+                            if (get<shared_ptr<vector<Value>>>(result)->at(j) != get<shared_ptr<vector<Value>>>(childrenVal)->at(j))
+                            {
+                                equality = false;
+                            }
+                        }
+                    }
+                }
                 if (opToken.text == "==")
                 {
                     result = Value{equality};
@@ -1509,10 +1536,10 @@ void printInfixHelperCalc(Node *node)
             {
                 isArrayAssignOrArrayLiteral = true;
             }   
-            else if(dynamic_cast<ArrayAssignNode*>(node))
-            {
-                isArrayAssignOrArrayLiteral = true;
-            }
+            // else if(dynamic_cast<ArrayAssignNode*>(node))
+            // {
+            //     isArrayAssignOrArrayLiteral = true;
+            // }
             if (!isArrayAssignOrArrayLiteral && currNode && (currNode->token.type != FLOAT && currNode->token.type != IDENTIFIER && currNode->token.type != BOOLEAN && currNode->token.type != NULLVAL))
                 cout << "(";
             printInfixHelperCalc(currNode);
